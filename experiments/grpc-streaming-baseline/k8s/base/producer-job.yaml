@@ -1,0 +1,111 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: grpc-stream-producer
+  namespace: streaming-experiments
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: grpc-stream-producer
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: producer
+          image: grpc-streaming-baseline-producer:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: RUN_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RUN_ID
+            - name: TRANSPORT_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: TRANSPORT_MODE
+            - name: WORKLOAD_SOURCE
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: WORKLOAD_SOURCE
+            - name: PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: PROFILE
+            - name: TOTAL_MESSAGES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: TOTAL_MESSAGES
+            - name: PAYLOAD_BYTES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: PAYLOAD_BYTES
+            - name: DATASET_DIR
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: DATASET_DIR
+            - name: DATASET_FILES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: DATASET_FILES
+            - name: DATASET_ROWS_PER_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: DATASET_ROWS_PER_MESSAGE
+            - name: DATASET_REPEAT_COUNT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: DATASET_REPEAT_COUNT
+            - name: CONCURRENCY
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: CONCURRENCY
+            - name: TARGET_MESSAGES_PER_SECOND
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: TARGET_MESSAGES_PER_SECOND
+            - name: TRANSFORMER_WORK_ITERATIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: TRANSFORMER_WORK_ITERATIONS
+            - name: SINK_PROCESS_DELAY_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: SINK_PROCESS_DELAY_MS
+            - name: SUMMARY_POLL_MILLISECONDS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: SUMMARY_POLL_MILLISECONDS
+            - name: MAX_SUMMARY_WAIT_SECONDS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: MAX_SUMMARY_WAIT_SECONDS
+            - name: TRANSFORMER_ADDR
+              value: grpc-stream-transformer:50051
+            - name: SINK_ADMIN_ADDR
+              value: grpc-stream-sink:50052
+            - name: RESULT_DIR
+              value: /results
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

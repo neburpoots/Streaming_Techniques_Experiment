@@ -1,0 +1,69 @@
+services:
+  sink:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: sink
+    environment:
+      LISTEN_ADDR: ":50052"
+      METRICS_ADDR: ":9102"
+      RESULT_DIR: /results
+      SINK_PROCESS_DELAY_MS: ${SINK_PROCESS_DELAY_MS:-0}
+    ports:
+      - "50052:50052"
+      - "9102:9102"
+    volumes:
+      - ./results:/results
+
+  transformer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: transformer
+    depends_on:
+      - sink
+    environment:
+      LISTEN_ADDR: ":50051"
+      METRICS_ADDR: ":9101"
+      SINK_ADDR: sink:50052
+      TRANSFORMER_WORK_ITERATIONS: ${TRANSFORMER_WORK_ITERATIONS:-0}
+    ports:
+      - "50051:50051"
+      - "9101:9101"
+
+  producer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: producer
+    depends_on:
+      - sink
+      - transformer
+    environment:
+      RUN_ID: ${RUN_ID:-grpc-stream-local}
+      TRANSPORT_MODE: ${TRANSPORT_MODE:-client-streaming}
+      WORKLOAD_SOURCE: ${WORKLOAD_SOURCE:-synthetic}
+      PROFILE: bulk
+      TRANSFORMER_ADDR: transformer:50051
+      SINK_ADMIN_ADDR: sink:50052
+      RESULT_DIR: /results
+      TOTAL_MESSAGES: ${TOTAL_MESSAGES:-50000}
+      PAYLOAD_BYTES: ${PAYLOAD_BYTES:-1024}
+      DATASET_DIR: /datasets
+      DATASET_FILES: ${DATASET_FILES:-}
+      DATASET_ROWS_PER_MESSAGE: ${DATASET_ROWS_PER_MESSAGE:-1}
+      DATASET_REPEAT_COUNT: ${DATASET_REPEAT_COUNT:-1}
+      CONCURRENCY: ${CONCURRENCY:-1}
+      TARGET_MESSAGES_PER_SECOND: ${TARGET_MESSAGES_PER_SECOND:-0}
+      TRANSFORMER_WORK_ITERATIONS: ${TRANSFORMER_WORK_ITERATIONS:-0}
+      SINK_PROCESS_DELAY_MS: ${SINK_PROCESS_DELAY_MS:-0}
+      SUMMARY_POLL_MILLISECONDS: ${SUMMARY_POLL_MILLISECONDS:-250}
+      MAX_SUMMARY_WAIT_SECONDS: ${MAX_SUMMARY_WAIT_SECONDS:-30}
+    volumes:
+      - ./results:/results
+      - ../../datasets:/datasets:ro
+    profiles:
+      - manual

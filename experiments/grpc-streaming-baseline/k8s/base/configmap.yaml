@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grpc-streaming-baseline-config
+  namespace: streaming-experiments
+data:
+  RUN_ID: grpc-stream-k8s
+  TRANSPORT_MODE: client-streaming
+  WORKLOAD_SOURCE: synthetic
+  PROFILE: bulk
+  TOTAL_MESSAGES: "50000"
+  PAYLOAD_BYTES: "1024"
+  DATASET_DIR: /datasets
+  DATASET_FILES: ""
+  DATASET_ROWS_PER_MESSAGE: "1"
+  DATASET_REPEAT_COUNT: "1"
+  CONCURRENCY: "1"
+  TARGET_MESSAGES_PER_SECOND: "0"
+  TRANSFORMER_WORK_ITERATIONS: "0"
+  SINK_PROCESS_DELAY_MS: "0"
+  SUMMARY_POLL_MILLISECONDS: "250"
+  MAX_SUMMARY_WAIT_SECONDS: "60"

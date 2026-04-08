@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gRPC Benchmark Plots</title>
+  <style>
+    :root {
+      --bg: #f7f5ef;
+      --panel: #fffdf7;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --grid: #e5dcc8;
+      --stream: #0f766e;
+      --unary: #c2410c;
+      --accent: #8b5cf6;
+      --border: #d6c7aa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background: linear-gradient(180deg, #f3efe5 0%, var(--bg) 100%);
+      color: var(--ink);
+    }
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+    h1, h2 {
+      margin: 0 0 12px;
+      font-weight: 600;
+    }
+    p {
+      margin: 0 0 16px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 24px 0 32px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 10px 30px rgba(84, 69, 46, 0.08);
+    }
+    .card .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .card .value {
+      font-size: 28px;
+      line-height: 1.1;
+    }
+    .section {
+      margin-top: 30px;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
+      gap: 20px;
+    }
+    .chart-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(84, 69, 46, 0.08);
+    }
+    .chart-card h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+    .chart-card .caption {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: var(--panel);
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--grid);
+      text-align: left;
+      white-space: nowrap;
+    }
+    th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .footnote {
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>gRPC Baseline Benchmark Report</h1>
+    <p>This report summarizes the first controlled benchmark matrix for unary gRPC versus client-streaming gRPC, plus a smaller CSV replay realism check based on the copied DYNAMOS datasets.</p>
+
+    <div class="summary" id="summary-cards"></div>
+
+    <div class="section">
+      <h2>Interpretation</h2>
+      <p id="interpretation"></p>
+    </div>
+
+    <div class="section">
+      <h2>Synthetic Workload</h2>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Throughput by Payload Size</h3>
+          <div class="caption">Messages per second across payload sizes and concurrency levels.</div>
+          <div class="legend" id="legend-synthetic-throughput"></div>
+          <svg id="chart-synthetic-throughput" viewBox="0 0 620 360"></svg>
+        </div>
+        <div class="chart-card">
+          <h3>P95 Latency by Payload Size</h3>
+          <div class="caption">P95 latency in milliseconds for the same synthetic matrix.</div>
+          <div class="legend" id="legend-synthetic-p95"></div>
+          <svg id="chart-synthetic-p95" viewBox="0 0 620 360"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>CSV Replay Realism Check</h2>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Throughput by Replay Batch Size</h3>
+          <div class="caption">Rows-per-message on the x-axis, with separate series for transport mode and concurrency.</div>
+          <div class="legend" id="legend-csv-throughput"></div>
+          <svg id="chart-csv-throughput" viewBox="0 0 620 360"></svg>
+        </div>
+        <div class="chart-card">
+          <h3>P95 Latency by Replay Batch Size</h3>
+          <div class="caption">P95 latency in milliseconds for the realism-check runs.</div>
+          <div class="legend" id="legend-csv-p95"></div>
+          <svg id="chart-csv-p95" viewBox="0 0 620 360"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Aggregate Comparison</h2>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Average Throughput by Workload and Transport</h3>
+          <div class="caption">Simple averages across each completed matrix.</div>
+          <svg id="chart-aggregate-throughput" viewBox="0 0 620 320"></svg>
+        </div>
+        <div class="chart-card">
+          <h3>Average P95 Latency by Workload and Transport</h3>
+          <div class="caption">Lower is better here.</div>
+          <svg id="chart-aggregate-p95" viewBox="0 0 620 320"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Selected Highlights</h2>
+      <div class="table-wrap">
+        <table id="highlights-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Run</th>
+              <th>Transport</th>
+              <th>Workload</th>
+              <th>Payload</th>
+              <th>Concurrency</th>
+              <th>Throughput</th>
+              <th>P95</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="footnote">Notes: throughput is in messages per second. Latency values are P95 in milliseconds. The CSV replay runs batch rows from Personen.csv and Aanstellingen.csv into larger messages.</div>
+    </div>
+  </div>
+
+  <script id="benchmark-data" type="application/json">[
+    {"run_id":"synthetic-clean-stream-p256-c1","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":256,"concurrency":1,"throughput_messages_per_second":116112.40728358965,"throughput_megabytes_per_second":28.34775568447013,"duration_seconds":0.172246881,"p50_latency_ms":4.24308,"p95_latency_ms":16.532958,"p99_latency_ms":17.514217,"max_latency_ms":17.719285},
+    {"run_id":"synthetic-clean-stream-p256-c4","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":256,"concurrency":4,"throughput_messages_per_second":136462.62324911804,"throughput_megabytes_per_second":33.31607012917921,"duration_seconds":0.146560278,"p50_latency_ms":26.648425,"p95_latency_ms":40.264069,"p99_latency_ms":42.64679,"max_latency_ms":43.220229},
+    {"run_id":"synthetic-clean-stream-p256-c8","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":256,"concurrency":8,"throughput_messages_per_second":149345.76845939833,"throughput_megabytes_per_second":36.461369252782795,"duration_seconds":0.13391742,"p50_latency_ms":12.510511,"p95_latency_ms":25.081328,"p99_latency_ms":28.678253,"max_latency_ms":30.404627},
+    {"run_id":"synthetic-clean-stream-p256-c16","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":256,"concurrency":16,"throughput_messages_per_second":141387.25370013446,"throughput_megabytes_per_second":34.51837248538439,"duration_seconds":0.141455467,"p50_latency_ms":27.929687,"p95_latency_ms":36.617888,"p99_latency_ms":38.922138,"max_latency_ms":41.287284},
+    {"run_id":"synthetic-clean-stream-p1024-c1","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":1024,"concurrency":1,"throughput_messages_per_second":112704.60774868747,"throughput_megabytes_per_second":110.06309350457761,"duration_seconds":0.177455034,"p50_latency_ms":1.701162,"p95_latency_ms":4.633493,"p99_latency_ms":7.686174,"max_latency_ms":8.612852},
+    {"run_id":"synthetic-clean-stream-p1024-c4","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":1024,"concurrency":4,"throughput_messages_per_second":102851.1723172038,"throughput_megabytes_per_second":100.44059796601934,"duration_seconds":0.194455732,"p50_latency_ms":14.312836,"p95_latency_ms":22.458908,"p99_latency_ms":26.807133,"max_latency_ms":27.290975},
+    {"run_id":"synthetic-clean-stream-p1024-c8","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":1024,"concurrency":8,"throughput_messages_per_second":81292.7997191041,"throughput_megabytes_per_second":79.3874997256876,"duration_seconds":0.246024249,"p50_latency_ms":44.952047,"p95_latency_ms":61.100249,"p99_latency_ms":64.872326,"max_latency_ms":71.770622},
+    {"run_id":"synthetic-clean-stream-p1024-c16","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":1024,"concurrency":16,"throughput_messages_per_second":107717.87767925128,"throughput_megabytes_per_second":105.19323992114383,"duration_seconds":0.185670201,"p50_latency_ms":27.526236,"p95_latency_ms":42.00003,"p99_latency_ms":47.099356,"max_latency_ms":49.90437},
+    {"run_id":"synthetic-clean-stream-p4096-c1","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":4096,"concurrency":1,"throughput_messages_per_second":25656.406854291763,"throughput_megabytes_per_second":100.2203392745772,"duration_seconds":0.779532384,"p50_latency_ms":13.417922,"p95_latency_ms":29.833108,"p99_latency_ms":35.002999,"max_latency_ms":45.830559},
+    {"run_id":"synthetic-clean-stream-p4096-c4","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":4096,"concurrency":4,"throughput_messages_per_second":51873.37032836629,"throughput_megabytes_per_second":202.63035284518082,"duration_seconds":0.385554281,"p50_latency_ms":19.237603,"p95_latency_ms":39.994441,"p99_latency_ms":46.749984,"max_latency_ms":53.402424},
+    {"run_id":"synthetic-clean-stream-p4096-c8","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":4096,"concurrency":8,"throughput_messages_per_second":34212.23803058552,"throughput_megabytes_per_second":133.64155480697468,"duration_seconds":0.584586135,"p50_latency_ms":99.975236,"p95_latency_ms":161.404469,"p99_latency_ms":184.328546,"max_latency_ms":207.746646},
+    {"run_id":"synthetic-clean-stream-p4096-c16","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":4096,"concurrency":16,"throughput_messages_per_second":23939.669743613667,"throughput_megabytes_per_second":93.51433493599089,"duration_seconds":0.835433413,"p50_latency_ms":50.65205,"p95_latency_ms":89.54871,"p99_latency_ms":111.190464,"max_latency_ms":147.731645},
+    {"run_id":"synthetic-clean-stream-p16384-c1","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":16384,"concurrency":1,"throughput_messages_per_second":12022.51936178052,"throughput_megabytes_per_second":187.85186502782062,"duration_seconds":1.663544836,"p50_latency_ms":2.345678,"p95_latency_ms":7.764017,"p99_latency_ms":12.944878,"max_latency_ms":22.895585},
+    {"run_id":"synthetic-clean-stream-p16384-c4","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":16384,"concurrency":4,"throughput_messages_per_second":22783.93295093175,"throughput_megabytes_per_second":355.9989523583086,"duration_seconds":0.877811572,"p50_latency_ms":9.356041,"p95_latency_ms":23.772845,"p99_latency_ms":30.64335,"max_latency_ms":36.707002},
+    {"run_id":"synthetic-clean-stream-p16384-c8","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":16384,"concurrency":8,"throughput_messages_per_second":31980.49675801312,"throughput_megabytes_per_second":499.695261843955,"duration_seconds":0.625381155,"p50_latency_ms":27.672054,"p95_latency_ms":48.555052,"p99_latency_ms":55.554024,"max_latency_ms":60.415229},
+    {"run_id":"synthetic-clean-stream-p16384-c16","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":16384,"concurrency":16,"throughput_messages_per_second":19059.46343318244,"throughput_megabytes_per_second":297.80411614347565,"duration_seconds":1.049347484,"p50_latency_ms":14.338053,"p95_latency_ms":35.555516,"p99_latency_ms":43.336308,"max_latency_ms":55.255513},
+    {"run_id":"synthetic-clean-unary-p256-c1","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":256,"concurrency":1,"throughput_messages_per_second":1560.9383879695574,"throughput_megabytes_per_second":0.38108847362538023,"duration_seconds":12.812805524,"p50_latency_ms":0.279741,"p95_latency_ms":0.640832,"p99_latency_ms":1.40983,"max_latency_ms":22.11841},
+    {"run_id":"synthetic-clean-unary-p256-c4","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":256,"concurrency":4,"throughput_messages_per_second":3654.254864859941,"throughput_megabytes_per_second":0.8921520666161965,"duration_seconds":5.473072005,"p50_latency_ms":0.388206,"p95_latency_ms":1.323185,"p99_latency_ms":3.513062,"max_latency_ms":72.389463},
+    {"run_id":"synthetic-clean-unary-p256-c8","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":256,"concurrency":8,"throughput_messages_per_second":6337.787075353669,"throughput_megabytes_per_second":1.5473112976937669,"duration_seconds":3.155675595,"p50_latency_ms":0.484476,"p95_latency_ms":1.812689,"p99_latency_ms":3.59879,"max_latency_ms":24.527612},
+    {"run_id":"synthetic-clean-unary-p256-c16","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":256,"concurrency":16,"throughput_messages_per_second":14241.465776888654,"throughput_megabytes_per_second":3.4769203556857065,"duration_seconds":1.4043498269999999,"p50_latency_ms":0.482112,"p95_latency_ms":1.305307,"p99_latency_ms":2.261713,"max_latency_ms":20.316701},
+    {"run_id":"synthetic-clean-unary-p1024-c1","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":1024,"concurrency":1,"throughput_messages_per_second":1321.0190870226177,"throughput_megabytes_per_second":1.290057702170525,"duration_seconds":15.139826666,"p50_latency_ms":0.289129,"p95_latency_ms":0.71931,"p99_latency_ms":1.798326,"max_latency_ms":909.914187},
+    {"run_id":"synthetic-clean-unary-p1024-c4","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":1024,"concurrency":4,"throughput_messages_per_second":4995.4191357121035,"throughput_megabytes_per_second":4.878338999718851,"duration_seconds":4.003668052,"p50_latency_ms":0.347324,"p95_latency_ms":0.949995,"p99_latency_ms":1.806472,"max_latency_ms":20.99841},
+    {"run_id":"synthetic-clean-unary-p1024-c8","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":1024,"concurrency":8,"throughput_messages_per_second":4318.781620535921,"throughput_megabytes_per_second":4.217560176304611,"duration_seconds":4.6309357030000005,"p50_latency_ms":0.485942,"p95_latency_ms":2.004775,"p99_latency_ms":3.481847,"max_latency_ms":24.298252},
+    {"run_id":"synthetic-clean-unary-p1024-c16","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":1024,"concurrency":16,"throughput_messages_per_second":9650.015551965063,"throughput_megabytes_per_second":9.423843312465882,"duration_seconds":2.07253552,"p50_latency_ms":0.572846,"p95_latency_ms":1.88355,"p99_latency_ms":3.335285,"max_latency_ms":101.431978},
+    {"run_id":"synthetic-clean-unary-p4096-c1","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":4096,"concurrency":1,"throughput_messages_per_second":1623.750896113006,"throughput_megabytes_per_second":6.34277693794143,"duration_seconds":12.317160254,"p50_latency_ms":0.280505,"p95_latency_ms":0.604483,"p99_latency_ms":1.134317,"max_latency_ms":22.037488},
+    {"run_id":"synthetic-clean-unary-p4096-c4","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":4096,"concurrency":4,"throughput_messages_per_second":5141.482590402921,"throughput_megabytes_per_second":20.08391636876141,"duration_seconds":3.889928566,"p50_latency_ms":0.352276,"p95_latency_ms":0.827361,"p99_latency_ms":1.592343,"max_latency_ms":20.037544},
+    {"run_id":"synthetic-clean-unary-p4096-c8","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":4096,"concurrency":8,"throughput_messages_per_second":8181.163477889056,"throughput_megabytes_per_second":31.957669835504124,"duration_seconds":2.444640063,"p50_latency_ms":0.434692,"p95_latency_ms":1.107943,"p99_latency_ms":1.797874,"max_latency_ms":23.353291},
+    {"run_id":"synthetic-clean-unary-p4096-c16","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":4096,"concurrency":16,"throughput_messages_per_second":7646.522380852193,"throughput_megabytes_per_second":29.86922805020388,"duration_seconds":2.615568098,"p50_latency_ms":0.762329,"p95_latency_ms":3.167177,"p99_latency_ms":5.404812,"max_latency_ms":30.17708},
+    {"run_id":"synthetic-clean-unary-p16384-c1","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":16384,"concurrency":1,"throughput_messages_per_second":1185.960092282553,"throughput_megabytes_per_second":18.53062644191489,"duration_seconds":16.863973864,"p50_latency_ms":0.341745,"p95_latency_ms":0.958058,"p99_latency_ms":2.080948,"max_latency_ms":904.001355},
+    {"run_id":"synthetic-clean-unary-p16384-c4","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":16384,"concurrency":4,"throughput_messages_per_second":4082.0052451710067,"throughput_megabytes_per_second":63.78133195579698,"duration_seconds":4.899552744,"p50_latency_ms":0.434833,"p95_latency_ms":1.249785,"p99_latency_ms":2.723382,"max_latency_ms":19.380014},
+    {"run_id":"synthetic-clean-unary-p16384-c8","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":16384,"concurrency":8,"throughput_messages_per_second":4530.340552007794,"throughput_megabytes_per_second":70.78657112512178,"duration_seconds":4.414679155,"p50_latency_ms":0.547939,"p95_latency_ms":1.709074,"p99_latency_ms":2.984765,"max_latency_ms":903.231561},
+    {"run_id":"synthetic-clean-unary-p16384-c16","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"bulk","expected_messages":20000,"payload_bytes":16384,"concurrency":16,"throughput_messages_per_second":8253.523926948737,"throughput_megabytes_per_second":128.96131135857402,"duration_seconds":2.423207369,"p50_latency_ms":0.868641,"p95_latency_ms":2.765368,"p99_latency_ms":4.911855,"max_latency_ms":24.062885},
+    {"run_id":"csv-replay-check-stream-r25-c1","transport_mode":"client-streaming","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=25:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":1283,"concurrency":1,"throughput_messages_per_second":82577.83014166441,"throughput_megabytes_per_second":100.43706098789706,"duration_seconds":0.121097878,"p50_latency_ms":1.442277,"p95_latency_ms":3.168467,"p99_latency_ms":3.962428,"max_latency_ms":4.324627},
+    {"run_id":"csv-replay-check-stream-r25-c8","transport_mode":"client-streaming","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=25:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":1283,"concurrency":8,"throughput_messages_per_second":69124.87295626006,"throughput_megabytes_per_second":84.0746126288151,"duration_seconds":0.144665727,"p50_latency_ms":15.788064,"p95_latency_ms":23.917143,"p99_latency_ms":26.217301,"max_latency_ms":28.954973},
+    {"run_id":"csv-replay-check-stream-r100-c1","transport_mode":"client-streaming","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=100:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":5134,"concurrency":1,"throughput_messages_per_second":23909.8372470529,"throughput_megabytes_per_second":116.82630740227354,"duration_seconds":0.418237895,"p50_latency_ms":1.768319,"p95_latency_ms":5.175195,"p99_latency_ms":8.919549,"max_latency_ms":15.272283},
+    {"run_id":"csv-replay-check-stream-r100-c8","transport_mode":"client-streaming","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=100:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":5134,"concurrency":8,"throughput_messages_per_second":43643.83533400894,"throughput_megabytes_per_second":213.2489682075775,"duration_seconds":0.229127434,"p50_latency_ms":31.260513,"p95_latency_ms":44.704526,"p99_latency_ms":52.429013,"max_latency_ms":58.17593},
+    {"run_id":"csv-replay-check-unary-r25-c1","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=25:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":1283,"concurrency":1,"throughput_messages_per_second":1270.9414752174634,"throughput_megabytes_per_second":1.5458098891612673,"duration_seconds":7.868182914,"p50_latency_ms":0.289443,"p95_latency_ms":0.700484,"p99_latency_ms":1.44798,"max_latency_ms":898.914053},
+    {"run_id":"csv-replay-check-unary-r25-c8","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=25:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":1283,"concurrency":8,"throughput_messages_per_second":7952.001976893137,"throughput_megabytes_per_second":9.671793339192192,"duration_seconds":1.257544959,"p50_latency_ms":0.397148,"p95_latency_ms":1.217122,"p99_latency_ms":2.822672,"max_latency_ms":21.560381},
+    {"run_id":"csv-replay-check-unary-r100-c1","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=100:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":5134,"concurrency":1,"throughput_messages_per_second":1596.3859041491783,"throughput_megabytes_per_second":7.8001313201651366,"duration_seconds":6.264149523,"p50_latency_ms":0.297096,"p95_latency_ms":0.610427,"p99_latency_ms":1.192299,"max_latency_ms":20.334031},
+    {"run_id":"csv-replay-check-unary-r100-c8","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=100:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":5134,"concurrency":8,"throughput_messages_per_second":6681.2571782759,"throughput_megabytes_per_second":32.6454169000718,"duration_seconds":1.496724304,"p50_latency_ms":0.479382,"p95_latency_ms":1.704639,"p99_latency_ms":3.232955,"max_latency_ms":23.436942}
+  ]</script>
+  <script>
+    const rows = JSON.parse(document.getElementById('benchmark-data').textContent);
+    const colors = { 'client-streaming': '#0f766e', 'unary': '#c2410c' };
+    const dashByConcurrency = { 1: '', 4: '6 4', 8: '2 4', 16: '10 4' };
+
+    function fmt(value, digits = 2) {
+      return Number(value).toFixed(digits);
+    }
+
+    function createSummary() {
+      const synthetic = rows.filter(r => r.workload_source === 'synthetic');
+      const csvReplay = rows.filter(r => r.workload_source === 'csv-replay');
+      const bestSynthetic = synthetic.reduce((best, row) => row.throughput_messages_per_second > best.throughput_messages_per_second ? row : best, synthetic[0]);
+      const bestCSV = csvReplay.reduce((best, row) => row.throughput_messages_per_second > best.throughput_messages_per_second ? row : best, csvReplay[0]);
+      const fastestP95 = rows.reduce((best, row) => row.p95_latency_ms < best.p95_latency_ms ? row : best, rows[0]);
+      const avg = (items, field) => items.reduce((sum, item) => sum + item[field], 0) / items.length;
+
+      const cards = [
+        { label: 'Synthetic Avg Throughput', value: `${fmt(avg(synthetic, 'throughput_messages_per_second'), 0)} msg/s` },
+        { label: 'Synthetic Avg P95', value: `${fmt(avg(synthetic, 'p95_latency_ms'))} ms` },
+        { label: 'CSV Replay Avg Throughput', value: `${fmt(avg(csvReplay, 'throughput_messages_per_second'), 0)} msg/s` },
+        { label: 'CSV Replay Avg P95', value: `${fmt(avg(csvReplay, 'p95_latency_ms'))} ms` },
+        { label: 'Best Synthetic Run', value: `${bestSynthetic.run_id}` },
+        { label: 'Best CSV Replay Run', value: `${bestCSV.run_id}` },
+        { label: 'Lowest P95 Overall', value: `${fastestP95.run_id}` }
+      ];
+
+      document.getElementById('summary-cards').innerHTML = cards.map(card => `
+        <div class="card">
+          <div class="label">${card.label}</div>
+          <div class="value">${card.value}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('interpretation').textContent =
+        `Across both datasets, client-streaming wins clearly on total throughput, while unary consistently wins on P95 latency. In the synthetic matrix, the fastest run is ${bestSynthetic.run_id} at about ${fmt(bestSynthetic.throughput_messages_per_second, 0)} messages per second. In the CSV replay realism check, the fastest run is ${bestCSV.run_id} at about ${fmt(bestCSV.throughput_messages_per_second, 0)} messages per second. The lowest P95 latency overall comes from ${fastestP95.run_id} at about ${fmt(fastestP95.p95_latency_ms)} ms. The pattern is stable: streaming is better for moving lots of data, unary is better for keeping single-message response times low.`;
+    }
+
+    function renderLegend(elId, series) {
+      document.getElementById(elId).innerHTML = series.map(item => `
+        <span><i class="swatch" style="background:${item.color}"></i>${item.label}</span>
+      `).join('');
+    }
+
+    function drawLineChart(svgId, legendId, data, options) {
+      const svg = document.getElementById(svgId);
+      const width = 620;
+      const height = 360;
+      const margin = { top: 20, right: 24, bottom: 54, left: 72 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const xValues = [...new Set(data.map(d => d.x))].sort((a, b) => a - b);
+      const yMax = Math.max(...data.map(d => d.y)) * 1.08;
+      const xPos = value => margin.left + (xValues.indexOf(value) * (plotWidth / Math.max(1, xValues.length - 1)));
+      const yPos = value => margin.top + plotHeight - (value / yMax) * plotHeight;
+
+      const grouped = {};
+      data.forEach(point => {
+        grouped[point.series] = grouped[point.series] || [];
+        grouped[point.series].push(point);
+      });
+
+      const gridLines = 5;
+      const yTicks = Array.from({ length: gridLines + 1 }, (_, i) => (yMax / gridLines) * i);
+      const lineSeries = Object.entries(grouped).map(([series, points]) => {
+        points.sort((a, b) => a.x - b.x);
+        const path = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${xPos(point.x)} ${yPos(point.y)}`).join(' ');
+        return { series, color: points[0].color, path, points };
+      });
+
+      renderLegend(legendId, lineSeries.map(item => ({ label: item.series, color: item.color })));
+
+      svg.innerHTML = `
+        <rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>
+        ${yTicks.map(tick => `
+          <g>
+            <line x1="${margin.left}" y1="${yPos(tick)}" x2="${margin.left + plotWidth}" y2="${yPos(tick)}" stroke="var(--grid)" stroke-width="1"></line>
+            <text x="${margin.left - 10}" y="${yPos(tick) + 4}" text-anchor="end" font-size="12" fill="var(--muted)">${fmt(tick, 0)}</text>
+          </g>
+        `).join('')}
+        ${xValues.map(value => `
+          <text x="${xPos(value)}" y="${height - 18}" text-anchor="middle" font-size="12" fill="var(--muted)">${value}</text>
+        `).join('')}
+        <text x="${margin.left + plotWidth / 2}" y="${height - 2}" text-anchor="middle" font-size="13" fill="var(--muted)">${options.xLabel}</text>
+        <text x="18" y="${margin.top + plotHeight / 2}" text-anchor="middle" font-size="13" fill="var(--muted)" transform="rotate(-90, 18, ${margin.top + plotHeight / 2})">${options.yLabel}</text>
+        ${lineSeries.map(line => `
+          <g>
+            <path d="${line.path}" fill="none" stroke="${line.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+            ${line.points.map(point => `<circle cx="${xPos(point.x)}" cy="${yPos(point.y)}" r="4" fill="${line.color}"></circle>`).join('')}
+          </g>
+        `).join('')}
+      `;
+    }
+
+    function drawBarChart(svgId, series) {
+      const svg = document.getElementById(svgId);
+      const width = 620;
+      const height = 320;
+      const margin = { top: 16, right: 20, bottom: 62, left: 72 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const maxY = Math.max(...series.map(item => item.value)) * 1.1;
+      const barWidth = plotWidth / series.length * 0.64;
+      const gap = plotWidth / series.length;
+      const yPos = value => margin.top + plotHeight - (value / maxY) * plotHeight;
+
+      const ticks = 5;
+      const yTicks = Array.from({ length: ticks + 1 }, (_, i) => (maxY / ticks) * i);
+
+      svg.innerHTML = `
+        ${yTicks.map(tick => `
+          <g>
+            <line x1="${margin.left}" y1="${yPos(tick)}" x2="${margin.left + plotWidth}" y2="${yPos(tick)}" stroke="var(--grid)"></line>
+            <text x="${margin.left - 10}" y="${yPos(tick) + 4}" text-anchor="end" font-size="12" fill="var(--muted)">${fmt(tick, 0)}</text>
+          </g>
+        `).join('')}
+        ${series.map((item, index) => {
+          const x = margin.left + (index * gap) + (gap - barWidth) / 2;
+          const y = yPos(item.value);
+          return `
+            <g>
+              <rect x="${x}" y="${y}" width="${barWidth}" height="${margin.top + plotHeight - y}" rx="8" fill="${item.color}"></rect>
+              <text x="${x + barWidth / 2}" y="${y - 8}" text-anchor="middle" font-size="12" fill="var(--ink)">${fmt(item.value, 1)}</text>
+              <text x="${x + barWidth / 2}" y="${height - 30}" text-anchor="middle" font-size="12" fill="var(--muted)">${item.label}</text>
+            </g>
+          `;
+        }).join('')}
+      `;
+    }
+
+    function workloadDescriptorToRows(descriptor) {
+      const match = descriptor.match(/rows-per-message=(\d+)/);
+      return match ? Number(match[1]) : null;
+    }
+
+    function buildHighlights() {
+      const categories = [
+        { label: 'Best Throughput Synthetic', rows: rows.filter(r => r.workload_source === 'synthetic'), sort: (a, b) => b.throughput_messages_per_second - a.throughput_messages_per_second },
+        { label: 'Best Throughput CSV Replay', rows: rows.filter(r => r.workload_source === 'csv-replay'), sort: (a, b) => b.throughput_messages_per_second - a.throughput_messages_per_second },
+        { label: 'Lowest P95 Synthetic', rows: rows.filter(r => r.workload_source === 'synthetic'), sort: (a, b) => a.p95_latency_ms - b.p95_latency_ms },
+        { label: 'Lowest P95 CSV Replay', rows: rows.filter(r => r.workload_source === 'csv-replay'), sort: (a, b) => a.p95_latency_ms - b.p95_latency_ms }
+      ];
+      const tbody = document.querySelector('#highlights-table tbody');
+      tbody.innerHTML = categories.map(category => {
+        const best = [...category.rows].sort(category.sort)[0];
+        return `
+          <tr>
+            <td>${category.label}</td>
+            <td>${best.run_id}</td>
+            <td>${best.transport_mode}</td>
+            <td>${best.workload_source}</td>
+            <td>${best.payload_bytes}</td>
+            <td>${best.concurrency}</td>
+            <td>${fmt(best.throughput_messages_per_second, 0)}</td>
+            <td>${fmt(best.p95_latency_ms)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderCharts() {
+      const synthetic = rows.filter(r => r.workload_source === 'synthetic');
+      const csv = rows.filter(r => r.workload_source === 'csv-replay');
+
+      const syntheticThroughput = synthetic.map(r => ({
+        x: r.payload_bytes,
+        y: r.throughput_messages_per_second,
+        series: `${r.transport_mode} c=${r.concurrency}`,
+        color: colors[r.transport_mode]
+      }));
+      drawLineChart('chart-synthetic-throughput', 'legend-synthetic-throughput', syntheticThroughput, { xLabel: 'Payload size (bytes)', yLabel: 'Throughput (msg/s)' });
+
+      const syntheticP95 = synthetic.map(r => ({
+        x: r.payload_bytes,
+        y: r.p95_latency_ms,
+        series: `${r.transport_mode} c=${r.concurrency}`,
+        color: colors[r.transport_mode]
+      }));
+      drawLineChart('chart-synthetic-p95', 'legend-synthetic-p95', syntheticP95, { xLabel: 'Payload size (bytes)', yLabel: 'P95 latency (ms)' });
+
+      const csvThroughput = csv.map(r => ({
+        x: workloadDescriptorToRows(r.workload_descriptor),
+        y: r.throughput_messages_per_second,
+        series: `${r.transport_mode} c=${r.concurrency}`,
+        color: colors[r.transport_mode]
+      }));
+      drawLineChart('chart-csv-throughput', 'legend-csv-throughput', csvThroughput, { xLabel: 'Rows per message', yLabel: 'Throughput (msg/s)' });
+
+      const csvP95 = csv.map(r => ({
+        x: workloadDescriptorToRows(r.workload_descriptor),
+        y: r.p95_latency_ms,
+        series: `${r.transport_mode} c=${r.concurrency}`,
+        color: colors[r.transport_mode]
+      }));
+      drawLineChart('chart-csv-p95', 'legend-csv-p95', csvP95, { xLabel: 'Rows per message', yLabel: 'P95 latency (ms)' });
+
+      const aggregateKeys = [
+        ['synthetic', 'client-streaming'],
+        ['synthetic', 'unary'],
+        ['csv-replay', 'client-streaming'],
+        ['csv-replay', 'unary']
+      ];
+      const aggregate = aggregateKeys.map(([workload, transport]) => {
+        const subset = rows.filter(r => r.workload_source === workload && r.transport_mode === transport);
+        const avgThroughput = subset.reduce((sum, r) => sum + r.throughput_messages_per_second, 0) / subset.length;
+        const avgP95 = subset.reduce((sum, r) => sum + r.p95_latency_ms, 0) / subset.length;
+        return {
+          label: `${workload}\n${transport}`,
+          throughput: avgThroughput,
+          p95: avgP95,
+          color: colors[transport]
+        };
+      });
+      drawBarChart('chart-aggregate-throughput', aggregate.map(item => ({ label: item.label, value: item.throughput, color: item.color })));
+      drawBarChart('chart-aggregate-p95', aggregate.map(item => ({ label: item.label, value: item.p95, color: item.color })));
+    }
+
+    createSummary();
+    renderCharts();
+    buildHighlights();
+  </script>
+</body>
+</html>

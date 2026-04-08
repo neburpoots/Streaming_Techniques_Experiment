@@ -1,0 +1,78 @@
+{
+  "latex-workshop.latex.tools": [
+    {
+      "name": "lualatex",
+      "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/lualatex.exe",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "biber",
+      "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/biber.exe",
+      "args": [
+        "%DOCFILE%"
+      ]
+    },
+    {
+      "name": "pdflatex",
+      "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "xelatex",
+      "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/xelatex.exe",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "kpsewhich",
+      "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/kpsewhich.exe",
+      "args": [
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "lualatex -> biber -> lualatex -> lualatex",
+      "tools": [
+        "lualatex",
+        "biber",
+        "lualatex",
+        "lualatex"
+      ]
+    },
+    {
+      "name": "pdflatex -> biber -> pdflatex -> pdflatex",
+      "tools": [
+        "pdflatex",
+        "biber",
+        "pdflatex",
+        "pdflatex"
+      ]
+    },
+    {
+      "name": "xelatex -> biber -> xelatex -> xelatex",
+      "tools": [
+        "xelatex",
+        "biber",
+        "xelatex",
+        "xelatex"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "first"
+}

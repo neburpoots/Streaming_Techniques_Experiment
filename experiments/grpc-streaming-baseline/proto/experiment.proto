@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package experiment;
+
+option go_package = "github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/pb;pb";
+
+service Transformer {
+  rpc Push(stream DataChunk) returns (StreamAck) {}
+  rpc PushUnary(DataChunk) returns (UnaryAck) {}
+}
+
+service Sink {
+  rpc Push(stream DataChunk) returns (StreamAck) {}
+  rpc PushUnary(DataChunk) returns (UnaryAck) {}
+}
+
+service ExperimentAdmin {
+  rpc RegisterRun(RunConfig) returns (RegisterRunResponse) {}
+  rpc GetRunSummary(RunQuery) returns (RunSummary) {}
+}
+
+message RunConfig {
+  string run_id = 1;
+  string profile = 2;
+  uint64 expected_total_messages = 3;
+  uint64 payload_bytes = 4;
+  uint64 concurrency = 5;
+  uint64 target_messages_per_second = 6;
+  uint64 transformer_work_iterations = 7;
+  uint64 sink_process_delay_ms = 8;
+  int64 registered_at_unix_nano = 9;
+  string transport_mode = 10;
+}
+
+message RegisterRunResponse {
+  bool accepted = 1;
+}
+
+message RunQuery {
+  string run_id = 1;
+}
+
+message DataChunk {
+  string run_id = 1;
+  uint64 sequence = 2;
+  uint64 producer_worker = 3;
+  int64 created_at_unix_nano = 4;
+  bytes payload = 5;
+}
+
+message StreamAck {
+  string run_id = 1;
+  string stage = 2;
+  uint64 stream_messages = 3;
+  uint64 stream_bytes = 4;
+  int64 finished_at_unix_nano = 5;
+}
+
+message UnaryAck {
+  string run_id = 1;
+  string stage = 2;
+  uint64 sequence = 3;
+  int64 finished_at_unix_nano = 4;
+}
+
+message RunSummary {
+  string run_id = 1;
+  string stage = 2;
+  bool completed = 3;
+  uint64 messages_received = 4;
+  uint64 bytes_received = 5;
+  uint64 duplicates = 6;
+  uint64 ordering_violations = 7;
+  double duration_seconds = 8;
+  double throughput_messages_per_second = 9;
+  double throughput_megabytes_per_second = 10;
+  double p50_latency_ms = 11;
+  double p95_latency_ms = 12;
+  double p99_latency_ms = 13;
+  double max_latency_ms = 14;
+  int64 started_at_unix_nano = 15;
+  int64 finished_at_unix_nano = 16;
+  string transport_mode = 17;
+}
