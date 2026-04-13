@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('synthetic-clean', 'csv-replay-check')]
+    [ValidateSet('synthetic-clean', 'csv-replay-check', 'synthetic-continuous', 'synthetic-backpressure', 'synthetic-recovery')]
     [string]$Preset,
 
     [string]$RootPath = (Join-Path $PSScriptRoot '..'),
@@ -13,6 +13,54 @@ $resolvedRoot = [System.IO.Path]::GetFullPath($RootPath)
 $resultsDir = Join-Path $resolvedRoot 'results'
 $exportScript = Join-Path $PSScriptRoot 'export-results.ps1'
 
+function New-RunCase {
+    param(
+        [string]$RunId,
+        [string]$TransportMode,
+        [string]$WorkloadSource,
+        [string]$Profile,
+        [string]$TotalMessages,
+        [string]$PayloadBytes,
+        [string]$Concurrency,
+        [string]$TargetMessagesPerSecond,
+        [string]$TransformerWorkIterations = '0',
+        [string]$SinkProcessDelayMs = '0',
+        [string]$SummaryPollMilliseconds = '250',
+        [string]$MaxSummaryWaitSeconds = '120',
+        [string]$DatasetFiles = '',
+        [string]$DatasetRowsPerMessage = '1',
+        [string]$DatasetRepeatCount = '1',
+        [string]$MaxRetryAttempts = '0',
+        [string]$RetryBackoffMs = '500',
+        [string]$FailureAction = '',
+        [string]$FailureTarget = '',
+        [string]$FailureAfterSeconds = '0'
+    )
+
+    [PSCustomObject]@{
+        run_id = $RunId
+        transport_mode = $TransportMode
+        workload_source = $WorkloadSource
+        profile = $Profile
+        total_messages = $TotalMessages
+        payload_bytes = $PayloadBytes
+        concurrency = $Concurrency
+        target_messages_per_second = $TargetMessagesPerSecond
+        transformer_work_iterations = $TransformerWorkIterations
+        sink_process_delay_ms = $SinkProcessDelayMs
+        summary_poll_milliseconds = $SummaryPollMilliseconds
+        max_summary_wait_seconds = $MaxSummaryWaitSeconds
+        dataset_files = $DatasetFiles
+        dataset_rows_per_message = $DatasetRowsPerMessage
+        dataset_repeat_count = $DatasetRepeatCount
+        max_retry_attempts = $MaxRetryAttempts
+        retry_backoff_ms = $RetryBackoffMs
+        failure_action = $FailureAction
+        failure_target = $FailureTarget
+        failure_after_seconds = $FailureAfterSeconds
+    }
+}
+
 function Get-MatrixCases {
     param([string]$PresetName)
 
@@ -23,23 +71,15 @@ function Get-MatrixCases {
                 foreach ($payloadBytes in @(256, 1024, 4096, 16384)) {
                     foreach ($concurrency in @(1, 4, 8, 16)) {
                         $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
-                        $cases += [PSCustomObject]@{
-                            run_id = "synthetic-clean-$transportShort-p$payloadBytes-c$concurrency"
-                            transport_mode = $transportMode
-                            workload_source = 'synthetic'
-                            profile = 'bulk'
-                            total_messages = '20000'
-                            payload_bytes = [string]$payloadBytes
-                            concurrency = [string]$concurrency
-                            target_messages_per_second = '0'
-                            transformer_work_iterations = '0'
-                            sink_process_delay_ms = '0'
-                            summary_poll_milliseconds = '250'
-                            max_summary_wait_seconds = '120'
-                            dataset_files = ''
-                            dataset_rows_per_message = '1'
-                            dataset_repeat_count = '1'
-                        }
+                        $cases += New-RunCase `
+                            -RunId "synthetic-clean-$transportShort-p$payloadBytes-c$concurrency" `
+                            -TransportMode $transportMode `
+                            -WorkloadSource 'synthetic' `
+                            -Profile 'bulk' `
+                            -TotalMessages '20000' `
+                            -PayloadBytes ([string]$payloadBytes) `
+                            -Concurrency ([string]$concurrency) `
+                            -TargetMessagesPerSecond '0'
                     }
                 }
             }
@@ -51,25 +91,76 @@ function Get-MatrixCases {
                 foreach ($rowsPerMessage in @(25, 100)) {
                     foreach ($concurrency in @(1, 8)) {
                         $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
-                        $cases += [PSCustomObject]@{
-                            run_id = "csv-replay-check-$transportShort-r$rowsPerMessage-c$concurrency"
-                            transport_mode = $transportMode
-                            workload_source = 'csv-replay'
-                            profile = 'bulk'
-                            total_messages = '10000'
-                            payload_bytes = '1024'
-                            concurrency = [string]$concurrency
-                            target_messages_per_second = '0'
-                            transformer_work_iterations = '0'
-                            sink_process_delay_ms = '0'
-                            summary_poll_milliseconds = '250'
-                            max_summary_wait_seconds = '120'
-                            dataset_files = 'Personen.csv,Aanstellingen.csv'
-                            dataset_rows_per_message = [string]$rowsPerMessage
-                            dataset_repeat_count = '10'
-                        }
+                        $cases += New-RunCase `
+                            -RunId "csv-replay-check-$transportShort-r$rowsPerMessage-c$concurrency" `
+                            -TransportMode $transportMode `
+                            -WorkloadSource 'csv-replay' `
+                            -Profile 'bulk' `
+                            -TotalMessages '10000' `
+                            -PayloadBytes '1024' `
+                            -Concurrency ([string]$concurrency) `
+                            -TargetMessagesPerSecond '0' `
+                            -DatasetFiles 'Personen.csv,Aanstellingen.csv' `
+                            -DatasetRowsPerMessage ([string]$rowsPerMessage) `
+                            -DatasetRepeatCount '10'
                     }
                 }
+            }
+            return $cases
+        }
+        'synthetic-continuous' {
+            $cases = @()
+            foreach ($transportMode in @('client-streaming', 'unary')) {
+                foreach ($concurrency in @(4, 8)) {
+                    $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
+                    $cases += New-RunCase `
+                        -RunId "synthetic-continuous-$transportShort-p1024-c$concurrency" `
+                        -TransportMode $transportMode `
+                        -WorkloadSource 'synthetic' `
+                        -Profile 'continuous' `
+                        -TotalMessages '20000' `
+                        -PayloadBytes '1024' `
+                        -Concurrency ([string]$concurrency) `
+                        -TargetMessagesPerSecond '1000'
+                }
+            }
+            return $cases
+        }
+        'synthetic-backpressure' {
+            $cases = @()
+            foreach ($transportMode in @('client-streaming', 'unary')) {
+                $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
+                $cases += New-RunCase `
+                    -RunId "synthetic-backpressure-$transportShort-p1024-c8" `
+                    -TransportMode $transportMode `
+                    -WorkloadSource 'synthetic' `
+                    -Profile 'continuous' `
+                    -TotalMessages '20000' `
+                    -PayloadBytes '1024' `
+                    -Concurrency '8' `
+                    -TargetMessagesPerSecond '4000' `
+                    -SinkProcessDelayMs '2'
+            }
+            return $cases
+        }
+        'synthetic-recovery' {
+            $cases = @()
+            foreach ($transportMode in @('client-streaming', 'unary')) {
+                $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
+                $cases += New-RunCase `
+                    -RunId "synthetic-recovery-$transportShort-p4096-c8" `
+                    -TransportMode $transportMode `
+                    -WorkloadSource 'synthetic' `
+                    -Profile 'continuous' `
+                    -TotalMessages '20000' `
+                    -PayloadBytes '4096' `
+                    -Concurrency '8' `
+                    -TargetMessagesPerSecond '2000' `
+                    -MaxRetryAttempts '40' `
+                    -RetryBackoffMs '250' `
+                    -FailureAction 'restart' `
+                    -FailureTarget 'transformer' `
+                    -FailureAfterSeconds '3'
             }
             return $cases
         }
@@ -104,6 +195,35 @@ function Start-DockerStatsSampling {
     } -ArgumentList $OutputPath, $StopFile
 }
 
+function Start-FailureInjection {
+    param(
+        [pscustomobject]$Case,
+        [string]$ComposeRoot
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Case.failure_action) -or [string]::IsNullOrWhiteSpace($Case.failure_target)) {
+        return $null
+    }
+
+    $delaySeconds = [int]$Case.failure_after_seconds
+    if ($delaySeconds -le 0) {
+        return $null
+    }
+
+    Start-Job -ScriptBlock {
+        param($Action, $Target, $DelaySeconds, $ProjectRoot)
+        Start-Sleep -Seconds $DelaySeconds
+        switch ($Action) {
+            'restart' {
+                docker compose -f (Join-Path $ProjectRoot 'docker-compose.yml') restart $Target | Out-Null
+            }
+            default {
+                throw "Unsupported failure action: $Action"
+            }
+        }
+    } -ArgumentList $Case.failure_action, $Case.failure_target, $delaySeconds, $ComposeRoot
+}
+
 function Invoke-RunCase {
     param([pscustomobject]$Case)
 
@@ -115,7 +235,8 @@ function Invoke-RunCase {
     if (Test-Path $statsPath) { Remove-Item $statsPath -Force }
     if (Test-Path $stopFile) { Remove-Item $stopFile -Force }
 
-    $job = Start-DockerStatsSampling -OutputPath $statsPath -StopFile $stopFile
+    $statsJob = Start-DockerStatsSampling -OutputPath $statsPath -StopFile $stopFile
+    $failureJob = Start-FailureInjection -Case $Case -ComposeRoot $resolvedRoot
     try {
         $env:RUN_ID = $Case.run_id
         $env:TRANSPORT_MODE = $Case.transport_mode
@@ -132,14 +253,23 @@ function Invoke-RunCase {
         $env:DATASET_FILES = $Case.dataset_files
         $env:DATASET_ROWS_PER_MESSAGE = $Case.dataset_rows_per_message
         $env:DATASET_REPEAT_COUNT = $Case.dataset_repeat_count
+        $env:MAX_RETRY_ATTEMPTS = $Case.max_retry_attempts
+        $env:RETRY_BACKOFF_MS = $Case.retry_backoff_ms
+        $env:FAILURE_ACTION = $Case.failure_action
+        $env:FAILURE_TARGET = $Case.failure_target
+        $env:FAILURE_AFTER_SECONDS = $Case.failure_after_seconds
 
         Write-Host "Running $($Case.run_id)"
         docker compose run --rm producer
     } finally {
         'stop' | Out-File -FilePath $stopFile -Encoding ascii
-        Wait-Job $job | Out-Null
-        Remove-Job $job -Force | Out-Null
+        Wait-Job $statsJob | Out-Null
+        Remove-Job $statsJob -Force | Out-Null
         Remove-Item $stopFile -Force -ErrorAction SilentlyContinue
+        if ($failureJob) {
+            Wait-Job $failureJob | Out-Null
+            Remove-Job $failureJob -Force | Out-Null
+        }
         docker compose down | Out-Null
     }
 }
@@ -155,5 +285,5 @@ foreach ($case in $matrixCases) {
 }
 
 $outputPath = Join-Path $resultsDir "$Preset-summary.csv"
-& $exportScript -ResultsDir $resultsDir -RunIdPrefix $Preset -OutputPath $outputPath
+& $exportScript -ResultsDir $resultsDir -RunIdPrefix $Preset -OutputPath $OutputPath
 Write-Host "Finished preset $Preset"

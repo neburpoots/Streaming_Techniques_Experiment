@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>gRPC Benchmark Plots</title>
+  <title>gRPC Benchmark Report</title>
   <style>
     :root {
       --bg: #f7f5ef;
@@ -141,8 +141,8 @@
 </head>
 <body>
   <div class="page">
-    <h1>gRPC Baseline Benchmark Report</h1>
-    <p>This report summarizes the first controlled benchmark matrix for unary gRPC versus client-streaming gRPC, plus a smaller CSV replay realism check based on the copied DYNAMOS datasets.</p>
+    <h1>gRPC Benchmark Report</h1>
+    <p>This report summarizes the current gRPC benchmark slices: the clean unary-versus-client-streaming baseline, the CSV replay realism check based on copied DYNAMOS datasets, a steady-rate continuous-stream jitter scenario, a slow-consumer backpressure scenario, and a restart-oriented continuous-stream recovery scenario.</p>
 
     <div class="summary" id="summary-cards"></div>
 
@@ -201,6 +201,114 @@
           <svg id="chart-aggregate-p95" viewBox="0 0 620 320"></svg>
         </div>
       </div>
+    </div>
+
+    <div class="section">
+      <h2>Continuous Jitter Scenario</h2>
+      <p id="continuous-interpretation"></p>
+      <div class="summary" id="continuous-cards"></div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Continuous Throughput</h3>
+          <div class="caption">Observed throughput during a 1 KiB steady-rate run with a 1,000 msg/s target and no induced failure or sink delay.</div>
+          <svg id="chart-continuous-throughput" viewBox="0 0 620 320"></svg>
+        </div>
+        <div class="chart-card">
+          <h3>Continuous Jitter</h3>
+          <div class="caption">Inter-arrival jitter proxy at the sink for the same steady-rate run.</div>
+          <svg id="chart-continuous-jitter" viewBox="0 0 620 320"></svg>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="continuous-table">
+          <thead>
+            <tr>
+              <th>Transport</th>
+              <th>Concurrency</th>
+              <th>Throughput</th>
+              <th>P95 Latency</th>
+              <th>P95 Inter-arrival</th>
+              <th>Jitter</th>
+              <th>Transformer CPU Avg</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="footnote">This scenario isolates steady continuous pacing without backlog or failures. The main question is whether the transport can keep a regular delivery cadence while staying close to the configured target rate.</div>
+    </div>
+
+    <div class="section">
+      <h2>Recovery Scenario</h2>
+      <p id="recovery-interpretation"></p>
+      <div class="summary" id="recovery-cards"></div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Recovery Throughput</h3>
+          <div class="caption">Observed sustained throughput during a continuous 4 KiB stream with concurrency 8 and a forced transformer restart after 3 seconds.</div>
+          <svg id="chart-recovery-throughput" viewBox="0 0 620 320"></svg>
+        </div>
+        <div class="chart-card">
+          <h3>Recovery P95 Latency</h3>
+          <div class="caption">Tail latency during the same restart-oriented scenario.</div>
+          <svg id="chart-recovery-p95" viewBox="0 0 620 320"></svg>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="recovery-table">
+          <thead>
+            <tr>
+              <th>Transport</th>
+              <th>Throughput</th>
+              <th>P50</th>
+              <th>P95</th>
+              <th>Max</th>
+              <th>Jitter</th>
+              <th>Duplicates</th>
+              <th>Avg Recovery</th>
+              <th>Transformer CPU Avg</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="footnote">The current client-streaming recovery path prioritizes completeness over deduplication by replaying a worker sequence set after reconnect. That produces at-least-once behavior under restart, which is why duplicates appear only in the streaming recovery run.</div>
+    </div>
+
+    <div class="section">
+      <h2>Backpressure Scenario</h2>
+      <p id="backpressure-interpretation"></p>
+      <div class="summary" id="backpressure-cards"></div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Backpressure Throughput</h3>
+          <div class="caption">Observed throughput during a continuous 1 KiB stream with concurrency 8, target rate 4,000 msg/s, and an artificial 2 ms sink delay.</div>
+          <svg id="chart-backpressure-throughput" viewBox="0 0 620 320"></svg>
+        </div>
+        <div class="chart-card">
+          <h3>Backpressure P95 Latency</h3>
+          <div class="caption">Tail latency under the same slow-consumer condition.</div>
+          <svg id="chart-backpressure-p95" viewBox="0 0 620 320"></svg>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="backpressure-table">
+          <thead>
+            <tr>
+              <th>Transport</th>
+              <th>Throughput</th>
+              <th>P50</th>
+              <th>P95</th>
+              <th>Max</th>
+              <th>Jitter</th>
+              <th>Transformer CPU Avg</th>
+              <th>Sink CPU Avg</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="footnote">This scenario isolates sink-side backpressure. The sink is intentionally slowed down, so the key question is whether each transport absorbs the mismatch as queue growth, sender throttling, or both.</div>
     </div>
 
     <div class="section">
@@ -266,7 +374,15 @@
     {"run_id":"csv-replay-check-unary-r25-c1","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=25:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":1283,"concurrency":1,"throughput_messages_per_second":1270.9414752174634,"throughput_megabytes_per_second":1.5458098891612673,"duration_seconds":7.868182914,"p50_latency_ms":0.289443,"p95_latency_ms":0.700484,"p99_latency_ms":1.44798,"max_latency_ms":898.914053},
     {"run_id":"csv-replay-check-unary-r25-c8","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=25:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":1283,"concurrency":8,"throughput_messages_per_second":7952.001976893137,"throughput_megabytes_per_second":9.671793339192192,"duration_seconds":1.257544959,"p50_latency_ms":0.397148,"p95_latency_ms":1.217122,"p99_latency_ms":2.822672,"max_latency_ms":21.560381},
     {"run_id":"csv-replay-check-unary-r100-c1","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=100:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":5134,"concurrency":1,"throughput_messages_per_second":1596.3859041491783,"throughput_megabytes_per_second":7.8001313201651366,"duration_seconds":6.264149523,"p50_latency_ms":0.297096,"p95_latency_ms":0.610427,"p99_latency_ms":1.192299,"max_latency_ms":20.334031},
-    {"run_id":"csv-replay-check-unary-r100-c8","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=100:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":5134,"concurrency":8,"throughput_messages_per_second":6681.2571782759,"throughput_megabytes_per_second":32.6454169000718,"duration_seconds":1.496724304,"p50_latency_ms":0.479382,"p95_latency_ms":1.704639,"p99_latency_ms":3.232955,"max_latency_ms":23.436942}
+    {"run_id":"csv-replay-check-unary-r100-c8","transport_mode":"unary","workload_source":"csv-replay","workload_descriptor":"csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=100:repeat=10","profile":"bulk","expected_messages":10000,"payload_bytes":5134,"concurrency":8,"throughput_messages_per_second":6681.2571782759,"throughput_megabytes_per_second":32.6454169000718,"duration_seconds":1.496724304,"p50_latency_ms":0.479382,"p95_latency_ms":1.704639,"p99_latency_ms":3.232955,"max_latency_ms":23.436942},
+    {"run_id":"synthetic-continuous-stream-p1024-c4","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"continuous","expected_messages":20000,"payload_bytes":1024,"concurrency":4,"target_messages_per_second":1000,"sink_process_delay_ms":0,"retry_attempts":0,"stream_reconnects":0,"recovery_events":0,"avg_recovery_ms":0,"max_recovery_ms":0,"throughput_messages_per_second":918.1993286511969,"throughput_megabytes_per_second":0.8966790318859345,"duration_seconds":21.781762822,"p50_latency_ms":0.271331,"p95_latency_ms":4.680191,"p99_latency_ms":12.006413,"max_latency_ms":13.268378,"mean_inter_arrival_ms":0.9494169008450442,"p95_inter_arrival_ms":1.613597,"inter_arrival_jitter_ms":0.6588074157851056,"messages_received":20000,"bytes_received":20480000,"duplicates":0,"ordering_violations":0,"producer_cpu_avg_pct":28.676666666666666,"transformer_cpu_avg_pct":32.443333333333335,"sink_cpu_avg_pct":19.016666666666666},
+    {"run_id":"synthetic-continuous-stream-p1024-c8","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"continuous","expected_messages":20000,"payload_bytes":1024,"concurrency":8,"target_messages_per_second":1000,"sink_process_delay_ms":0,"retry_attempts":0,"stream_reconnects":0,"recovery_events":0,"avg_recovery_ms":0,"max_recovery_ms":0,"throughput_messages_per_second":918.7023729829835,"throughput_megabytes_per_second":0.8971702861161949,"duration_seconds":21.769836008,"p50_latency_ms":0.274815,"p95_latency_ms":6.567136,"p99_latency_ms":16.493738,"max_latency_ms":19.810581,"mean_inter_arrival_ms":0.9494705052252603,"p95_inter_arrival_ms":1.617997,"inter_arrival_jitter_ms":0.6618786781814872,"messages_received":20000,"bytes_received":20480000,"duplicates":0,"ordering_violations":0,"producer_cpu_avg_pct":30.87,"transformer_cpu_avg_pct":38.980000000000004,"sink_cpu_avg_pct":22.674285714285713},
+    {"run_id":"synthetic-continuous-unary-p1024-c4","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"continuous","expected_messages":20000,"payload_bytes":1024,"concurrency":4,"target_messages_per_second":1000,"sink_process_delay_ms":0,"retry_attempts":0,"stream_reconnects":0,"recovery_events":0,"avg_recovery_ms":0,"max_recovery_ms":0,"throughput_messages_per_second":918.4236237867915,"throughput_megabytes_per_second":0.8968980701042886,"duration_seconds":21.776443334,"p50_latency_ms":0.384355,"p95_latency_ms":1.133633,"p99_latency_ms":2.782888,"max_latency_ms":46.011106,"mean_inter_arrival_ms":0.9499408898944868,"p95_inter_arrival_ms":2.169368,"inter_arrival_jitter_ms":1.0188986463609668,"messages_received":20000,"bytes_received":20480000,"duplicates":0,"ordering_violations":0,"producer_cpu_avg_pct":46.34833333333333,"transformer_cpu_avg_pct":62.63666666666666,"sink_cpu_avg_pct":34.61000000000001},
+    {"run_id":"synthetic-continuous-unary-p1024-c8","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"continuous","expected_messages":20000,"payload_bytes":1024,"concurrency":8,"target_messages_per_second":1000,"sink_process_delay_ms":0,"retry_attempts":0,"stream_reconnects":0,"recovery_events":0,"avg_recovery_ms":0,"max_recovery_ms":0,"throughput_messages_per_second":1050.394734998531,"throughput_megabytes_per_second":1.025776108397003,"duration_seconds":19.040461013,"p50_latency_ms":0.378489,"p95_latency_ms":1.027759,"p99_latency_ms":2.086593,"max_latency_ms":48.464271,"mean_inter_arrival_ms":0.949695753587682,"p95_inter_arrival_ms":2.163409,"inter_arrival_jitter_ms":0.8783223872370912,"messages_received":20000,"bytes_received":20480000,"duplicates":0,"ordering_violations":0,"producer_cpu_avg_pct":50.19499999999999,"transformer_cpu_avg_pct":59.55833333333333,"sink_cpu_avg_pct":36.330000000000005},
+    {"run_id":"synthetic-recovery-stream-p4096-c8","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"continuous","expected_messages":20000,"payload_bytes":4096,"concurrency":8,"target_messages_per_second":2000,"retry_attempts":40,"stream_reconnects":8,"recovery_events":8,"avg_recovery_ms":1003.1378269999999,"max_recovery_ms":1003.937296,"throughput_messages_per_second":1376.1135786989605,"throughput_megabytes_per_second":5.3754436667928145,"duration_seconds":14.533684072,"p50_latency_ms":0.312482,"p95_latency_ms":12.329427,"p99_latency_ms":17.070225,"max_latency_ms":32.931101,"mean_inter_arrival_ms":0.4629216042633165,"p95_inter_arrival_ms":1.523243,"inter_arrival_jitter_ms":6.204133946284299,"messages_received":20000,"bytes_received":81920000,"duplicates":7163,"ordering_violations":0,"producer_cpu_avg_pct":37.44,"transformer_cpu_avg_pct":43.5025,"sink_cpu_avg_pct":25.265},
+    {"run_id":"synthetic-recovery-unary-p4096-c8","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"continuous","expected_messages":20000,"payload_bytes":4096,"concurrency":8,"target_messages_per_second":2000,"retry_attempts":40,"stream_reconnects":0,"recovery_events":8,"avg_recovery_ms":1273.309859,"max_recovery_ms":1275.256166,"throughput_messages_per_second":2097.03457368959,"throughput_megabytes_per_second":8.191541303474962,"duration_seconds":9.537277187,"p50_latency_ms":0.596253,"p95_latency_ms":2.73836,"p99_latency_ms":5.630941,"max_latency_ms":1274.565625,"mean_inter_arrival_ms":0.4640052256612829,"p95_inter_arrival_ms":1.462207,"inter_arrival_jitter_ms":9.030143747562493,"messages_received":20000,"bytes_received":81920000,"duplicates":0,"ordering_violations":0,"producer_cpu_avg_pct":63.42,"transformer_cpu_avg_pct":111.02,"sink_cpu_avg_pct":67.41},
+    {"run_id":"synthetic-backpressure-stream-p1024-c8","transport_mode":"client-streaming","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"continuous","expected_messages":20000,"payload_bytes":1024,"concurrency":8,"target_messages_per_second":4000,"sink_process_delay_ms":2,"retry_attempts":0,"stream_reconnects":0,"recovery_events":0,"avg_recovery_ms":0,"max_recovery_ms":0,"throughput_messages_per_second":3395.935984653347,"throughput_megabytes_per_second":3.3163437350130343,"duration_seconds":5.889392524,"p50_latency_ms":1427.579214,"p95_latency_ms":1760.945715,"p99_latency_ms":1813.119802,"max_latency_ms":1853.159326,"mean_inter_arrival_ms":0.28873640327016237,"p95_inter_arrival_ms":2.073485,"inter_arrival_jitter_ms":0.6341719727217435,"messages_received":20000,"bytes_received":20480000,"duplicates":0,"ordering_violations":0,"producer_cpu_avg_pct":29.179999999999996,"transformer_cpu_avg_pct":38.336666666666666,"sink_cpu_avg_pct":13.993333333333332},
+    {"run_id":"synthetic-backpressure-unary-p1024-c8","transport_mode":"unary","workload_source":"synthetic","workload_descriptor":"synthetic","profile":"continuous","expected_messages":20000,"payload_bytes":1024,"concurrency":8,"target_messages_per_second":4000,"sink_process_delay_ms":2,"retry_attempts":0,"stream_reconnects":0,"recovery_events":0,"avg_recovery_ms":0,"max_recovery_ms":0,"throughput_messages_per_second":2386.1739573620944,"throughput_megabytes_per_second":2.3302480052364203,"duration_seconds":8.38161859,"p50_latency_ms":0.439355,"p95_latency_ms":0.825452,"p99_latency_ms":1.696279,"max_latency_ms":28.873689,"mean_inter_arrival_ms":0.41673462473124095,"p95_inter_arrival_ms":3.180627,"inter_arrival_jitter_ms":1.0620852115552346,"messages_received":20000,"bytes_received":20480000,"duplicates":0,"ordering_violations":0,"producer_cpu_avg_pct":21.406666666666666,"transformer_cpu_avg_pct":42.75,"sink_cpu_avg_pct":32.129999999999995}
   ]</script>
   <script>
     const rows = JSON.parse(document.getElementById('benchmark-data').textContent);
@@ -278,11 +394,12 @@
     }
 
     function createSummary() {
-      const synthetic = rows.filter(r => r.workload_source === 'synthetic');
+      const synthetic = rows.filter(r => r.workload_source === 'synthetic' && r.profile === 'bulk');
       const csvReplay = rows.filter(r => r.workload_source === 'csv-replay');
+      const baselineRows = [...synthetic, ...csvReplay];
       const bestSynthetic = synthetic.reduce((best, row) => row.throughput_messages_per_second > best.throughput_messages_per_second ? row : best, synthetic[0]);
       const bestCSV = csvReplay.reduce((best, row) => row.throughput_messages_per_second > best.throughput_messages_per_second ? row : best, csvReplay[0]);
-      const fastestP95 = rows.reduce((best, row) => row.p95_latency_ms < best.p95_latency_ms ? row : best, rows[0]);
+      const fastestP95 = baselineRows.reduce((best, row) => row.p95_latency_ms < best.p95_latency_ms ? row : best, baselineRows[0]);
       const avg = (items, field) => items.reduce((sum, item) => sum + item[field], 0) / items.length;
 
       const cards = [
@@ -303,7 +420,156 @@
       `).join('');
 
       document.getElementById('interpretation').textContent =
-        `Across both datasets, client-streaming wins clearly on total throughput, while unary consistently wins on P95 latency. In the synthetic matrix, the fastest run is ${bestSynthetic.run_id} at about ${fmt(bestSynthetic.throughput_messages_per_second, 0)} messages per second. In the CSV replay realism check, the fastest run is ${bestCSV.run_id} at about ${fmt(bestCSV.throughput_messages_per_second, 0)} messages per second. The lowest P95 latency overall comes from ${fastestP95.run_id} at about ${fmt(fastestP95.p95_latency_ms)} ms. The pattern is stable: streaming is better for moving lots of data, unary is better for keeping single-message response times low.`;
+        `In the clean bulk matrices, client-streaming wins clearly on total throughput, while unary consistently wins on P95 latency. In the synthetic matrix, the fastest run is ${bestSynthetic.run_id} at about ${fmt(bestSynthetic.throughput_messages_per_second, 0)} messages per second. In the CSV replay realism check, the fastest run is ${bestCSV.run_id} at about ${fmt(bestCSV.throughput_messages_per_second, 0)} messages per second. The lowest P95 latency across the clean baseline comes from ${fastestP95.run_id} at about ${fmt(fastestP95.p95_latency_ms)} ms. The clean-baseline pattern is stable: streaming is better for moving lots of data, unary is better for keeping single-message response times low.`;
+    }
+
+    function createRecoverySection() {
+      const recovery = rows.filter(r => (r.run_id || '').startsWith('synthetic-recovery'));
+      if (!recovery.length) {
+        return;
+      }
+
+      const bestThroughput = [...recovery].sort((a, b) => b.throughput_messages_per_second - a.throughput_messages_per_second)[0];
+      const bestP95 = [...recovery].sort((a, b) => a.p95_latency_ms - b.p95_latency_ms)[0];
+      const bestJitter = [...recovery].sort((a, b) => a.inter_arrival_jitter_ms - b.inter_arrival_jitter_ms)[0];
+      const bestRecovery = [...recovery].sort((a, b) => a.avg_recovery_ms - b.avg_recovery_ms)[0];
+
+      const cards = [
+        { label: 'Best Recovery Throughput', value: `${bestThroughput.transport_mode} at ${fmt(bestThroughput.throughput_messages_per_second, 0)} msg/s` },
+        { label: 'Lowest Recovery P95', value: `${bestP95.transport_mode} at ${fmt(bestP95.p95_latency_ms)} ms` },
+        { label: 'Lowest Recovery Jitter', value: `${bestJitter.transport_mode} at ${fmt(bestJitter.inter_arrival_jitter_ms)} ms` },
+        { label: 'Fastest Avg Recovery', value: `${bestRecovery.transport_mode} at ${fmt(bestRecovery.avg_recovery_ms)} ms` }
+      ];
+
+      document.getElementById('recovery-cards').innerHTML = cards.map(card => `
+        <div class="card">
+          <div class="label">${card.label}</div>
+          <div class="value">${card.value}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('recovery-interpretation').textContent =
+        `The restart-oriented continuous run changes the trade-off. Unary sustains the target rate better and keeps lower P95 latency after the forced transformer restart, but it pays with a very large worst-case stall and materially higher CPU use. Client-streaming recovers faster on average and keeps a tighter jitter profile, but the current replay-on-reconnect strategy produces duplicates, so it behaves like at-least-once delivery under failure rather than exactly-once delivery.`;
+
+      drawBarChart('chart-recovery-throughput', recovery.map(row => ({ label: row.transport_mode, value: row.throughput_messages_per_second, color: colors[row.transport_mode] })));
+      drawBarChart('chart-recovery-p95', recovery.map(row => ({ label: row.transport_mode, value: row.p95_latency_ms, color: colors[row.transport_mode] })));
+
+      const tbody = document.querySelector('#recovery-table tbody');
+      tbody.innerHTML = recovery.map(row => `
+        <tr>
+          <td>${row.transport_mode}</td>
+          <td>${fmt(row.throughput_messages_per_second, 0)} msg/s</td>
+          <td>${fmt(row.p50_latency_ms)} ms</td>
+          <td>${fmt(row.p95_latency_ms)} ms</td>
+          <td>${fmt(row.max_latency_ms)} ms</td>
+          <td>${fmt(row.inter_arrival_jitter_ms)} ms</td>
+          <td>${fmt(row.duplicates || 0, 0)}</td>
+          <td>${fmt(row.avg_recovery_ms)} ms</td>
+          <td>${fmt(row.transformer_cpu_avg_pct)}%</td>
+        </tr>
+      `).join('');
+    }
+
+    function createContinuousSection() {
+      const continuous = rows.filter(r => (r.run_id || '').startsWith('synthetic-continuous'));
+      if (!continuous.length) {
+        return;
+      }
+
+      const bestJitter = [...continuous].sort((a, b) => a.inter_arrival_jitter_ms - b.inter_arrival_jitter_ms)[0];
+      const bestP95Latency = [...continuous].sort((a, b) => a.p95_latency_ms - b.p95_latency_ms)[0];
+      const closestToTarget = [...continuous].sort((a, b) => Math.abs(a.throughput_messages_per_second - a.target_messages_per_second) - Math.abs(b.throughput_messages_per_second - b.target_messages_per_second))[0];
+      const lowestTransformerCPU = [...continuous].sort((a, b) => a.transformer_cpu_avg_pct - b.transformer_cpu_avg_pct)[0];
+
+      const cards = [
+        { label: 'Lowest Continuous Jitter', value: `${bestJitter.transport_mode} c=${bestJitter.concurrency} at ${fmt(bestJitter.inter_arrival_jitter_ms)} ms` },
+        { label: 'Lowest Continuous P95', value: `${bestP95Latency.transport_mode} c=${bestP95Latency.concurrency} at ${fmt(bestP95Latency.p95_latency_ms)} ms` },
+        { label: 'Closest To Target Rate', value: `${closestToTarget.transport_mode} c=${closestToTarget.concurrency} at ${fmt(closestToTarget.throughput_messages_per_second, 0)} msg/s` },
+        { label: 'Lowest Transformer CPU Avg', value: `${lowestTransformerCPU.transport_mode} c=${lowestTransformerCPU.concurrency} at ${fmt(lowestTransformerCPU.transformer_cpu_avg_pct)}%` }
+      ];
+
+      document.getElementById('continuous-cards').innerHTML = cards.map(card => `
+        <div class="card">
+          <div class="label">${card.label}</div>
+          <div class="value">${card.value}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('continuous-interpretation').textContent =
+        `The steady-rate continuous run mostly confirms the intended jitter story. Client-streaming delivers a tighter inter-arrival pattern, with lower jitter and lower p95 inter-arrival spread than unary at both tested concurrency levels. Unary still wins on end-to-end latency, and at concurrency 8 it even overshoots the requested 1,000 msg/s target, which suggests less precise pacing. So if the priority is delivery regularity, streaming currently looks better; if the priority is per-message latency, unary remains better.`;
+
+      const byTransport = ['client-streaming', 'unary'].map(transport => {
+        const subset = continuous.filter(row => row.transport_mode === transport);
+        return {
+          label: transport,
+          throughput: subset.reduce((sum, row) => sum + row.throughput_messages_per_second, 0) / subset.length,
+          jitter: subset.reduce((sum, row) => sum + row.inter_arrival_jitter_ms, 0) / subset.length,
+          color: colors[transport]
+        };
+      });
+      drawBarChart('chart-continuous-throughput', byTransport.map(row => ({ label: row.label, value: row.throughput, color: row.color })));
+      drawBarChart('chart-continuous-jitter', byTransport.map(row => ({ label: row.label, value: row.jitter, color: row.color })));
+
+      const tbody = document.querySelector('#continuous-table tbody');
+      tbody.innerHTML = continuous
+        .sort((a, b) => a.transport_mode.localeCompare(b.transport_mode) || a.concurrency - b.concurrency)
+        .map(row => `
+          <tr>
+            <td>${row.transport_mode}</td>
+            <td>${row.concurrency}</td>
+            <td>${fmt(row.throughput_messages_per_second, 0)} msg/s</td>
+            <td>${fmt(row.p95_latency_ms)} ms</td>
+            <td>${fmt(row.p95_inter_arrival_ms)} ms</td>
+            <td>${fmt(row.inter_arrival_jitter_ms)} ms</td>
+            <td>${fmt(row.transformer_cpu_avg_pct)}%</td>
+          </tr>
+        `).join('');
+    }
+
+    function createBackpressureSection() {
+      const backpressure = rows.filter(r => (r.run_id || '').startsWith('synthetic-backpressure'));
+      if (!backpressure.length) {
+        return;
+      }
+
+      const bestThroughput = [...backpressure].sort((a, b) => b.throughput_messages_per_second - a.throughput_messages_per_second)[0];
+      const bestP95 = [...backpressure].sort((a, b) => a.p95_latency_ms - b.p95_latency_ms)[0];
+      const bestJitter = [...backpressure].sort((a, b) => a.inter_arrival_jitter_ms - b.inter_arrival_jitter_ms)[0];
+      const lowestSinkCPU = [...backpressure].sort((a, b) => a.sink_cpu_avg_pct - b.sink_cpu_avg_pct)[0];
+
+      const cards = [
+        { label: 'Best Backpressure Throughput', value: `${bestThroughput.transport_mode} at ${fmt(bestThroughput.throughput_messages_per_second, 0)} msg/s` },
+        { label: 'Lowest Backpressure P95', value: `${bestP95.transport_mode} at ${fmt(bestP95.p95_latency_ms)} ms` },
+        { label: 'Lowest Backpressure Jitter', value: `${bestJitter.transport_mode} at ${fmt(bestJitter.inter_arrival_jitter_ms)} ms` },
+        { label: 'Lowest Sink CPU Avg', value: `${lowestSinkCPU.transport_mode} at ${fmt(lowestSinkCPU.sink_cpu_avg_pct)}%` }
+      ];
+
+      document.getElementById('backpressure-cards').innerHTML = cards.map(card => `
+        <div class="card">
+          <div class="label">${card.label}</div>
+          <div class="value">${card.value}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('backpressure-interpretation').textContent =
+        `The slow-consumer run exposes a different trade-off from the restart scenario. Client-streaming keeps more throughput flowing through the pipeline even when the sink is delayed, but it does that by letting queueing accumulate, so end-to-end latency explodes into the multi-second range. Unary throttles much earlier, which lowers throughput, but it prevents backlog growth and keeps median and P95 latency near the non-stressed baseline. In other words, streaming is currently more throughput-oriented under backpressure, while unary is more self-limiting and latency-protective.`;
+
+      drawBarChart('chart-backpressure-throughput', backpressure.map(row => ({ label: row.transport_mode, value: row.throughput_messages_per_second, color: colors[row.transport_mode] })));
+      drawBarChart('chart-backpressure-p95', backpressure.map(row => ({ label: row.transport_mode, value: row.p95_latency_ms, color: colors[row.transport_mode] })));
+
+      const tbody = document.querySelector('#backpressure-table tbody');
+      tbody.innerHTML = backpressure.map(row => `
+        <tr>
+          <td>${row.transport_mode}</td>
+          <td>${fmt(row.throughput_messages_per_second, 0)} msg/s</td>
+          <td>${fmt(row.p50_latency_ms)} ms</td>
+          <td>${fmt(row.p95_latency_ms)} ms</td>
+          <td>${fmt(row.max_latency_ms)} ms</td>
+          <td>${fmt(row.inter_arrival_jitter_ms)} ms</td>
+          <td>${fmt(row.transformer_cpu_avg_pct)}%</td>
+          <td>${fmt(row.sink_cpu_avg_pct)}%</td>
+        </tr>
+      `).join('');
     }
 
     function renderLegend(elId, series) {
@@ -405,9 +671,9 @@
 
     function buildHighlights() {
       const categories = [
-        { label: 'Best Throughput Synthetic', rows: rows.filter(r => r.workload_source === 'synthetic'), sort: (a, b) => b.throughput_messages_per_second - a.throughput_messages_per_second },
+        { label: 'Best Throughput Synthetic', rows: rows.filter(r => r.workload_source === 'synthetic' && r.profile === 'bulk'), sort: (a, b) => b.throughput_messages_per_second - a.throughput_messages_per_second },
         { label: 'Best Throughput CSV Replay', rows: rows.filter(r => r.workload_source === 'csv-replay'), sort: (a, b) => b.throughput_messages_per_second - a.throughput_messages_per_second },
-        { label: 'Lowest P95 Synthetic', rows: rows.filter(r => r.workload_source === 'synthetic'), sort: (a, b) => a.p95_latency_ms - b.p95_latency_ms },
+        { label: 'Lowest P95 Synthetic', rows: rows.filter(r => r.workload_source === 'synthetic' && r.profile === 'bulk'), sort: (a, b) => a.p95_latency_ms - b.p95_latency_ms },
         { label: 'Lowest P95 CSV Replay', rows: rows.filter(r => r.workload_source === 'csv-replay'), sort: (a, b) => a.p95_latency_ms - b.p95_latency_ms }
       ];
       const tbody = document.querySelector('#highlights-table tbody');
@@ -429,7 +695,7 @@
     }
 
     function renderCharts() {
-      const synthetic = rows.filter(r => r.workload_source === 'synthetic');
+      const synthetic = rows.filter(r => r.workload_source === 'synthetic' && r.profile === 'bulk');
       const csv = rows.filter(r => r.workload_source === 'csv-replay');
 
       const syntheticThroughput = synthetic.map(r => ({
@@ -471,7 +737,7 @@
         ['csv-replay', 'unary']
       ];
       const aggregate = aggregateKeys.map(([workload, transport]) => {
-        const subset = rows.filter(r => r.workload_source === workload && r.transport_mode === transport);
+        const subset = rows.filter(r => r.workload_source === workload && r.transport_mode === transport && (workload !== 'synthetic' || r.profile === 'bulk'));
         const avgThroughput = subset.reduce((sum, r) => sum + r.throughput_messages_per_second, 0) / subset.length;
         const avgP95 = subset.reduce((sum, r) => sum + r.p95_latency_ms, 0) / subset.length;
         return {
@@ -487,6 +753,9 @@
 
     createSummary();
     renderCharts();
+    createContinuousSection();
+    createRecoverySection();
+    createBackpressureSection();
     buildHighlights();
   </script>
 </body>

@@ -17,8 +17,10 @@ The metrics are chosen to line up with the papers already discussed in the thesi
 
 - throughput in messages per second and MiB per second;
 - end-to-end latency at the sink, reported as p50, p95, p99, and max;
+- inter-arrival regularity for continuous runs, reported as mean, p95, and jitter proxy at the sink;
 - total stream completion time for the run;
 - duplicate detection and per-flow ordering violations;
+- retry attempts, stream reconnects, and recovery timing during restart-oriented runs;
 - per-service message and byte counters through Prometheus-style `/metrics` endpoints;
 - container CPU and memory snapshots through `docker stats` sampling.
 
@@ -30,6 +32,13 @@ The experiment now supports two workload sources:
 
 - `synthetic`: deterministic generated payloads with exact size control;
 - `csv-replay`: repeated batches of rows from the copied DYNAMOS CSV datasets.
+
+Scenario behavior is controlled separately through the run profile and stress settings:
+
+- `bulk`: clean transfer baseline with no target send rate;
+- `continuous`: rate-limited flow where inter-arrival stability becomes meaningful;
+- slow-consumer runs via `SINK_PROCESS_DELAY_MS`;
+- recovery runs via `FAILURE_ACTION`, `FAILURE_TARGET`, `FAILURE_AFTER_SECONDS`, and producer retry settings.
 
 ## Why synthetic data first
 
@@ -129,8 +138,9 @@ CONCURRENCY=8 \
 Results are written to `results/`.
 
 - `*-sink-summary.json`: canonical end-to-end run summary.
-- `*-producer-result.json`: producer view plus stream acknowledgements and workload metadata.
+- `*-producer-result.json`: producer view plus workload metadata, retry counts, reconnect counts, and recovery timing.
 - `*-docker-stats.ndjson`: container CPU and memory snapshots taken during the run.
+- `*-summary.csv`: exported comparison table with sink metrics and per-role CPU/memory aggregates.
 
 ## Matrix runs and CSV export
 
@@ -140,6 +150,30 @@ Run the preset synthetic matrix:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
 	\\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\scripts\run-matrix.ps1 \
 	-Preset synthetic-clean
+```
+
+Run the continuous synthetic matrix that exposes inter-arrival regularity:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
+	\\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\scripts\run-matrix.ps1 \
+	-Preset synthetic-continuous
+```
+
+Run the slow-consumer matrix:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
+	\\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\scripts\run-matrix.ps1 \
+	-Preset synthetic-backpressure
+```
+
+Run the restart-and-recovery matrix:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
+	\\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\scripts\run-matrix.ps1 \
+	-Preset synthetic-recovery
 ```
 
 Run the smaller CSV replay matrix:
@@ -171,7 +205,6 @@ The recommended sequence is:
 ## What is intentionally not included yet
 
 - broker-based alternatives;
-- Prometheus/Grafana stack for historical dashboards;
-- automated multi-run matrix orchestration.
+- Prometheus/Grafana stack for historical dashboards.
 
 CSV replay is primarily wired for local Docker runs. For Kubernetes, the same envs are exposed in the manifests, but you still need to mount the datasets into the producer pod before enabling `WORKLOAD_SOURCE=csv-replay` there.

@@ -81,4 +81,7 @@ message RunSummary {
   int64 started_at_unix_nano = 15;
   int64 finished_at_unix_nano = 16;
   string transport_mode = 17;
+  double mean_inter_arrival_ms = 18;
+  double p95_inter_arrival_ms = 19;
+  double inter_arrival_jitter_ms = 20;
 }

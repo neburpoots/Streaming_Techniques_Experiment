@@ -1,288 +1,124 @@
-This is LuaHBTeX, Version 1.24.0 (MiKTeX 25.12) (format=lualatex 2026.3.8)  8 APR 2026 15:01
- restricted system commands enabled.
- file:line:error style messages enabled.
-**/home/nebur/Streaming_Techniques_Experiment/master-thesis/main
-(/home/nebur/Streaming_Techniques_Experiment/master-thesis/main.tex
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.8)  11 APR 2026 13:48
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**./main.tex
+(main.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
-Lua module: luaotfload 2024-12-03 v3.29 Lua based OpenType font support
-Lua module: lualibs 2023-07-13 v2.76 ConTeXt Lua standard libraries.
-Lua module: lualibs-extended 2023-07-13 v2.76 ConTeXt Lua libraries -- extended 
-collection.
-luaotfload | conf : Root cache directory is "C:/Users/nebur/AppData/Local/MiKTeX
-/luatex-cache/generic/names".
-luaotfload | init : Loading fontloader "fontloader-2023-12-28.lua" from kpse-res
-olved path "C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/luatex/luaotfload/f
-ontloader-2023-12-28.lua".
-Lua-only attribute luaotfload@noligature = 1
-luaotfload | init : Context OpenType loader version 3.134
-Inserting `luaotfload.node_processor' in `pre_linebreak_filter'.
-Inserting `luaotfload.node_processor' in `hpack_filter'.
-Inserting `luaotfload.glyph_stream' in `glyph_stream_provider'.
-Inserting `luaotfload.define_font' in `define_font'.
-Lua-only attribute luaotfload_color_attribute = 2
-luaotfload | conf : Root cache directory is "C:/Users/nebur/AppData/Local/MiKTeX
-/luatex-cache/generic/names".
-Inserting `luaotfload.harf.strip_prefix' in `find_opentype_file'.
-Inserting `luaotfload.harf.strip_prefix' in `find_truetype_file'.
-Removing  `luaotfload.glyph_stream' from `glyph_stream_provider'.
-Inserting `luaotfload.harf.glyphstream' in `glyph_stream_provider'.
-Inserting `luaotfload.harf.finalize_vlist' in `post_linebreak_filter'.
-Inserting `luaotfload.harf.finalize_hlist' in `hpack_filter'.
-Inserting `luaotfload.cleanup_files' in `wrapup_run'.
-Inserting `luaotfload.harf.finalize_unicode' in `finish_pdffile'.
-Inserting `luaotfload.glyphinfo' in `glyph_info'.
-Lua-only attribute luaotfload.letterspace_done = 3
-Inserting `luaotfload.aux.set_sscale_dimens' in `luaotfload.patch_font'.
-Inserting `luaotfload.aux.set_font_index' in `luaotfload.patch_font'.
-Inserting `luaotfload.aux.patch_cambria_domh' in `luaotfload.patch_font'.
-Inserting `luaotfload.aux.fixup_fontdata' in `luaotfload.patch_font_unsafe'.
-Inserting `luaotfload.aux.set_capheight' in `luaotfload.patch_font'.
-Inserting `luaotfload.aux.set_xheight' in `luaotfload.patch_font'.
-Inserting `luaotfload.rewrite_fontname' in `luaotfload.patch_font'.
-Inserting `tracingstacklevels' in `input_level_string'. (C:/Users/nebur/AppData
-/Local/Programs/MiKTeX/tex/latex/nag/nag.sty
-Package: nag 2011/11/25 0.7 warning about old commands (ulmi)
-\c@nag@c=\count273
-\c@nag@sins=\count274
-Package nag Info: Loaded nag-l2tabu.cfg  on input line 552.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/nag/nag-l2tabu.cfg
-File: nag-l2tabu.cfg 2010/05/17 v2.11 l2tabu rules for nag.sty (ulmi)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/ieeetran\IEEEtran.cls
+Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
+-- See the "IEEEtran_HOWTO" manual for usage information.
+-- http://www.michaelshell.org/tex/ieeetran/
+\@IEEEtrantmpdimenA=\dimen148
+\@IEEEtrantmpdimenB=\dimen149
+\@IEEEtrantmpdimenC=\dimen150
+\@IEEEtrantmpcountA=\count275
+\@IEEEtrantmpcountB=\count276
+\@IEEEtrantmpcountC=\count277
+\@IEEEtrantmptoksA=\toks17
+LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 5
+03.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
-Package nag Info: Loaded nag-orthodox.cfg  on input line 552.
+-- Using 210mm x 297mm (a4) paper.
+-- Using PDF output.
+\@IEEEnormalsizeunitybaselineskip=\dimen151
+-- This is a 10 point document.
+LaTeX Encoding Info:    Redeclaring text command \textunderscore (encoding ?) o
+n input line 937.
+\CLASSINFOnormalsizebaselineskip=\dimen152
+\CLASSINFOnormalsizeunitybaselineskip=\dimen153
+\IEEEnormaljot=\dimen154
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/nag/nag-orthodox.cfg
-File: nag-orthodox.cfg 2006/04/19 v1.8 strict rules for nag.sty (ulmi)
-))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/scrartcl.cl
-s
-Document Class: scrartcl 2026/02/02 v3.49.2 KOMA-Script document class (article
-)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/scrkbase.st
-y
-Package: scrkbase 2026/02/02 v3.49.2 KOMA-Script package (KOMA-Script-dependent
- basics and keyval usage)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/scrbase.sty
-Package: scrbase 2026/02/02 v3.49.2 KOMA-Script package (KOMA-Script-independen
-t basics and keyval usage)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/scrlfile.st
-y
-Package: scrlfile 2026/02/02 v3.49.2 KOMA-Script package (file load hooks)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/scrlfile-ho
-ok.sty
-Package: scrlfile-hook 2026/02/02 v3.49.2 KOMA-Script package (using LaTeX hook
-s)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <11> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <11> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/scrlogo.sty
-Package: scrlogo 2026/02/02 v3.49.2 KOMA-Script package (logo)
-))) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/graphics/keyval.sty
-Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
-\KV@toks@=\toks17
-)
-Applying: [2021/05/01] Usage of raw or classic option list on input line 254.
-Already applied: [0000/00/00] Usage of raw or classic option list on input line
- 370.
-))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/tocbasic.st
-y
-Package: tocbasic 2026/02/02 v3.49.2 KOMA-Script package (handling toc-files)
-\scr@dte@tocline@numberwidth=\skip49
-\scr@dte@tocline@numbox=\box53
-)
-Package tocbasic Info: omitting babel extension for `toc'
-(tocbasic)             because of feature `nobabel' available
-(tocbasic)             for `toc' on input line 141.
-Package scrartcl Info: You've used standard option `10pt'.
-(scrartcl)             This is correct!
-(scrartcl)             Internally I'm using `fontsize=10pt'.
-(scrartcl)             If you'd like to set the option with \KOMAoptions,
-(scrartcl)             you'd have to use `fontsize=10pt' there
-(scrartcl)             instead of `10pt', too.
-Class scrartcl Info: File `scrsize10pt.clo' used to setup font sizes on input l
-ine 2489.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/scrsize10pt
-.clo
-File: scrsize10pt.clo 2026/02/02 v3.49.2 KOMA-Script font size class option (10
-pt)
-luaotfload | db : Font names database loaded from C:/Users/nebur/AppData/Local/M
-iKTeX/luatex-cache/generic/names/luaotfload-names.luc.gz)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/koma-script/typearea.st
-y
-Package: typearea 2026/02/02 v3.49.2 KOMA-Script package (type area)
-\ta@bcor=\skip50
-\ta@div=\count275
-Package typearea Info: You've used standard option `a4paper'.
-(typearea)             This is correct!
-(typearea)             Internally I'm using `paper=a4'.
-(typearea)             If you'd like to set the option with \KOMAoptions,
-(typearea)             you'd have to use `paper=a4' there
-(typearea)             instead of `a4paper', too.
-\ta@hblk=\skip51
-\ta@vblk=\skip52
-\ta@temp=\skip53
-\footheight=\skip54
-Package typearea Info: These are the values describing the layout:
-(typearea)             DIV  = 8
-(typearea)             BCOR = 0.0pt
-(typearea)             \paperwidth      = 597.50793pt
-(typearea)              \textwidth      = 373.44246pt
-(typearea)              DIV departure   = -4%
-(typearea)              \evensidemargin = 39.76274pt
-(typearea)              \oddsidemargin  = 39.76274pt
-(typearea)             \paperheight     = 845.04694pt
-(typearea)              \textheight     = 538.0pt
-(typearea)              \topmargin      = 0.36087pt
-(typearea)              \headheight     = 15.0pt
-(typearea)              \headsep        = 18.0pt
-(typearea)              \topskip        = 10.0pt
-(typearea)              \footskip       = 42.0pt
-(typearea)              \baselineskip   = 12.0pt
-(typearea)              on input line 1810.
-)
-\c_scrartcl_cmdhook_cctab=\catcodetable14
-\c@part=\count276
-\c@section=\count277
-\c@subsection=\count278
-\c@subsubsection=\count279
-\c@paragraph=\count280
-\c@subparagraph=\count281
-\scr@dte@section@maxnumwidth=\skip55
-Class scrartcl Info: using compatibility default `runin=bysign'
-(scrartcl)           for `\section on input line 5015.
-Class scrartcl Info: using compatibility default `afterindent=bysign'
-(scrartcl)           for `\section on input line 5015.
-\scr@dte@part@maxnumwidth=\skip56
-Class scrartcl Info: using compatibility default `afterindent=false'
-(scrartcl)           for `\part on input line 5023.
-\scr@dte@subsection@maxnumwidth=\skip57
-Class scrartcl Info: using compatibility default `runin=bysign'
-(scrartcl)           for `\subsection on input line 5033.
-Class scrartcl Info: using compatibility default `afterindent=bysign'
-(scrartcl)           for `\subsection on input line 5033.
-\scr@dte@subsubsection@maxnumwidth=\skip58
-Class scrartcl Info: using compatibility default `runin=bysign'
-(scrartcl)           for `\subsubsection on input line 5043.
-Class scrartcl Info: using compatibility default `afterindent=bysign'
-(scrartcl)           for `\subsubsection on input line 5043.
-\scr@dte@paragraph@maxnumwidth=\skip59
-Class scrartcl Info: using compatibility default `runin=bysign'
-(scrartcl)           for `\paragraph on input line 5054.
-Class scrartcl Info: using compatibility default `afterindent=bysign'
-(scrartcl)           for `\paragraph on input line 5054.
-\scr@dte@subparagraph@maxnumwidth=\skip60
-Class scrartcl Info: using compatibility default `runin=bysign'
-(scrartcl)           for `\subparagraph on input line 5064.
-Class scrartcl Info: using compatibility default `afterindent=bysign'
-(scrartcl)           for `\subparagraph on input line 5064.
-\abovecaptionskip=\skip61
-\belowcaptionskip=\skip62
-\c@pti@nb@sid@b@x=\box54
-Package tocbasic Info: omitting babel extension for `lof'
-(tocbasic)             because of feature `nobabel' available
-(tocbasic)             for `lof' on input line 6287.
-\scr@dte@figure@maxnumwidth=\skip63
-\c@figure=\count282
-Package tocbasic Info: omitting babel extension for `lot'
-(tocbasic)             because of feature `nobabel' available
-(tocbasic)             for `lot' on input line 6299.
-\scr@dte@table@maxnumwidth=\skip64
-\c@table=\count283
-Class scrartcl Info: Redefining `\numberline' on input line 6469.
-\bibindent=\dimen147
-) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/babel/babel.sty
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <17> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <20> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <20> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <24> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1090.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <24> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1090.
+
+\IEEEquantizedlength=\dimen155
+\IEEEquantizedlengthdiff=\dimen156
+\IEEEquantizedtextheightdiff=\dimen157
+\IEEEilabelindentA=\dimen158
+\IEEEilabelindentB=\dimen159
+\IEEEilabelindent=\dimen160
+\IEEEelabelindent=\dimen161
+\IEEEdlabelindent=\dimen162
+\IEEElabelindent=\dimen163
+\IEEEiednormlabelsep=\dimen164
+\IEEEiedmathlabelsep=\dimen165
+\IEEEiedtopsep=\skip49
+\c@section=\count278
+\c@subsection=\count279
+\c@subsubsection=\count280
+\c@paragraph=\count281
+\c@IEEEsubequation=\count282
+\abovecaptionskip=\skip50
+\belowcaptionskip=\skip51
+\c@figure=\count283
+\c@table=\count284
+\@IEEEeqnnumcols=\count285
+\@IEEEeqncolcnt=\count286
+\@IEEEsubeqnnumrollback=\count287
+\@IEEEquantizeheightA=\dimen166
+\@IEEEquantizeheightB=\dimen167
+\@IEEEquantizeheightC=\dimen168
+\@IEEEquantizeprevdepth=\dimen169
+\@IEEEquantizemultiple=\count288
+\@IEEEquantizeboxA=\box53
+\@IEEEtmpitemindent=\dimen170
+\IEEEPARstartletwidth=\dimen171
+\c@IEEEbiography=\count289
+\@IEEEtranrubishbin=\box54
+) (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
 Package: babel 2025/12/11 v25.17 The multilingual framework for LuaLaTeX, pdfLa
 TeX and XeLaTeX
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/babel/luababel.def
-\bbl@readstream=\read2
-\l@afrikaans=\language2
-Package babel Info: Non-standard hyphenation setup on input line 118.
-\l@ancientgreek=\language3
-\l@armenian=\language4
-\l@assamese=\language5
-\l@basque=\language6
-\l@belarusian=\language7
-\l@bengali=\language8
-\l@bokmal=\language9
-\l@bulgarian=\language10
-\l@catalan=\language11
-\l@churchslavonic=\language12
-\l@classiclatin=\language13
-\l@coptic=\language14
-\l@croatian=\language15
-\l@czech=\language16
-\l@danish=\language17
-\l@dutch=\language18
-\l@esperanto=\language19
-\l@estonian=\language20
-\l@ethiopic=\language21
-\l@finnish=\language22
-\l@french=\language23
-\l@friulan=\language24
-\l@galician=\language25
-\l@georgian=\language26
-\l@german=\language27
-\l@greek=\language28
-\l@gujarati=\language29
-\l@hindi=\language30
-\l@hungarian=\language31
-\l@icelandic=\language32
-\l@indonesian=\language33
-\l@interlingua=\language34
-\l@irish=\language35
-\l@italian=\language36
-\l@kannada=\language37
-\l@kurmanji=\language38
-\l@latin=\language39
-\l@latvian=\language40
-\l@lithuanian=\language41
-\l@liturgicallatin=\language42
-\l@macedonian=\language43
-\l@malayalam=\language44
-\l@marathi=\language45
-\l@mongolian=\language46
-\l@mongolianlmc=\language47
-\l@monogreek=\language48
-\l@ngerman=\language49
-\l@nynorsk=\language50
-\l@occitan=\language51
-\l@oriya=\language52
-\l@pali=\language53
-\l@panjabi=\language54
-\l@piedmontese=\language55
-\l@polish=\language56
-\l@portuguese=\language57
-\l@romanian=\language58
-\l@romansh=\language59
-\l@russian=\language60
-\l@sanskrit=\language61
-\l@serbian=\language62
-\l@serbianc=\language63
-\l@slovak=\language64
-\l@slovenian=\language65
-\l@spanish=\language66
-\l@swedish=\language67
-\l@swissgerman=\language68
-\l@tamil=\language69
-\l@telugu=\language70
-\l@thai=\language71
-\l@turkish=\language72
-\l@turkmen=\language73
-\l@ukenglish=\language74
-\l@ukrainian=\language75
-\l@uppersorbian=\language76
-\l@usenglishmax=\language77
-\l@welsh=\language78
-\babelcatcodetablenum=\catcodetable15
-\bbl@pattcodes=\catcodetable16
-)
-\babel@savecnt=\count284
+\babel@savecnt=\count290
 LaTeX Encoding Info:    Redeclaring text command \ij (encoding OT1) on input li
 ne 2068.
 LaTeX Encoding Info:    Redeclaring text command \IJ (encoding OT1) on input li
@@ -297,12 +133,12 @@ LaTeX Encoding Info:    Ignoring declaration for text command \IJ (encoding ?)
 on input line 2076.
 LaTeX Encoding Info:    Ignoring declaration for text command \SS (encoding ?) 
 on input line 2101.
-\U@D=\dimen148
+\U@D=\dimen172
 \l@unhyphenated=\language79
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/babel/luababel.def
-\bbl@attr@locale=\attribute4
-)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/babel\txtbabel.def)
+\bbl@readstream=\read2
+\bbl@dirlevel=\count291
 Package babel Info: Configuration files are deprecated, as
 (babel)             they can break document portability.
 (babel)             Reported on input line 4196.
@@ -310,206 +146,151 @@ Package babel Info: Configuration files are deprecated, as
 *************************************
 * Local config file bblopts.cfg used
 *
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/arabi/bblopts.cfg
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/arabi\bblopts.cfg
 File: bblopts.cfg 2005/09/08 v0.1 add Arabic and Farsi to "declared" options of
  babel
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/babel/locale/en/babel
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/babel/locale/en\babel
 -british.tex)
 Package babel Info: Importing font and identification data for british
 (babel)             from babel-en-GB.ini. Reported on input line 4320.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/babel-english/british.l
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/babel-english\british.l
 df
 Language: british 2017/06/06 v3.3r English support from the babel system
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/babel-english/english.l
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/babel-english\english.l
 df
 Language: english 2017/06/06 v3.3r English support from the babel system
 Package babel Info: Hyphen rules for 'canadian' set to \l@english
 (babel)             (\language0). Reported on input line 102.
 Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
-(babel)             (\language74). Reported on input line 105.
+(babel)             (\language73). Reported on input line 105.
 Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
-(babel)             (\language74). Reported on input line 108.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/hyph-utf8/loadhyph/lo
-adhyph-en-gb.tex ASCII Hyphenation patterns for British English
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/hyph-utf8/patterns/te
-x/hyph-en-gb.tex)))))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/microtype/microtype.sty
-Package: microtype 2026/03/01 v3.2d Micro-typographical refinements (RS)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/etoolbox/etoolbox.sty
-Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count285
-)
-\MT@toks=\toks18
-\MT@tempbox=\box55
-\MT@count=\count286
-LaTeX Info: Redefining \noprotrusionifhmode on input line 1084.
-LaTeX Info: Redefining \leftprotrusion on input line 1085.
-\MT@prot@toks=\toks19
-LaTeX Info: Redefining \rightprotrusion on input line 1104.
-LaTeX Info: Redefining \textls on input line 1449.
-\MT@outer@kern=\dimen149
-LaTeX Info: Redefining \microtypecontext on input line 2053.
-LaTeX Info: Redefining \textmicrotypecontext on input line 2070.
-\MT@listname@count=\count287
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/microtype/microtype-lua
-tex.def
-File: microtype-luatex.def 2026/03/01 v3.2d Definitions specific to luatex (RS)
-
-Lua module: microtype 2026/03/01 v3.2d microtype module.
-Module microtype Info: overwriting function `keepligature' on input line 63
-LaTeX Info: Redefining \lsstyle on input line 779.
-LaTeX Info: Redefining \lslig on input line 779.
-\MT@outer@space=\skip65
-)
-Package microtype Info: Loading configuration file microtype.cfg.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/microtype/microtype.cfg
-File: microtype.cfg 2026/03/01 v3.2d microtype main configuration file (RS)
-)
-LaTeX Info: Redefining \microtypesetup on input line 3065.
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/csquotes/csquotes.sty
-Package: csquotes 2024-04-04 v5.2o context-sensitive quotations (JAW)
-\csq@reset=\count288
-\csq@gtype=\count289
-\csq@glevel=\count290
-\csq@qlevel=\count291
-\csq@maxlvl=\count292
-\csq@tshold=\count293
-\csq@ltx@everypar=\toks20
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/csquotes/csquotes.def
-File: csquotes.def 2024-04-04 v5.2o csquotes generic definitions (JAW)
-)
-Package csquotes Info: Trying to load configuration file 'csquotes.cfg'...
-Package csquotes Info: ... configuration file loaded successfully.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/csquotes/csquotes.cfg
-File: csquotes.cfg 
-)) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgfplots/pgfplots.st
-y
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplots.rev
+(babel)             (\language73). Reported on input line 108.
+)))
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgfplots\pgfplots.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.rev
 ision.tex)
 Package: pgfplots 2021/05/15 v1.18.1 Data Visualization (1.18.1)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/graphics/graphicx.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/graphics/graphics.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks18
+)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
 Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/graphics/trig.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
 Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/graphics-cfg/graphics.c
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
 fg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: luatex.def on input line 106.
+Package graphics Info: Driver file: pdftex.def on input line 106.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/graphics-def/luatex.def
-File: luatex.def 2025/09/29 v1.2f Graphics/color driver for luatex
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen150
-\Gin@req@width=\dimen151
+\Gin@req@height=\dimen173
+\Gin@req@width=\dimen174
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/frontendlayer/tikz.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz.
 sty
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/basiclayer/pgf.sty
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/utilities/pgfrcs.st
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.st
 y
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/utilities/pgfutil
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
 -common.tex
-\pgfutil@everybye=\toks21
-\pgfutil@tempdima=\dimen152
-\pgfutil@tempdimb=\dimen153
+\pgfutil@everybye=\toks19
+\pgfutil@tempdima=\dimen175
+\pgfutil@tempdimb=\dimen176
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/utilities/pgfutil
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
 -latex.def
-\pgfutil@abb=\box56
+\pgfutil@abb=\box55
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/utilities/pgfrcs.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs.
 code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/pgf.revision.tex)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.tex)
 Package: pgfrcs 2025-08-29 v3.1.11a (3.1.11a)
 ))
 Package: pgf 2025-08-29 v3.1.11a (3.1.11a)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/basiclayer/pgfcore.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgfcore.
 sty
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/systemlayer/pgfsys.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsys.
 sty
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/systemlayer/pgfsy
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
 s.code.tex
 Package: pgfsys 2025-08-29 v3.1.11a (3.1.11a)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/utilities/pgfkeys
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
 .code.tex
-\pgfkeys@pathtoks=\toks22
-\pgfkeys@temptoks=\toks23
+\pgfkeys@pathtoks=\toks20
+\pgfkeys@temptoks=\toks21
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/utilities/pgfkeys
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
 libraryfiltered.code.tex
-\pgfkeys@tmptoks=\toks24
+\pgfkeys@tmptoks=\toks22
 ))
-\pgf@x=\dimen154
-\pgf@y=\dimen155
-\pgf@xa=\dimen156
-\pgf@ya=\dimen157
-\pgf@xb=\dimen158
-\pgf@yb=\dimen159
-\pgf@xc=\dimen160
-\pgf@yc=\dimen161
-\pgf@xd=\dimen162
-\pgf@yd=\dimen163
+\pgf@x=\dimen177
+\pgf@y=\dimen178
+\pgf@xa=\dimen179
+\pgf@ya=\dimen180
+\pgf@xb=\dimen181
+\pgf@yb=\dimen182
+\pgf@xc=\dimen183
+\pgf@yc=\dimen184
+\pgf@xd=\dimen185
+\pgf@yd=\dimen186
 \w@pgf@writea=\write3
 \r@pgf@reada=\read3
-\c@pgf@counta=\count294
-\c@pgf@countb=\count295
-\c@pgf@countc=\count296
-\c@pgf@countd=\count297
-\t@pgf@toka=\toks25
-\t@pgf@tokb=\toks26
-\t@pgf@tokc=\toks27
-\pgf@sys@id@count=\count298
+\c@pgf@counta=\count292
+\c@pgf@countb=\count293
+\c@pgf@countc=\count294
+\c@pgf@countd=\count295
+\t@pgf@toka=\toks23
+\t@pgf@tokb=\toks24
+\t@pgf@tokc=\toks25
+\pgf@sys@id@count=\count296
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/systemlayer/pgf.c
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf.c
 fg
 File: pgf.cfg 2025-08-29 v3.1.11a (3.1.11a)
 )
-Driver file for pgf: pgfsys-luatex.def
+Driver file for pgf: pgfsys-pdftex.def
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/systemlayer/pgfsy
-s-luatex.def
-File: pgfsys-luatex.def 2025-08-29 v3.1.11a (3.1.11a)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-pdftex.def
+File: pgfsys-pdftex.def 2025-08-29 v3.1.11a (3.1.11a)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/systemlayer/pgfsy
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
 s-common-pdf.def
 File: pgfsys-common-pdf.def 2025-08-29 v3.1.11a (3.1.11a)
 )))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/systemlayer/pgfsy
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
 ssoftpath.code.tex
 File: pgfsyssoftpath.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfsyssoftpath@smallbuffer@items=\count299
-\pgfsyssoftpath@bigbuffer@items=\count300
+\pgfsyssoftpath@smallbuffer@items=\count297
+\pgfsyssoftpath@bigbuffer@items=\count298
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/systemlayer/pgfsy
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
 sprotocol.code.tex
 File: pgfsysprotocol.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 ))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
 Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/graphics-cfg/color.cfg
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
-Package xcolor Info: Driver file: luatex.def on input line 274.
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/graphics/mathcolor.ltx)
+Package xcolor Info: Driver file: pdftex.def on input line 274.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
 Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1349.
 Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1353.
 Package xcolor Info: Model `RGB' extended on input line 1365.
@@ -520,1157 +301,568 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 e.code.tex
 Package: pgfcore 2025-08-29 v3.1.11a (3.1.11a)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmath.code
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
 .tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathutil.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathutil.
 code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathparse
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathparse
 r.code.tex
-\pgfmath@dimen=\dimen164
-\pgfmath@count=\count301
-\pgfmath@box=\box57
-\pgfmath@toks=\toks28
-\pgfmath@stack@operand=\toks29
-\pgfmath@stack@operation=\toks30
+\pgfmath@dimen=\dimen187
+\pgfmath@count=\count299
+\pgfmath@box=\box56
+\pgfmath@toks=\toks26
+\pgfmath@stack@operand=\toks27
+\pgfmath@stack@operation=\toks28
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.basic.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.trigonometric.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.random.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.comparison.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.base.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.round.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.misc.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfunct
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
 ions.integerarithmetics.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathcalc.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathcalc.
 code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmathfloat
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfloat
 .code.tex
-\c@pgfmathroundto@lastzeros=\count302
+\c@pgfmathroundto@lastzeros=\count300
 ))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfint.code.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.code.
 tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 epoints.code.tex
 File: pgfcorepoints.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@picminx=\dimen165
-\pgf@picmaxx=\dimen166
-\pgf@picminy=\dimen167
-\pgf@picmaxy=\dimen168
-\pgf@pathminx=\dimen169
-\pgf@pathmaxx=\dimen170
-\pgf@pathminy=\dimen171
-\pgf@pathmaxy=\dimen172
-\pgf@xx=\dimen173
-\pgf@xy=\dimen174
-\pgf@yx=\dimen175
-\pgf@yy=\dimen176
-\pgf@zx=\dimen177
-\pgf@zy=\dimen178
+\pgf@picminx=\dimen188
+\pgf@picmaxx=\dimen189
+\pgf@picminy=\dimen190
+\pgf@picmaxy=\dimen191
+\pgf@pathminx=\dimen192
+\pgf@pathmaxx=\dimen193
+\pgf@pathminy=\dimen194
+\pgf@pathmaxy=\dimen195
+\pgf@xx=\dimen196
+\pgf@xy=\dimen197
+\pgf@yx=\dimen198
+\pgf@yy=\dimen199
+\pgf@zx=\dimen256
+\pgf@zy=\dimen257
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 epathconstruct.code.tex
 File: pgfcorepathconstruct.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@path@lastx=\dimen179
-\pgf@path@lasty=\dimen180
+\pgf@path@lastx=\dimen258
+\pgf@path@lasty=\dimen259
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 epathusage.code.tex
 File: pgfcorepathusage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@shorten@end@additional=\dimen181
-\pgf@shorten@start@additional=\dimen182
+\pgf@shorten@end@additional=\dimen260
+\pgf@shorten@start@additional=\dimen261
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 escopes.code.tex
 File: pgfcorescopes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfpic=\box58
-\pgf@hbox=\box59
-\pgf@layerbox@main=\box60
-\pgf@picture@serial@count=\count303
+\pgfpic=\box57
+\pgf@hbox=\box58
+\pgf@layerbox@main=\box59
+\pgf@picture@serial@count=\count301
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 egraphicstate.code.tex
 File: pgfcoregraphicstate.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgflinewidth=\dimen183
+\pgflinewidth=\dimen262
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 etransformations.code.tex
 File: pgfcoretransformations.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@pt@x=\dimen184
-\pgf@pt@y=\dimen185
-\pgf@pt@temp=\dimen186
+\pgf@pt@x=\dimen263
+\pgf@pt@y=\dimen264
+\pgf@pt@temp=\dimen265
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 equick.code.tex
 File: pgfcorequick.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 eobjects.code.tex
 File: pgfcoreobjects.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 epathprocessing.code.tex
 File: pgfcorepathprocessing.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 earrows.code.tex
 File: pgfcorearrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfarrowsep=\dimen187
+\pgfarrowsep=\dimen266
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 eshade.code.tex
 File: pgfcoreshade.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@max=\dimen188
-\pgf@sys@shading@range@num=\count304
-\pgf@shadingcount=\count305
+\pgf@max=\dimen267
+\pgf@sys@shading@range@num=\count302
+\pgf@shadingcount=\count303
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 eimage.code.tex
 File: pgfcoreimage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 eexternal.code.tex
 File: pgfcoreexternal.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfexternal@startupbox=\box61
+\pgfexternal@startupbox=\box60
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 elayers.code.tex
 File: pgfcorelayers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 etransparency.code.tex
 File: pgfcoretransparency.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 epatterns.code.tex
 File: pgfcorepatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/basiclayer/pgfcor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
 erdf.code.tex
 File: pgfcorerdf.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/modules/pgfmodule
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
 shapes.code.tex
 File: pgfmoduleshapes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfnodeparttextbox=\box62
+\pgfnodeparttextbox=\box61
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/modules/pgfmodule
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
 plot.code.tex
 File: pgfmoduleplot.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/compatibility/pgfco
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfco
 mp-version-0-65.sty
 Package: pgfcomp-version-0-65 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@nodesepstart=\dimen189
-\pgf@nodesepend=\dimen190
+\pgf@nodesepstart=\dimen268
+\pgf@nodesepend=\dimen269
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/compatibility/pgfco
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfco
 mp-version-1-18.sty
 Package: pgfcomp-version-1-18 2025-08-29 v3.1.11a (3.1.11a)
 ))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/utilities/pgffor.st
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgffor.st
 y
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/utilities/pgfkeys.s
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys.s
 ty
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/utilities/pgfkeys
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
 .code.tex))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/math/pgfmath.sty
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/math/pgfmath.code
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
 .tex))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/utilities/pgffor.
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffor.
 code.tex
 Package: pgffor 2025-08-29 v3.1.11a (3.1.11a)
-\pgffor@iter=\dimen191
-\pgffor@skip=\dimen192
-\pgffor@stack=\toks31
-\pgffor@toks=\toks32
+\pgffor@iter=\dimen270
+\pgffor@skip=\dimen271
+\pgffor@stack=\toks29
+\pgffor@toks=\toks30
 ))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/tikz.code.tex
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z\tikz.code.tex
 Package: tikz 2025-08-29 v3.1.11a (3.1.11a)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/pgflibr
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
 aryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@plot@mark@count=\count306
-\pgfplotmarksize=\dimen193
+\pgf@plot@mark@count=\count304
+\pgfplotmarksize=\dimen272
 )
-\tikz@lastx=\dimen194
-\tikz@lasty=\dimen195
-\tikz@lastxsaved=\dimen196
-\tikz@lastysaved=\dimen197
-\tikz@lastmovetox=\dimen198
-\tikz@lastmovetoy=\dimen199
-\tikzleveldistance=\dimen256
-\tikzsiblingdistance=\dimen257
-\tikz@figbox=\box63
-\tikz@figbox@bg=\box64
-\tikz@tempbox=\box65
-\tikz@tempbox@bg=\box66
-\tikztreelevel=\count307
-\tikznumberofchildren=\count308
-\tikznumberofcurrentchild=\count309
-\tikz@fig@count=\count310
+\tikz@lastx=\dimen273
+\tikz@lasty=\dimen274
+\tikz@lastxsaved=\dimen275
+\tikz@lastysaved=\dimen276
+\tikz@lastmovetox=\dimen277
+\tikz@lastmovetoy=\dimen278
+\tikzleveldistance=\dimen279
+\tikzsiblingdistance=\dimen280
+\tikz@figbox=\box62
+\tikz@figbox@bg=\box63
+\tikz@tempbox=\box64
+\tikz@tempbox@bg=\box65
+\tikztreelevel=\count305
+\tikznumberofchildren=\count306
+\tikznumberofcurrentchild=\count307
+\tikz@fig@count=\count308
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/modules/pgfmodule
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
 matrix.code.tex
 File: pgfmodulematrix.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfmatrixcurrentrow=\count311
-\pgfmatrixcurrentcolumn=\count312
-\pgf@matrix@numberofcolumns=\count313
+\pgfmatrixcurrentrow=\count309
+\pgfmatrixcurrentcolumn=\count310
+\pgf@matrix@numberofcolumns=\count311
 )
-\tikz@expandcount=\count314
+\tikz@expandcount=\count312
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibrarytopaths.code.tex
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarytopaths.code.tex
 File: tikzlibrarytopaths.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplots.cod
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.cod
 e.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplotscore
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotscore
 .code.tex
-Package pgfplots info on input line 124: Initializing with LUA version Lua 5.3
-\pgfplots@luabackend@table=\catcodetable17
-\t@pgfplots@toka=\toks33
-\t@pgfplots@tokb=\toks34
-\t@pgfplots@tokc=\toks35
-\pgfplots@tmpa=\dimen258
-\c@pgfplots@coordindex=\count315
-\c@pgfplots@scanlineindex=\count316
+\t@pgfplots@toka=\toks31
+\t@pgfplots@tokb=\toks32
+\t@pgfplots@tokc=\toks33
+\pgfplots@tmpa=\dimen281
+\c@pgfplots@coordindex=\count313
+\c@pgfplots@scanlineindex=\count314
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/sys/pgfplots
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/sys\pgfplots
 sysgeneric.code.tex))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/libs/pgfplot
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/libs\pgfplot
 slibrary.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/oldpgfcompat
-ib/pgfplotsoldpgfsupp_loader.code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/pgflibr
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/oldpgfcompat
+ib\pgfplotsoldpgfsupp_loader.code.tex
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
 aryfpu.code.tex)
 Package pgfplots: loading complementary utilities for your pgf version...
-\t@pgf@toka=\toks36
-\t@pgf@tokb=\toks37
-\t@pgf@tokc=\toks38
+\t@pgf@toka=\toks34
+\t@pgf@tokb=\toks35
+\t@pgf@tokc=\toks36
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/oldpgfcompat
-ib/pgfplotsoldpgfsupp_pgfutil-common-lists.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/luamath
-/pgflibraryluamath.code.tex)
-Package pgfplots info on input line 290: luamath library shipped with pgf 3.1.1
-1a is up-to-date
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/util/pgfplot
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/oldpgfcompat
+ib\pgfplotsoldpgfsupp_pgfutil-common-lists.tex))
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
 sutil.code.tex
-Package pgfplots info on input line 82: Found new luatex: initializing lua comm
-ands instead of write18 (shell-escape)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/liststructur
-e/pgfplotsliststructure.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/liststructur
-e/pgfplotsliststructureext.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/liststructur
-e/pgfplotsarray.code.tex
-\c@pgfplotsarray@tmp=\count317
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsliststructure.code.tex)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsliststructureext.code.tex)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsarray.code.tex
+\c@pgfplotsarray@tmp=\count315
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/liststructur
-e/pgfplotsmatrix.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/numtable/pgf
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsmatrix.code.tex)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/numtable\pgf
 plotstableshared.code.tex
-\c@pgfplotstable@counta=\count318
-\t@pgfplotstable@a=\toks39
+\c@pgfplotstable@counta=\count316
+\t@pgfplotstable@a=\toks37
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/liststructur
-e/pgfplotsdeque.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/util/pgfplot
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/liststructur
+e\pgfplotsdeque.code.tex)
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
 sbinary.code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/util/pgfplot
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
 sbinary.data.code.tex))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/util/pgfplot
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
 sutil.verb.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/libs/pgflibr
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/libs\pgflibr
 arypgfplots.surfshading.code.tex
-\c@pgfplotslibrarysurf@no=\count319
+\c@pgfplotslibrarysurf@no=\count317
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/sys/pgflibra
-rypgfplots.surfshading.pgfsys-luatex.def)))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/util/pgfplot
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/sys\pgflibra
+rypgfplots.surfshading.pgfsys-pdftex.def)))
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
 scolormap.code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/util/pgfplot
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/util\pgfplot
 scolor.code.tex))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplotsstac
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotsstac
 kedplots.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplotsplot
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotsplot
 handlers.code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplotsmesh
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotsmesh
 plothandler.code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplotsmesh
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotsmesh
 plotimage.code.tex)))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplots.sca
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.sca
 ling.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplotscoor
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotscoor
 dprocessing.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplots.err
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.err
 orbars.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplots.mar
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.mar
 kers.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplotstick
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplotstick
 s.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/pgfplots.pat
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots\pgfplots.pat
 hs.code.tex)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibrarydecorations.code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/modules/pgfmodule
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarydecorations.code.tex
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
 decorations.code.tex
-\pgfdecoratedcompleteddistance=\dimen259
-\pgfdecoratedremainingdistance=\dimen260
-\pgfdecoratedinputsegmentcompleteddistance=\dimen261
-\pgfdecoratedinputsegmentremainingdistance=\dimen262
-\pgf@decorate@distancetomove=\dimen263
-\pgf@decorate@repeatstate=\count320
-\pgfdecorationsegmentamplitude=\dimen264
-\pgfdecorationsegmentlength=\dimen265
+\pgfdecoratedcompleteddistance=\dimen282
+\pgfdecoratedremainingdistance=\dimen283
+\pgfdecoratedinputsegmentcompleteddistance=\dimen284
+\pgfdecoratedinputsegmentremainingdistance=\dimen285
+\pgf@decorate@distancetomove=\dimen286
+\pgf@decorate@repeatstate=\count318
+\pgfdecorationsegmentamplitude=\dimen287
+\pgfdecorationsegmentlength=\dimen288
 )
-\tikz@lib@dec@box=\box67
+\tikz@lib@dec@box=\box66
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibrarydecorations.pathmorphing.code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/decorat
-ions/pgflibrarydecorations.pathmorphing.code.tex))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibrarydecorations.pathreplacing.code.tex
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/decorat
-ions/pgflibrarydecorations.pathreplacing.code.tex))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgfplots/libs/tikzlib
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarydecorations.pathmorphing.code.tex
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/decorat
+ions\pgflibrarydecorations.pathmorphing.code.tex))
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarydecorations.pathreplacing.code.tex
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/decorat
+ions\pgflibrarydecorations.pathreplacing.code.tex))
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgfplots/libs\tikzlib
 rarypgfplots.contourlua.code.tex)
-\pgfplots@numplots=\count321
-\pgfplots@xmin@reg=\dimen266
-\pgfplots@xmax@reg=\dimen267
-\pgfplots@ymin@reg=\dimen268
-\pgfplots@ymax@reg=\dimen269
-\pgfplots@zmin@reg=\dimen270
-\pgfplots@zmax@reg=\dimen271
+\pgfplots@numplots=\count319
+\pgfplots@xmin@reg=\dimen289
+\pgfplots@xmax@reg=\dimen290
+\pgfplots@ymin@reg=\dimen291
+\pgfplots@ymax@reg=\dimen292
+\pgfplots@zmin@reg=\dimen293
+\pgfplots@zmax@reg=\dimen294
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibraryplotmarks.code.tex
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibraryplotmarks.code.tex
 File: tikzlibraryplotmarks.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/pgflibr
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
 aryplotmarks.code.tex
 File: pgflibraryplotmarks.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/biblatex.sty
-Package: biblatex 2025/07/10 v3.21 programmable bibliographies (PK/MW)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pdftexcmds/pdftexcmds
-.sty
-Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/cite\cite.sty
+LaTeX Info: Redefining \cite on input line 302.
+LaTeX Info: Redefining \nocite on input line 332.
+Package: cite 2015/02/27  v 5.5
 )
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/infwarerr/infwarerr.s
-ty
-Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
-) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/iftex/iftex.sty
-Package: iftex 2024/12/12 v1.0g TeX engine tests
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/ltxcmds/ltxcmds.sty
-Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
-)
-Package pdftexcmds Info: \pdf@primitive is available.
-Package pdftexcmds Info: \pdf@ifprimitive is available.
-Package pdftexcmds Info: \pdfdraftmode found.
-\pdftexcmds@toks=\toks40
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/kvoptions/kvoptions.sty
-Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/kvsetkeys/kvsetkeys.sty
-Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
-)) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/logreq/logreq.sty
-Package: logreq 2010/08/04 v1.0 xml request logger
-\lrq@indent=\count322
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/logreq/logreq.def
-File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
-))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/base/ifthen.sty
-Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip17
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
-\c@tabx@nest=\count323
-\c@listtotal=\count324
-\c@listcount=\count325
-\c@liststart=\count326
-\c@liststop=\count327
-\c@citecount=\count328
-\c@citetotal=\count329
-\c@multicitecount=\count330
-\c@multicitetotal=\count331
-\c@instcount=\count332
-\c@maxnames=\count333
-\c@minnames=\count334
-\c@maxitems=\count335
-\c@minitems=\count336
-\c@citecounter=\count337
-\c@maxcitecounter=\count338
-\c@savedcitecounter=\count339
-\c@uniquelist=\count340
-\c@uniquename=\count341
-\c@refsection=\count342
-\c@refsegment=\count343
-\c@maxextratitle=\count344
-\c@maxextratitleyear=\count345
-\c@maxextraname=\count346
-\c@maxextradate=\count347
-\c@maxextraalpha=\count348
-\c@abbrvpenalty=\count349
-\c@highnamepenalty=\count350
-\c@lownamepenalty=\count351
-\c@maxparens=\count352
-\c@parenlevel=\count353
-\blx@tempcnta=\count354
-\blx@tempcntb=\count355
-\blx@tempcntc=\count356
-\c@blx@maxsection=\count357
-\blx@maxsegment@0=\count358
-\blx@notetype=\count359
-\blx@parenlevel@text=\count360
-\blx@parenlevel@foot=\count361
-\blx@sectionciteorder@0=\count362
-\blx@sectionciteorderinternal@0=\count363
-\blx@entrysetcounter=\count364
-\blx@biblioinstance=\count365
-\labelnumberwidth=\skip66
-\labelalphawidth=\skip67
-\biblabelsep=\skip68
-\bibitemsep=\skip69
-\bibnamesep=\skip70
-\bibinitsep=\skip71
-\bibparsep=\skip72
-\bibhang=\skip73
-\blx@bcfin=\read4
-\blx@bcfout=\write4
-\blx@langwohyphens=\language80
-\c@mincomprange=\count366
-\c@maxcomprange=\count367
-\c@mincompwidth=\count368
-Package biblatex Info: Trying to load biblatex default data model...
-Package biblatex Info: ... file 'blx-dm.def' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/blx-dm.def
-File: blx-dm.def 2025/07/10 v3.21 biblatex datamodel (PK/MW)
-)
-Package biblatex Info: Trying to load biblatex style data model...
-Package biblatex Info: ... file 'numeric-comp.dbx' not found.
-Package biblatex Info: Trying to load biblatex custom data model...
-Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
-\c@afterword=\count369
-\c@savedafterword=\count370
-\c@annotator=\count371
-\c@savedannotator=\count372
-\c@author=\count373
-\c@savedauthor=\count374
-\c@bookauthor=\count375
-\c@savedbookauthor=\count376
-\c@commentator=\count377
-\c@savedcommentator=\count378
-\c@editor=\count379
-\c@savededitor=\count380
-\c@editora=\count381
-\c@savededitora=\count382
-\c@editorb=\count383
-\c@savededitorb=\count384
-\c@editorc=\count385
-\c@savededitorc=\count386
-\c@foreword=\count387
-\c@savedforeword=\count388
-\c@holder=\count389
-\c@savedholder=\count390
-\c@introduction=\count391
-\c@savedintroduction=\count392
-\c@namea=\count393
-\c@savednamea=\count394
-\c@nameb=\count395
-\c@savednameb=\count396
-\c@namec=\count397
-\c@savednamec=\count398
-\c@translator=\count399
-\c@savedtranslator=\count400
-\c@shortauthor=\count401
-\c@savedshortauthor=\count402
-\c@shorteditor=\count403
-\c@savedshorteditor=\count404
-\c@labelname=\count405
-\c@savedlabelname=\count406
-\c@institution=\count407
-\c@savedinstitution=\count408
-\c@lista=\count409
-\c@savedlista=\count410
-\c@listb=\count411
-\c@savedlistb=\count412
-\c@listc=\count413
-\c@savedlistc=\count414
-\c@listd=\count415
-\c@savedlistd=\count416
-\c@liste=\count417
-\c@savedliste=\count418
-\c@listf=\count419
-\c@savedlistf=\count420
-\c@location=\count421
-\c@savedlocation=\count422
-\c@organization=\count423
-\c@savedorganization=\count424
-\c@origlocation=\count425
-\c@savedoriglocation=\count426
-\c@origpublisher=\count427
-\c@savedorigpublisher=\count428
-\c@publisher=\count429
-\c@savedpublisher=\count430
-\c@language=\count431
-\c@savedlanguage=\count432
-\c@origlanguage=\count433
-\c@savedoriglanguage=\count434
-\c@pageref=\count435
-\c@savedpageref=\count436
-\shorthandwidth=\skip74
-\shortjournalwidth=\skip75
-\shortserieswidth=\skip76
-\shorttitlewidth=\skip77
-\shortauthorwidth=\skip78
-\shorteditorwidth=\skip79
-\locallabelnumberwidth=\skip80
-\locallabelalphawidth=\skip81
-\localshorthandwidth=\skip82
-\localshortjournalwidth=\skip83
-\localshortserieswidth=\skip84
-\localshorttitlewidth=\skip85
-\localshortauthorwidth=\skip86
-\localshorteditorwidth=\skip87
-Package biblatex Info: Trying to load enhanced support for Unicode engines...
-Package biblatex Info: ... file 'blx-unicode.def' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/blx-unicode.de
-f)
-Package biblatex Info: Trying to load compatibility code...
-Package biblatex Info: ... file 'blx-compat.def' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/blx-compat.def
-File: blx-compat.def 2025/07/10 v3.21 biblatex compatibility (PK/MW)
-)
-Package biblatex Info: Trying to load generic definitions...
-Package biblatex Info: ... file 'biblatex.def' found.
- (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/biblatex.def
-File: biblatex.def 2025/07/10 v3.21 biblatex compatibility (PK/MW)
-\c@textcitecount=\count437
-\c@textcitetotal=\count438
-\c@textcitemaxnames=\count439
-\c@biburlbigbreakpenalty=\count440
-\c@biburlbreakpenalty=\count441
-\c@biburlnumpenalty=\count442
-\c@biburlucpenalty=\count443
-\c@biburllcpenalty=\count444
-\biburlbigskip=\muskip18
-\biburlnumskip=\muskip19
-\biburlucskip=\muskip20
-\biburllcskip=\muskip21
-\c@smartand=\count445
-)
-Package biblatex Info: Trying to load bibliography style 'numeric-comp'...
-Package biblatex Info: ... file 'numeric-comp.bbx' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/bbx/numeric-co
-mp.bbx
-File: numeric-comp.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
-Package biblatex Info: Trying to load bibliography style 'numeric'...
-Package biblatex Info: ... file 'numeric.bbx' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/bbx/numeric.bb
-x
-File: numeric.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
-Package biblatex Info: Trying to load bibliography style 'standard'...
-Package biblatex Info: ... file 'standard.bbx' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/bbx/standard.b
-bx
-File: standard.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
-\c@bbx:relatedcount=\count446
-\c@bbx:relatedtotal=\count447
-)))
-Package biblatex Info: Trying to load citation style 'numeric-comp'...
-Package biblatex Info: ... file 'numeric-comp.cbx' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/cbx/numeric-co
-mp.cbx
-File: numeric-comp.cbx 2025/07/10 v3.21 biblatex citation style (PK/MW)
-\c@cbx@tempcnta=\count448
-\c@cbx@tempcntb=\count449
-\c@cbx@tempcntc=\count450
-\c@cbx@tempcntd=\count451
-Package biblatex Info: Redefining '\cite'.
-Package biblatex Info: Redefining '\parencite'.
-Package biblatex Info: Redefining '\footcite'.
-Package biblatex Info: Redefining '\footcitetext'.
-Package biblatex Info: Redefining '\smartcite'.
-Package biblatex Info: Redefining '\supercite'.
-Package biblatex Info: Redefining '\textcite'.
-Package biblatex Info: Redefining '\textcites'.
-Package biblatex Info: Redefining '\cites'.
-Package biblatex Info: Redefining '\parencites'.
-Package biblatex Info: Redefining '\smartcites'.
-)
-Package biblatex Info: Trying to load configuration file...
-Package biblatex Info: ... file 'biblatex.cfg' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/biblatex.cfg
-File: biblatex.cfg 
-)
-Package biblatex Info: LuaTeX detected.
-(biblatex)             Assuming input encoding 'utf8'.
-Package biblatex Info: Document encoding is UTF8 ....
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/l3kernel/expl3.sty
-Package: expl3 2025-12-24 L3 programming layer (loader) 
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/l3backend/l3backend-lua
-tex.def
-File: l3backend-luatex.def 2025-10-09 L3 backend support: PDF output (LuaTeX)
-\l__color_backend_stack_int=\count452
-Inserting `l3color' in `luaotfload.parse_color'.))
-Package biblatex Info: ... and expl3
-(biblatex)             2025-12-24 L3 programming layer (loader) 
-(biblatex)             is new enough (at least 2020/04/06),
-(biblatex)             setting 'casechanger=expl3'.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/blx-case-expl3
-.sty
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/l3packages/xparse/xpars
-e.sty
-Package: xparse 2025-10-09 L3 Experimental document command parser
-)
-Package: blx-case-expl3 2025/07/10 v3.21 expl3 case changing code for biblatex
-))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/hyperref/hyperref.sty
-Package: hyperref 2025-07-12 v7.01o Hypertext links for LaTeX
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/kvdefinekeys/kvdefine
-keys.sty
-Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pdfescape/pdfescape.s
-ty
-Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
-) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/hycolor/hycolor.sty
-Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
-) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/hyperref/nameref.sty
-Package: nameref 2025-06-21 v2.57 Cross-referencing by name of section
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/refcount/refcount.sty
-Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/gettitlestring/gettit
-lestring.sty
-Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
-)
-\c@section@level=\count453
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/stringenc/stringenc.s
-ty
-Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
-)
-)
-\@linkdim=\dimen272
-\Hy@linkcounter=\count454
-\Hy@pagecounter=\count455
- (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/hyperref/pd1enc.def
-File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
-) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/intcalc/intcalc.sty
-Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
-)
-\Hy@SavedSpaceFactor=\count456
- (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/hyperref/puenc.def
-File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
-)
-Package hyperref Info: Option `colorlinks' set `false' on input line 4066.
-Package hyperref Info: Option `pdfusetitle' set `true' on input line 4066.
-Package hyperref Info: Hyper figures OFF on input line 4195.
-Package hyperref Info: Link nesting OFF on input line 4200.
-Package hyperref Info: Hyper index ON on input line 4203.
-Package hyperref Info: Plain pages OFF on input line 4210.
-Package hyperref Info: Backreferencing OFF on input line 4215.
-Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
-Package hyperref Info: Bookmarks ON on input line 4462.
-\c@Hy@tempcnt=\count457
-LaTeX Info: Redefining \url on input line 4801.
-\XeTeXLinkMargin=\dimen273
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/bitset/bitset.sty
-Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/bigintcalc/bigintcalc
-.sty
-Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
-)
-))
-\Fld@menulength=\count458
-\Field@Width=\dimen274
-\Fld@charsize=\dimen275
-Package hyperref Info: Hyper figures OFF on input line 6078.
-Package hyperref Info: Link nesting OFF on input line 6083.
-Package hyperref Info: Hyper index ON on input line 6086.
-Package hyperref Info: backreferencing OFF on input line 6093.
-Package hyperref Info: Link coloring OFF on input line 6098.
-Package hyperref Info: Link coloring with OCG OFF on input line 6103.
-Package hyperref Info: PDF/A mode OFF on input line 6108.
-\Hy@abspage=\count459
-\c@Item=\count460
-\c@Hfootnote=\count461
-)
-Package hyperref Info: Driver (autodetected): hluatex.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/hyperref/hluatex.def
-File: hluatex.def 2025-07-12 v7.01o Hyperref driver for luaTeX
-\Fld@listcount=\count462
-\c@bookmark@seq@number=\count463
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/rerunfilecheck/rerunfil
-echeck.sty
-Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/uniquecounter/uniquec
-ounter.sty
-Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
-)
-Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
-84.
-)
-\Hy@SectionHShift=\skip88
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/bookmark/bookmark.sty
-Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/bookmark/bkm-pdftex.def
-File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO
-)
-\BKM@id=\count464
-)) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/foreign/foreign.sty
-Package: foreign 2012/09/25 v2.7 type-setting package for foreign words (PGR)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/xpunctuate/xpunctuate.s
-ty
-Package: xpunctuate 2023/08/13 v2.0 punctuation after command names (PGR)
- (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/tools/xspace.sty
-Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
-)
-\xpnct@tok=\toks41
-))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgfgantt/pgfgantt.sty
-Package: pgfgantt 2024/06/19 v5.0a Draw Gantt diagrams with TikZ
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibraryarrows.code.tex
-File: tikzlibraryarrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/pgflibr
-aryarrows.code.tex
-File: pgflibraryarrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\arrowsize=\dimen276
-))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibrarybackgrounds.code.tex
-File: tikzlibrarybackgrounds.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@layerbox@background=\box68
-\pgf@layerboxsaved@background=\box69
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibrarycalc.code.tex
-File: tikzlibrarycalc.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibrarypatterns.code.tex
-File: tikzlibrarypatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/pgflibr
-arypatterns.code.tex
-File: pgflibrarypatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibrarypositioning.code.tex
-File: tikzlibrarypositioning.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/frontendlayer/tik
-z/libraries/tikzlibraryshapes.geometric.code.tex
-File: tikzlibraryshapes.geometric.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/libraries/shapes/
-pgflibraryshapes.geometric.code.tex
-File: pgflibraryshapes.geometric.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-))
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/pgf/utilities/pgfcalend
-ar.sty
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/generic/pgf/utilities/pgfcale
-ndar.code.tex
-File: pgfcalendar.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfcalendarcurrentjulian=\count465
-\pgf@cal@easter@Y=\count466
-\pgf@cal@easter@G=\count467
-\pgf@cal@easter@C=\count468
-\pgf@cal@easter@X=\count469
-\pgf@cal@easter@Z=\count470
-\pgf@cal@easter@D=\count471
-\pgf@cal@easter@E=\count472
-\pgf@cal@easter@N=\count473
-\pgf@cal@easter@M=\count474
-\pgf@cal@easter@julianday=\count475
-))
-\gtt@currentline=\count476
-\gtt@lasttitleline=\count477
-\gtt@currgrid=\count478
-\gtt@chartwidth=\count479
-\gtt@lasttitleslot=\count480
-\gtt@elementid=\count481
-\gtt@today@slot=\count482
-\gtt@startjulian=\count483
-\gtt@endjulian=\count484
-\gtt@chartid=\count485
-\gtt@vrule@slot=\count486
-\gtt@calendar@slots=\count487
-\gtt@calendar@weeknumber=\count488
-\gtt@calendar@startofweek=\count489
-\gtt@left@slot=\count490
-\gtt@right@slot=\count491
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/booktabs/booktabs.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
-\heavyrulewidth=\dimen277
-\lightrulewidth=\dimen278
-\cmidrulewidth=\dimen279
-\belowrulesep=\dimen280
-\belowbottomsep=\dimen281
-\aboverulesep=\dimen282
-\abovetopsep=\dimen283
-\cmidrulesep=\dimen284
-\cmidrulekern=\dimen285
-\defaultaddspace=\dimen286
-\@cmidla=\count492
-\@cmidlb=\count493
-\@aboverulesep=\dimen287
-\@belowrulesep=\dimen288
-\@thisruleclass=\count494
-\@lastruleclass=\count495
-\@thisrulewidth=\dimen289
+\heavyrulewidth=\dimen295
+\lightrulewidth=\dimen296
+\cmidrulewidth=\dimen297
+\belowrulesep=\dimen298
+\belowbottomsep=\dimen299
+\aboverulesep=\dimen300
+\abovetopsep=\dimen301
+\cmidrulesep=\dimen302
+\cmidrulekern=\dimen303
+\defaultaddspace=\dimen304
+\@cmidla=\count320
+\@cmidlb=\count321
+\@aboverulesep=\dimen305
+\@belowrulesep=\dimen306
+\@thisruleclass=\count322
+\@lastruleclass=\count323
+\@thisrulewidth=\dimen307
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/amsfonts/amssymb.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/amsfonts/amsfonts.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
-\@emptytoks=\toks42
+\@emptytoks=\toks38
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
 LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
-)) (C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/float/float.sty
-Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count496
-\float@exts=\toks43
-\float@box=\box70
-\@float@everytoks=\toks44
-\@floatcapt=\box71
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/cleveref/cleveref.sty
-Package: cleveref 2018/03/27 v0.21.4 Intelligent cross-referencing
-Package cleveref Info: `hyperref' support loaded on input line 2370.
-LaTeX Info: Redefining \cref on input line 2370.
-LaTeX Info: Redefining \Cref on input line 2370.
-LaTeX Info: Redefining \crefrange on input line 2370.
-LaTeX Info: Redefining \Crefrange on input line 2370.
-LaTeX Info: Redefining \cpageref on input line 2370.
-LaTeX Info: Redefining \Cpageref on input line 2370.
-LaTeX Info: Redefining \cpagerefrange on input line 2370.
-LaTeX Info: Redefining \Cpagerefrange on input line 2370.
-LaTeX Info: Redefining \labelcref on input line 2370.
-LaTeX Info: Redefining \labelcpageref on input line 2370.
-)
-==> First Aid for cleveref.sty applied!
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/enumitem/enumitem.sty
-Package: enumitem 2025/02/06 v3.11 Customized lists
-\labelindent=\skip89
-\enit@outerparindent=\dimen290
-\enit@toks=\toks45
-\enit@inbox=\box72
-\enit@count@id=\count497
-\enitdp@description=\count498
-)
-Package csquotes Info: Checking for multilingual support...
-Package csquotes Info: ... found 'babel' package.
-Package csquotes Info: Adjusting default style.
-Package csquotes Info: Redefining alias 'default' -> 'british'.
+))
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def
+File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count324
+) (main.aux)
+\openout1 = `main.aux'.
 
-(./main.aux)
-\openout1 = main.aux
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-Package nag Info: pgf.sty is broken: disabling dollar check on input line 52.
-Package nag Info: Command \bf not defined, skipping amendment on input line 52.
+-- Lines per column: 56 (exact).
 
-Package nag Info: Command \it not defined, skipping amendment on input line 52.
-
-Package nag Info: Command \rm not defined, skipping amendment on input line 52.
-
-Package nag Info: Command \sc not defined, skipping amendment on input line 52.
-
-Package nag Info: Command \sf not defined, skipping amendment on input line 52.
-
-Package nag Info: Command \sl not defined, skipping amendment on input line 52.
-
-Package nag Info: Command \tt not defined, skipping amendment on input line 52.
-
-Package nag Info: Command \frontmatter not defined, skipping amendment on input
- line 52.
-Package nag Info: Command \mainmatter not defined, skipping amendment on input 
-line 52.
-Package nag Info: Command \backmatter not defined, skipping amendment on input 
-line 52.
-Package nag Info: Command \RaggedLeft not defined, skipping amendment on input 
-line 52.
-Package nag Info: Command \RaggedRight not defined, skipping amendment on input
- line 52.
-Package scrbase Info: activating british \abstractname on input line 52.
-Package scrbase Info: activating british \partname on input line 52.
-Package scrbase Info: activating british \figurename on input line 52.
-Package scrbase Info: activating british \tablename on input line 52.
-Package scrbase Info: activating british \contentsname on input line 52.
-Package scrbase Info: activating british \listfigurename on input line 52.
-Package scrbase Info: activating british \listtablename on input line 52.
-Package scrbase Info: activating british \refname on input line 52.
-Package scrbase Info: activating british \indexname on input line 52.
-LaTeX Info: Redefining \microtypecontext on input line 52.
-Package microtype Info: Applying patch `item' on input line 52.
-Package microtype Info: Applying patch `toc' on input line 52.
-Package microtype Info: Applying patch `eqnum' on input line 52.
-Package microtype Info: Applying patch `footnote' on input line 52.
-Package microtype Info: Applying patch `verbatim' on input line 52.
-LaTeX Info: Redefining \microtypesetup on input line 52.
-Package microtype Info: Generating PDF output.
-Package microtype Info: Character protrusion enabled (level 2).
-Package microtype Info: Using default protrusion set `alltext'.
-Package microtype Info: Automatic font expansion enabled (level 2),
-(microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
-Package microtype Info: Using default expansion set `alltext-nott'.
-Package microtype Info: Patching command `\showhyphens'.
-Package microtype Info: No adjustment of tracking.
-Package microtype Info: No adjustment of spacing.
-Package microtype Info: No adjustment of kerning.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/microtype/mt-LatinModer
-nRoman.cfg
-File: mt-LatinModernRoman.cfg 2026/02/26 v1.2 microtype config. file: Latin Mod
-ern Roman (RS)
-)
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/context/base/mkii/supp-pdf.mk
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count499
-\scratchdimen=\dimen291
-\scratchbox=\box73
-\nofMPsegments=\count500
-\nofMParguments=\count501
-\everyMPshowfont=\toks46
-\MPscratchCnt=\count502
-\MPscratchDim=\dimen292
-\MPnumerator=\count503
-\makeMPintoPDFobject=\count504
-\everyMPtoPDFconversion=\toks47
+\scratchcounter=\count325
+\scratchdimen=\dimen308
+\scratchbox=\box67
+\nofMPsegments=\count326
+\nofMParguments=\count327
+\everyMPshowfont=\toks39
+\MPscratchCnt=\count328
+\MPscratchDim=\dimen309
+\MPnumerator=\count329
+\makeMPintoPDFobject=\count330
+\everyMPtoPDFconversion=\toks40
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/epstopdf-pkg/epstopdf-b
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
 ase.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/grfext/grfext.sty
-Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
-)
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
-Package grfext Info: Graphics extension search list:
-(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
-G,.JBIG2,.JB2,.eps]
-(grfext)             \AppendGraphicsExtensions on input line 504.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/00miktex/epstopdf-sys.c
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-Package biblatex Info: Trying to load language 'british'...
-Package biblatex Info: ... file 'british.lbx' found.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 37.
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/lbx/british.lb
-x
-File: british.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
-Package biblatex Info: Trying to load language 'english'...
-Package biblatex Info: ... file 'english.lbx' found.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/biblatex/lbx/english.lb
-x
-File: english.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
-))
-Package biblatex Info: LuaTeX detected.
-(biblatex)             Assuming input encoding 'utf8'.
-Package biblatex Info: Automatic encoding selection.
-(biblatex)             Assuming data encoding 'utf8'.
-
-\openout4 = main.bcf
-Package biblatex Info: Trying to load bibliographic data...
-Package biblatex Info: ... file 'main.bbl' found.
- (./main.bbl)
-Package biblatex Info: Reference section=0 on input line 52.
-Package biblatex Info: Reference segment=0 on input line 52.
-Package hyperref Info: Link coloring OFF on input line 52.
-Package nag Info: Command \caption@xlabel not defined, skipping amendment on in
-put line 52.
-Package nag Info: Command \hc@caption not defined, skipping amendment on input 
-line 52.
-Package nag Info: Command \topcaption not defined, skipping amendment on input 
-line 52.
-\g__cctab_next_cctab=\catcodetable18
-Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `lmss' (encoding: TU).
-(microtype)             For optimal results, create family-specific settings.
-(microtype)             See the microtype manual for details.
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/microtype/mt-cmr.cfg
-File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
-(RS)
-)
-LaTeX Font Info:    Trying to load font information for U+msa on input line 55.
-
-
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/amsfonts/umsa.fd
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/microtype/mt-msa.cfg
-File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
-)
-LaTeX Font Info:    Trying to load font information for U+msb on input line 55.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 37.
 
 
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/amsfonts/umsb.fd
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-(C:/Users/nebur/AppData/Local/Programs/MiKTeX/tex/latex/microtype/mt-msb.cfg
-File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
-)
-Overfull \hbox (63.27267pt too wide) in paragraph at lines 58--67
-[] 
+Underfull \hbox (badness 1776) in paragraph at lines 48--49
+[]\OT1/ptm/m/n/10 DYNAMOS (Dy-nam-ic-ally Ad-apt-ive Microservice-based
  []
 
-[1
+[1{C:/Users/nebur/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/ne
+bur/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
-{C:/Users/nebur/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-Overfull \hbox (8.73788pt too wide) in paragraph at lines 102--103
-\TU/lmr/m/n/10 This sec-tion re-views ex-ist-ing lit-er-at-ure re-lated to strea
-m-ing com-mu-nic-a-tion in microservice-
+]
+Underfull \hbox (badness 2564) in paragraph at lines 70--71
+[]\OT1/ptm/m/n/10 gRPC provides nat-ive sup-port for stream-ing through
  []
 
 [2]
-Overfull \hbox (5.43437pt too wide) in paragraph at lines 108--109
-[]\TU/lmr/m/n/10 gRPC provides nat-ive sup-port for stream-ing through client-st
-reaming, server-streaming,
+Underfull \hbox (badness 1824) in paragraph at lines 98--99
+[]\OT1/ptm/m/n/10 Despite these con-tri-bu-tions, there is lim-ited guid-ance
  []
 
-[3] [4] [5] [6] [7] [8] [9] [10] [11]
-Overfull \hbox (3.65111pt too wide) in paragraph at lines 270--280
- [][] 
+
+Underfull \hbox (badness 4013) in paragraph at lines 102--103
+[]\OT1/ptm/m/n/10 Streaming-based com-mu-nic-a-tion in-tro-duces op-er-a-tional
+
  []
 
-Package pgfplots info on input line 308: Using 'lua backend=false' for axis: x 
+[3]
+Underfull \hbox (badness 1546) in paragraph at lines 118--119
+[]\OT1/ptm/m/n/10 However, most ex-ist-ing eval-u-ations as-sume static mi-
+ []
+
+[4] [5]
+Underfull \hbox (badness 10000) in paragraph at lines 188--188
+[]\OT1/ptm/m/n/8 Protocol over-head, sus-tained
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 188--188
+\OT1/ptm/m/n/8 through-put, multi-hop trans-fer
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 189--189
+[]\OT1/ptm/m/n/8 Continuous steady-rate
+ []
+
+
+Underfull \hbox (badness 3189) in paragraph at lines 190--190
+[]\OT1/ptm/m/n/8 Slow-consumer back-pres-
+ []
+
+
+Underfull \hbox (badness 1721) in paragraph at lines 191--191
+[]\OT1/ptm/m/n/8 Reconnect be-ha-viour, du-plic-ates,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 191--191
+\OT1/ptm/m/n/8 or-der-ing pre-ser-va-tion, re-cov-ery
+ []
+
+Package pgfplots info on input line 270: Using 'lua backend=false' for axis: x 
 coord trafo unsupported.
-[12
-warning  (pdf backend): ignoring duplicate destination with the name 'table.1'
-] [13
-warning  (pdf backend): ignoring duplicate destination with the name 'figure.1'
-] [14]
-Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `lmtt' (encoding: TU).
-(microtype)             For optimal results, create family-specific settings.
-(microtype)             See the microtype manual for details.
- [15] [16]
-No complaints by nag.
-[17] (./main.aux)
+
+Underfull \hbox (badness 3078) in paragraph at lines 282--283
+ \OT1/ptm/m/it/10 2) Clean baseline mat-rix: [][] \OT1/ptm/m/n/10 Sev-eral clea
+r ob-ser-va-tions
+ []
+
+
+Underfull \hbox (badness 1454) in paragraph at lines 282--283
+\OT1/ptm/m/n/10 already fol-low from Table II[] and Fig. 2[]. First, client-
+ []
+
+[6]
+Underfull \vbox (badness 1590) has occurred while \output is active []
+
+ [7]
+[8] (main.bbl [9])
+
+** Conference Paper **
+Before submitting the final camera ready copy, remember to:
+
+ 1. Manually equalize the lengths of two columns on the last page
+ of your paper;
+
+ 2. Ensure that any PostScript and/or PDF output post-processing
+ uses only Type 1 fonts and that every step in the generation
+ process uses the appropriate paper size.
+
+[10] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
-Package logreq Info: Writing requests to 'main.run.xml'.
-
-\openout1 = main.run.xml
-)
-
-Here is how much of LuaTeX's memory you used:
- 50162 strings out of 476081
- 100000,2373549 words of node,token memory allocated
- 738 words of node memory still in use:
-   5 hlist, 1 vlist, 1 rule, 1 local_par, 7 glue, 3 kern, 1 penalty, 3 glyph, 35
- attribute, 67 glue_spec, 19 attribute_list, 2 write, 11 pdf_action nodes
-   avail lists: 1:2,2:2337,3:680,4:152,5:447,6:88,7:8034,8:118,9:413,10:19,11:80
-5,12:1
- 71453 multiletter control sequences out of 65536+600000
- 50 fonts using 3654015 bytes
- 108i,19n,113p,11260b,2400s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/users/nebur/appdata/local/programs/miktex/fonts/opentype/public/lm/lmmono10-
-regular.otf><c:/users/nebur/appdata/local/programs/miktex/fonts/opentype/public/
-lm/lmromancaps10-regular.otf><c:/users/nebur/appdata/local/programs/miktex/fonts
-/opentype/public/lm/lmroman10-italic.otf><c:/users/nebur/appdata/local/programs/
-miktex/fonts/opentype/public/lm/lmroman10-regular.otf><c:/users/nebur/appdata/lo
-cal/programs/miktex/fonts/opentype/public/lm/lmroman10-bold.otf><c:/users/nebur/
-appdata/local/programs/miktex/fonts/opentype/public/lm/lmroman12-regular.otf><c:
-/users/nebur/appdata/local/programs/miktex/fonts/opentype/public/lm/lmsans10-bol
-d.otf><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/
-cm/cmmi10.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/a
-msfonts/cm/cmmi7.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/p
-ublic/amsfonts/cm/cmr10.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/amsfonts/cm/cmr7.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/
-fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on main.pdf (17 pages, 191517 bytes).
-
-PDF statistics: 411 PDF objects out of 1000 (max. 8388607)
- 76 named destinations out of 1000 (max. 1048576)
- 232 words of extra memory for PDF output out of 10000 (max. 100000000)
+ ) 
+Here is how much of TeX's memory you used:
+ 25013 strings out of 467871
+ 652525 string characters out of 5418377
+ 1196672 words of memory out of 5000000
+ 53508 multiletter control sequences out of 15000+600000
+ 666292 words of font info for 117 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 99i,19n,118p,1183b,2332s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
+cmmi10.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
+fonts/cm/cmmi7.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/pu
+blic/amsfonts/cm/cmmi8.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/
+type1/public/amsfonts/cm/cmr10.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/nebur/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/nebur/AppData/Local/
+Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/nebur/AppDa
+ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Users/neb
+ur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/neb
+ur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/ne
+bur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/ne
+bur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on main.pdf (10 pages, 190511 bytes).
+PDF statistics:
+ 99 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 13 words of extra memory for PDF output out of 10000 (max. 10000000)
 

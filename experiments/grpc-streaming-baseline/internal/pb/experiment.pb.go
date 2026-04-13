@@ -464,6 +464,9 @@ type RunSummary struct {
 	StartedAtUnixNano            int64                  `protobuf:"varint,15,opt,name=started_at_unix_nano,json=startedAtUnixNano,proto3" json:"started_at_unix_nano,omitempty"`
 	FinishedAtUnixNano           int64                  `protobuf:"varint,16,opt,name=finished_at_unix_nano,json=finishedAtUnixNano,proto3" json:"finished_at_unix_nano,omitempty"`
 	TransportMode                string                 `protobuf:"bytes,17,opt,name=transport_mode,json=transportMode,proto3" json:"transport_mode,omitempty"`
+	MeanInterArrivalMs           float64                `protobuf:"fixed64,18,opt,name=mean_inter_arrival_ms,json=meanInterArrivalMs,proto3" json:"mean_inter_arrival_ms,omitempty"`
+	P95InterArrivalMs            float64                `protobuf:"fixed64,19,opt,name=p95_inter_arrival_ms,json=p95InterArrivalMs,proto3" json:"p95_inter_arrival_ms,omitempty"`
+	InterArrivalJitterMs         float64                `protobuf:"fixed64,20,opt,name=inter_arrival_jitter_ms,json=interArrivalJitterMs,proto3" json:"inter_arrival_jitter_ms,omitempty"`
 	unknownFields                protoimpl.UnknownFields
 	sizeCache                    protoimpl.SizeCache
 }
@@ -617,6 +620,27 @@ func (x *RunSummary) GetTransportMode() string {
 	return ""
 }
 
+func (x *RunSummary) GetMeanInterArrivalMs() float64 {
+	if x != nil {
+		return x.MeanInterArrivalMs
+	}
+	return 0
+}
+
+func (x *RunSummary) GetP95InterArrivalMs() float64 {
+	if x != nil {
+		return x.P95InterArrivalMs
+	}
+	return 0
+}
+
+func (x *RunSummary) GetInterArrivalJitterMs() float64 {
+	if x != nil {
+		return x.InterArrivalJitterMs
+	}
+	return 0
+}
+
 var File_experiment_proto protoreflect.FileDescriptor
 
 const file_experiment_proto_rawDesc = "" +
@@ -655,7 +679,7 @@ const file_experiment_proto_rawDesc = "" +
 	"\x06run_id\x18\x01 \x01(\tR\x05runId\x12\x14\n" +
 	"\x05stage\x18\x02 \x01(\tR\x05stage\x12\x1a\n" +
 	"\bsequence\x18\x03 \x01(\x04R\bsequence\x121\n" +
-	"\x15finished_at_unix_nano\x18\x04 \x01(\x03R\x12finishedAtUnixNano\"\xd6\x05\n" +
+	"\x15finished_at_unix_nano\x18\x04 \x01(\x03R\x12finishedAtUnixNano\"\xf1\x06\n" +
 	"\n" +
 	"RunSummary\x12\x15\n" +
 	"\x06run_id\x18\x01 \x01(\tR\x05runId\x12\x14\n" +
@@ -677,7 +701,10 @@ const file_experiment_proto_rawDesc = "" +
 	"\x0emax_latency_ms\x18\x0e \x01(\x01R\fmaxLatencyMs\x12/\n" +
 	"\x14started_at_unix_nano\x18\x0f \x01(\x03R\x11startedAtUnixNano\x121\n" +
 	"\x15finished_at_unix_nano\x18\x10 \x01(\x03R\x12finishedAtUnixNano\x12%\n" +
-	"\x0etransport_mode\x18\x11 \x01(\tR\rtransportMode2\x83\x01\n" +
+	"\x0etransport_mode\x18\x11 \x01(\tR\rtransportMode\x121\n" +
+	"\x15mean_inter_arrival_ms\x18\x12 \x01(\x01R\x12meanInterArrivalMs\x12/\n" +
+	"\x14p95_inter_arrival_ms\x18\x13 \x01(\x01R\x11p95InterArrivalMs\x125\n" +
+	"\x17inter_arrival_jitter_ms\x18\x14 \x01(\x01R\x14interArrivalJitterMs2\x83\x01\n" +
 	"\vTransformer\x128\n" +
 	"\x04Push\x12\x15.experiment.DataChunk\x1a\x15.experiment.StreamAck\"\x00(\x01\x12:\n" +
 	"\tPushUnary\x12\x15.experiment.DataChunk\x1a\x14.experiment.UnaryAck\"\x002|\n" +

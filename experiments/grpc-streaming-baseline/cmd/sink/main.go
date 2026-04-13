@@ -40,12 +40,14 @@ type runState struct {
 	registeredAt       time.Time
 	startedAt          time.Time
 	finishedAt         time.Time
+	lastArrivalAt      time.Time
 	completed          bool
 	messagesReceived   uint64
 	bytesReceived      uint64
 	duplicates         uint64
 	orderingViolations uint64
 	latenciesMillis    []float64
+	interArrivalMillis []float64
 	seenSequences      map[uint64]struct{}
 	lastByWorker       map[uint64]uint64
 	summary            *pb.RunSummary
@@ -55,10 +57,10 @@ type sinkServer struct {
 	pb.UnimplementedSinkServer
 	pb.UnimplementedExperimentAdminServer
 
-	mu         sync.Mutex
-	runs       map[string]*runState
-	metrics    sinkMetrics
-	resultDir  string
+	mu           sync.Mutex
+	runs         map[string]*runState
+	metrics      sinkMetrics
+	resultDir    string
 	processDelay time.Duration
 }
 
@@ -134,9 +136,9 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	server := &sinkServer{
-		runs:        make(map[string]*runState),
-		metrics:     serverMetrics,
-		resultDir:   resultDir,
+		runs:         make(map[string]*runState),
+		metrics:      serverMetrics,
+		resultDir:    resultDir,
 		processDelay: processDelay,
 	}
 	pb.RegisterSinkServer(grpcServer, server)
@@ -171,11 +173,12 @@ func (s *sinkServer) RegisterRun(_ context.Context, in *pb.RunConfig) (*pb.Regis
 	}
 
 	s.runs[in.GetRunId()] = &runState{
-		config:        in,
-		registeredAt:  registeredAt,
-		latenciesMillis: make([]float64, 0, in.GetExpectedTotalMessages()),
-		seenSequences: make(map[uint64]struct{}),
-		lastByWorker:  make(map[uint64]uint64),
+		config:             in,
+		registeredAt:       registeredAt,
+		latenciesMillis:    make([]float64, 0, in.GetExpectedTotalMessages()),
+		interArrivalMillis: make([]float64, 0, in.GetExpectedTotalMessages()),
+		seenSequences:      make(map[uint64]struct{}),
+		lastByWorker:       make(map[uint64]uint64),
 	}
 	s.metrics.activeRuns.Inc()
 	return &pb.RegisterRunResponse{Accepted: true}, nil
@@ -273,12 +276,21 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 	if state.startedAt.IsZero() {
 		state.startedAt = now
 	}
+	if !state.lastArrivalAt.IsZero() {
+		state.interArrivalMillis = append(state.interArrivalMillis, float64(now.Sub(state.lastArrivalAt))/float64(time.Millisecond))
+	}
+	state.lastArrivalAt = now
 	if _, duplicate := state.seenSequences[chunk.GetSequence()]; duplicate {
 		state.duplicates++
 		s.metrics.duplicates.Inc()
-	} else {
-		state.seenSequences[chunk.GetSequence()] = struct{}{}
+		s.mu.Unlock()
+
+		if s.processDelay > 0 {
+			time.Sleep(s.processDelay)
+		}
+		return nil
 	}
+	state.seenSequences[chunk.GetSequence()] = struct{}{}
 	if last, exists := state.lastByWorker[chunk.GetProducerWorker()]; exists && chunk.GetSequence() <= last {
 		state.orderingViolations++
 		s.metrics.orderingViolations.Inc()
@@ -312,6 +324,9 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 func buildSummary(runID string, state *runState) *pb.RunSummary {
 	latencies := append([]float64(nil), state.latenciesMillis...)
 	sort.Float64s(latencies)
+	interArrivals := append([]float64(nil), state.interArrivalMillis...)
+	sortedInterArrivals := append([]float64(nil), interArrivals...)
+	sort.Float64s(sortedInterArrivals)
 	duration := state.finishedAt.Sub(state.registeredAt)
 	if duration <= 0 {
 		duration = state.finishedAt.Sub(state.startedAt)
@@ -335,6 +350,9 @@ func buildSummary(runID string, state *runState) *pb.RunSummary {
 		P95LatencyMs:                 percentile(latencies, 0.95),
 		P99LatencyMs:                 percentile(latencies, 0.99),
 		MaxLatencyMs:                 maxValue(latencies),
+		MeanInterArrivalMs:           meanValue(interArrivals),
+		P95InterArrivalMs:            percentile(sortedInterArrivals, 0.95),
+		InterArrivalJitterMs:         stddevValue(interArrivals),
 		StartedAtUnixNano:            state.startedAt.UnixNano(),
 		FinishedAtUnixNano:           state.finishedAt.UnixNano(),
 		TransportMode:                state.config.GetTransportMode(),
@@ -368,3 +386,26 @@ func maxValue(values []float64) float64 {
 	return max
 }
 
+func meanValue(values []float64) float64 {
+	if len(values) == 0 {
+		return 0
+	}
+	var total float64
+	for _, value := range values {
+		total += value
+	}
+	return total / float64(len(values))
+}
+
+func stddevValue(values []float64) float64 {
+	if len(values) <= 1 {
+		return 0
+	}
+	mean := meanValue(values)
+	var total float64
+	for _, value := range values {
+		delta := value - mean
+		total += delta * delta
+	}
+	return math.Sqrt(total / float64(len(values)))
+}

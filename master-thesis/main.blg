@@ -1,15 +1,58 @@
-[0] Config.pm:328> INFO - This is Biber 2.21
-[1] Config.pm:331> INFO - Logfile is 'main.blg'
-[138] biber-MSWIN64:342> INFO - === 
-[233] Biber.pm:421> INFO - Reading 'main.bcf'
-[401] Biber.pm:1002> INFO - Found 29 citekeys in bib section 0
-[420] Biber.pm:4487> INFO - Processing section 0
-[434] Biber.pm:4678> INFO - Looking for bibtex file 'references.bib' for section 0
-[589] bibtex.pm:1713> INFO - LaTeX decoding ...
-[665] bibtex.pm:1519> INFO - Found BibTeX data source 'references.bib'
-[923] UCollate.pm:68> INFO - Overriding locale 'en-GB' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[924] UCollate.pm:68> INFO - Overriding locale 'en-GB' defaults 'variable = shifted' with 'variable = non-ignorable'
-[924] Biber.pm:4307> INFO - Sorting list 'nty/global//global/global/global' of type 'entry' with template 'nty' and locale 'en-GB'
-[925] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-GB'
-[965] bbl.pm:676> INFO - Writing 'main.bbl' with encoding 'UTF-8'
-[1018] bbl.pm:779> INFO - Output to main.bbl
+This is BibTeX, Version 0.99e
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+The style file: IEEEtran.bst
+Reallocating 'name_of_file' (item size: 1) to 11 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Database file #1: references.bib
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+
+Done.
+You've used 29 entries,
+            4087 wiz_defined-function locations,
+            975 strings with 13335 characters,
+and the built_in function-call counts, 17131 in all, are:
+= -- 1361
+> -- 370
+< -- 81
++ -- 188
+- -- 72
+* -- 773
+:= -- 2771
+add.period$ -- 67
+call.type$ -- 29
+change.case$ -- 36
+chr.to.int$ -- 186
+cite$ -- 29
+duplicate$ -- 1286
+empty$ -- 1537
+format.name$ -- 92
+if$ -- 3932
+int.to.chr$ -- 0
+int.to.str$ -- 29
+missing$ -- 267
+newline$ -- 130
+num.names$ -- 31
+pop$ -- 678
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 1333
+stack$ -- 0
+substring$ -- 466
+swap$ -- 928
+text.length$ -- 19
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 29
+warning$ -- 0
+while$ -- 65
+width$ -- 31
+write$ -- 307
