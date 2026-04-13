@@ -13,6 +13,7 @@
 \usepackage[british]{babel}
 \usepackage{pgfplots}
 \usepackage{cite}
+\usepackage{dblfloatfix}
 \usepackage{url}
 \urlstyle{same}
 \usepackage{booktabs}
@@ -175,7 +176,7 @@ This dimensional view is important because it prevents the chapter from collapsi
 
 The full Phase 1 design distinguishes three workload families: \emph{bulk transfer}, \emph{continuous steady-rate flow}, and \emph{bursty transfer}. The currently completed gRPC reference study covers the first two directly and supplements them with two targeted stress probes that operationalize the properties most relevant to DYNAMOS: slow-consumer backpressure and forced-restart recovery. A bursty profile remains part of the planned cross-technology matrix, but it has not yet been executed in the current gRPC-only reference stage.
 
-\begin{table*}[t]
+\begin{table*}[!t]
     \centering
     \footnotesize
     \caption{Phase 1 scenario-to-property mapping.}
@@ -193,13 +194,10 @@ The full Phase 1 design distinguishes three workload families: \emph{bulk transf
     \end{tabular}
 \end{table*}
 
-\begin{figure*}[t]
+\begin{figure*}[!b]
     \centering
-    \fbox{%
-    \begin{minipage}{0.92\textwidth}
-    \emph{Placeholder for a manual conceptual figure.} Suggested content: a simple Phase 1 evaluation map with the common pipeline \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink} at the centre, surrounded by four labeled probes: \emph{bulk transfer} (transfer efficiency), \emph{continuous steady-rate} (pacing stability), \emph{slow-consumer backpressure} (overload response), and \emph{forced-restart recovery} (reconnect and duplicate behaviour). The figure should visually communicate that the scenario suite is a literature-guided operationalization of evaluation dimensions rather than an arbitrary collection of tests.
-    \end{minipage}}
-    \caption{Optional conceptual figure for the Phase 1 scenario design.}
+    \includegraphics[width=0.92\textwidth]{figures/phase1-evaluation-map.png}
+    \caption{Phase 1 evaluation map showing the common benchmark pipeline and the four scenario probes used to operationalize the literature-backed evaluation dimensions.}
     \label{fig:phase1-scenario-placeholder}
 \end{figure*}
 
@@ -241,31 +239,34 @@ For readers less familiar with streaming benchmarks, two metrics are especially 
     \end{tabular}}
 \end{table}
 
-\begin{figure*}[t]
+\begin{figure}[t]
     \centering
     \begin{tikzpicture}
         \begin{axis}[
             ybar,
-            bar width=16pt,
-            width=0.94\textwidth,
-            height=0.33\textwidth,
+            bar width=10pt,
+            width=\columnwidth,
+            height=0.72\columnwidth,
             ymin=0,
-            enlarge x limits=0.28,
-            ylabel={Average throughput (messages/s)},
+            enlarge x limits=0.34,
+            ylabel={Avg. throughput (msg/s)},
             symbolic x coords={Synthetic,CSV replay},
             xtick=data,
             scaled y ticks=false,
             ymajorgrids=true,
             grid style={dashed,gray!30},
             legend style={
-                at={(0.5,1.03)},
-                anchor=south,
+                at={(0.5,0.98)},
+                anchor=north,
                 legend columns=2,
-                draw=none
+                draw=none,
+                font=\scriptsize
             },
-            yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=0,/pgf/number format/1000 sep={,}},
+            yticklabel style={font=\scriptsize,/pgf/number format/fixed,/pgf/number format/precision=0,/pgf/number format/1000 sep={,}},
+            xticklabel style={font=\scriptsize},
+            ylabel style={font=\scriptsize},
             nodes near coords,
-            every node near coord/.append style={font=\scriptsize, rotate=90, anchor=west},
+            every node near coord/.append style={font=\tiny, rotate=90, anchor=west},
             point meta=y,
         ]
             \addplot coordinates {(Synthetic,73087.66) (CSV replay,54814.09)};
@@ -275,7 +276,7 @@ For readers less familiar with streaming benchmarks, two metrics are especially 
     \end{tikzpicture}
     \caption{Average throughput for the preliminary gRPC baseline, split by workload family and transport mode. Client-streaming sustains substantially higher throughput than unary gRPC in both workload families.}
     \label{fig:grpc-preliminary-throughput}
-\end{figure*}
+\end{figure}
 
 \subsubsection{Clean baseline matrix}
 
@@ -293,15 +294,16 @@ The clean matrices alone, however, are not enough to judge whether a transport i
 
 The first focused experiment was a continuous steady-rate scenario. It used 1 KiB synthetic messages, a fixed target rate of 1,000 messages per second, and concurrency levels of 4 and 8, without artificial sink delay or injected failures. The goal was to measure not just throughput and latency, but also inter-arrival regularity under a long-running steady stream.
 
-\begin{table*}[t]
+\begin{table}[t]
     \centering
-    \footnotesize
+    \scriptsize
     \caption{Focused gRPC continuous-stream jitter scenario.}
     \label{tab:grpc-continuous-results}
-    \resizebox{\textwidth}{!}{%
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
     \begin{tabular}{lrrrrr}
         \toprule
-        Transport mode & Concurrency & Throughput (msg/s) & Avg. $p_{95}$ (ms) & $p_{95}$ inter-arrival (ms) & Jitter (ms) \\
+        Transport mode & Concur. & Throughput & Avg. $p_{95}$ & \shortstack{$p_{95}$ inter-\\arrival} & Jitter \\
         \midrule
         Client-streaming & 4 & 918.20 & 4.68 & 1.61 & 0.66 \\
         Client-streaming & 8 & 918.70 & 6.57 & 1.62 & 0.66 \\
@@ -309,7 +311,7 @@ The first focused experiment was a continuous steady-rate scenario. It used 1 Ki
         Unary & 8 & 1,050.39 & 1.03 & 2.16 & 0.88 \\
         \bottomrule
     \end{tabular}}
-\end{table*}
+\end{table}
 
 The continuous results show a clear split between delivery regularity and per-message responsiveness. Client-streaming maintained the tighter inter-arrival pattern in both concurrency settings: its jitter stayed around 0.66 ms and its $p_{95}$ inter-arrival delay remained near 1.6 ms. Unary delivered much lower end-to-end latency, but its inter-arrival spread was wider and, at concurrency 8, it exceeded the requested send rate by reaching roughly 1,050 messages per second. In other words, the current client-streaming implementation paces the flow more steadily, whereas unary remains the faster low-latency option. The CPU data also points in the same direction: unary required substantially more transformer CPU than client-streaming in this continuous scenario, indicating that the lower latency was not free.
 
@@ -317,21 +319,22 @@ The continuous results show a clear split between delivery regularity and per-me
 
 The second focused experiment was a backpressure scenario. It used the same 1 KiB payload size with concurrency 8, but the sink was slowed down by adding a 2 ms processing delay per message while the producer still targeted 4,000 messages per second. This scenario was designed to expose whether the transport absorbs overload through explicit throttling or through queue growth and accumulated delay.
 
-\begin{table*}[t]
+\begin{table}[t]
     \centering
-    \footnotesize
+    \scriptsize
     \caption{Focused gRPC backpressure scenario with an intentionally slow sink.}
     \label{tab:grpc-backpressure-results}
-    \resizebox{\textwidth}{!}{%
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
     \begin{tabular}{lrrrrr}
         \toprule
-        Transport mode & Throughput (msg/s) & Median latency (ms) & Avg. $p_{95}$ (ms) & $p_{95}$ inter-arrival (ms) & Jitter (ms) \\
+        Transport mode & Throughput & Median lat. & Avg. $p_{95}$ & \shortstack{$p_{95}$ inter-\\arrival} & Jitter \\
         \midrule
         Client-streaming & 3,395.94 & 1,427.58 & 1,760.95 & 2.07 & 0.63 \\
         Unary & 2,386.17 & 0.44 & 0.83 & 3.18 & 1.06 \\
         \bottomrule
     \end{tabular}}
-\end{table*}
+\end{table}
 
 This result is important because it shows that higher throughput is not automatically the better outcome. Under backpressure, client-streaming kept much more of the nominal input rate, but it did so by allowing the pipeline to accumulate a very large queue. The median end-to-end latency increased to more than 1.4 seconds and the $p_{95}$ latency reached roughly 1.76 seconds. Unary behaved almost oppositely: it gave up throughput, but kept latency near the sub-millisecond range. The interpretation is that client-streaming preserves bulk movement under pressure, whereas unary currently protects responsiveness by throttling harder. For DYNAMOS this is a meaningful design trade-off, because some archetypes may prefer sustained throughput while others may require bounded latency or tighter admission control.
 
@@ -339,21 +342,22 @@ This result is important because it shows that higher throughput is not automati
 
 The third focused experiment was a recovery scenario. This run used 4 KiB messages, concurrency 8, a continuous target rate of 2,000 messages per second, and a forced \textit{Transformer} restart after 3 seconds. The producer was allowed to retry up to 40 times with a 250 ms backoff. The purpose of this scenario was not to replace the main matrix, but to observe how the two gRPC transport styles behave when the pipeline is interrupted during an active stream.
 
-\begin{table*}[t]
+\begin{table}[t]
     \centering
-    \footnotesize
+    \scriptsize
     \caption{Focused gRPC recovery scenario with a forced transformer restart.}
     \label{tab:grpc-recovery-results}
-    \resizebox{\textwidth}{!}{%
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
     \begin{tabular}{lrrrrr}
         \toprule
-        Transport mode & Throughput (msg/s) & Avg. $p_{95}$ (ms) & Max latency (ms) & Duplicates & Avg. recovery (ms) \\
+        Transport mode & Throughput & Avg. $p_{95}$ & Max lat. & Duplicates & Avg. recovery \\
         \midrule
         Client-streaming & 1,376.11 & 12.33 & 32.93 & 7,163 & 1,003.14 \\
         Unary & 2,097.03 & 2.74 & 1,274.57 & 0 & 1,273.31 \\
         \bottomrule
     \end{tabular}}
-\end{table*}
+\end{table}
 
 The recovery results change the interpretation in an important way. Unary gRPC sustained the intended rate more effectively after the restart and kept a much lower $p_{95}$ latency than client-streaming. It also completed the run without duplicates, because each request could simply be retried individually once the transformer became reachable again. In that sense, unary currently behaves more cleanly under restart in this benchmark implementation.
 

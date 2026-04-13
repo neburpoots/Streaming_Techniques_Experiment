@@ -1,6 +1,7 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.8)  11 APR 2026 13:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.8)  13 APR 2026 13:05
 entering extended mode
  restricted \write18 enabled.
+ file:line:error style messages enabled.
  %&-line parsing enabled.
 **./main.tex
 (main.tex
@@ -646,7 +647,23 @@ LaTeX Info: Redefining \cite on input line 302.
 LaTeX Info: Redefining \nocite on input line 332.
 Package: cite 2015/02/27  v 5.5
 )
-(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/dblfloatfix\dblfloatfix
+.sty
+Package: dblfloatfix 2012/12/31 v1.0a (JAW)
+ (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/base\fixltx2e.sty
+Package: fixltx2e 2016/12/29 v2.1a fixes to LaTeX (obsolete)
+Applying: [2015/01/01] Old fixltx2e package on input line 46.
+
+
+Package fixltx2e Warning: fixltx2e is not required with releases after 2015
+(fixltx2e)                All fixes are now in the LaTeX kernel.
+(fixltx2e)                See the latexrelease package for details.
+
+Already applied: [0000/00/00] Old fixltx2e package on input line 53.
+)
+\@dblbotnum=\count320
+\c@dblbotnumber=\count321
+) (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip17
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
@@ -662,12 +679,12 @@ Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \cmidrulesep=\dimen302
 \cmidrulekern=\dimen303
 \defaultaddspace=\dimen304
-\@cmidla=\count320
-\@cmidlb=\count321
+\@cmidla=\count322
+\@cmidlb=\count323
 \@aboverulesep=\dimen305
 \@belowrulesep=\dimen306
-\@thisruleclass=\count322
-\@lastruleclass=\count323
+\@thisruleclass=\count324
+\@lastruleclass=\count325
 \@thisrulewidth=\dimen307
 )
 (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
@@ -685,40 +702,40 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
 tex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count324
+\l__color_backend_stack_int=\count326
 ) (main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
 
 -- Lines per column: 56 (exact).
 
 (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count325
+\scratchcounter=\count327
 \scratchdimen=\dimen308
 \scratchbox=\box67
-\nofMPsegments=\count326
-\nofMParguments=\count327
+\nofMPsegments=\count328
+\nofMParguments=\count329
 \everyMPshowfont=\toks39
-\MPscratchCnt=\count328
+\MPscratchCnt=\count330
 \MPscratchDim=\dimen309
-\MPnumerator=\count329
-\makeMPintoPDFobject=\count330
+\MPnumerator=\count331
+\makeMPintoPDFobject=\count332
 \everyMPtoPDFconversion=\toks40
 )
 (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
@@ -734,18 +751,18 @@ File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 37.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 38.
 
 (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 37.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 38.
 
 
 (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Underfull \hbox (badness 1776) in paragraph at lines 48--49
+Underfull \hbox (badness 1776) in paragraph at lines 49--50
 []\OT1/ptm/m/n/10 DYNAMOS (Dy-nam-ic-ally Ad-apt-ive Microservice-based
  []
 
@@ -754,74 +771,76 @@ bur/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
 ]
-Underfull \hbox (badness 2564) in paragraph at lines 70--71
+Underfull \hbox (badness 2564) in paragraph at lines 71--72
 []\OT1/ptm/m/n/10 gRPC provides nat-ive sup-port for stream-ing through
  []
 
 [2]
-Underfull \hbox (badness 1824) in paragraph at lines 98--99
+Underfull \hbox (badness 1824) in paragraph at lines 99--100
 []\OT1/ptm/m/n/10 Despite these con-tri-bu-tions, there is lim-ited guid-ance
  []
 
 
-Underfull \hbox (badness 4013) in paragraph at lines 102--103
+Underfull \hbox (badness 4013) in paragraph at lines 103--104
 []\OT1/ptm/m/n/10 Streaming-based com-mu-nic-a-tion in-tro-duces op-er-a-tional
 
  []
 
 [3]
-Underfull \hbox (badness 1546) in paragraph at lines 118--119
+Underfull \hbox (badness 1546) in paragraph at lines 119--120
 []\OT1/ptm/m/n/10 However, most ex-ist-ing eval-u-ations as-sume static mi-
  []
 
 [4] [5]
-Underfull \hbox (badness 10000) in paragraph at lines 188--188
+Underfull \hbox (badness 10000) in paragraph at lines 189--189
 []\OT1/ptm/m/n/8 Protocol over-head, sus-tained
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 188--188
+Underfull \hbox (badness 10000) in paragraph at lines 189--189
 \OT1/ptm/m/n/8 through-put, multi-hop trans-fer
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 189--189
+Underfull \hbox (badness 10000) in paragraph at lines 190--190
 []\OT1/ptm/m/n/8 Continuous steady-rate
  []
 
 
-Underfull \hbox (badness 3189) in paragraph at lines 190--190
+Underfull \hbox (badness 3189) in paragraph at lines 191--191
 []\OT1/ptm/m/n/8 Slow-consumer back-pres-
  []
 
 
-Underfull \hbox (badness 1721) in paragraph at lines 191--191
+Underfull \hbox (badness 1721) in paragraph at lines 192--192
 []\OT1/ptm/m/n/8 Reconnect be-ha-viour, du-plic-ates,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 191--191
+Underfull \hbox (badness 10000) in paragraph at lines 192--192
 \OT1/ptm/m/n/8 or-der-ing pre-ser-va-tion, re-cov-ery
  []
 
-Package pgfplots info on input line 270: Using 'lua backend=false' for axis: x 
+<figures/phase1-evaluation-map.png, id=26, 1097.09875pt x 595.22375pt>
+File: figures/phase1-evaluation-map.png Graphic file (type png)
+<use figures/phase1-evaluation-map.png>
+Package pdftex.def Info: figures/phase1-evaluation-map.png  used on input line 
+199.
+(pdftex.def)             Requested size: 474.71906pt x 257.5488pt.
+Package pgfplots info on input line 271: Using 'lua backend=false' for axis: x 
 coord trafo unsupported.
 
-Underfull \hbox (badness 3078) in paragraph at lines 282--283
+Underfull \hbox (badness 3078) in paragraph at lines 283--284
  \OT1/ptm/m/it/10 2) Clean baseline mat-rix: [][] \OT1/ptm/m/n/10 Sev-eral clea
 r ob-ser-va-tions
  []
 
 
-Underfull \hbox (badness 1454) in paragraph at lines 282--283
+Underfull \hbox (badness 1454) in paragraph at lines 283--284
 \OT1/ptm/m/n/10 already fol-low from Table II[] and Fig. 2[]. First, client-
  []
 
-[6]
-Underfull \vbox (badness 1590) has occurred while \output is active []
-
- [7]
-[8] (main.bbl [9])
+[6] [7 <./figures/phase1-evaluation-map.png>] [8] (main.bbl [9])
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -833,36 +852,39 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[10] (main.aux)
+[10
+
+] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 25013 strings out of 467871
- 652525 string characters out of 5418377
- 1196672 words of memory out of 5000000
- 53508 multiletter control sequences out of 15000+600000
- 666292 words of font info for 117 fonts, out of 8000000 for 9000
+ 25079 strings out of 467871
+ 654342 string characters out of 5418377
+ 1195672 words of memory out of 5000000
+ 53566 multiletter control sequences out of 15000+600000
+ 667370 words of font info for 118 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,19n,118p,1183b,2332s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,19n,118p,1183b,2334s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmmi10.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
-fonts/cm/cmmi7.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/pu
-blic/amsfonts/cm/cmmi8.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/amsfonts/cm/cmr10.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTe
-X/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/nebur/AppData/Local/Program
-s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/nebur/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/nebur/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Users/neb
-ur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/neb
-ur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/ne
-bur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/ne
-bur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (10 pages, 190511 bytes).
+fonts/cm/cmmi5.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/pu
+blic/amsfonts/cm/cmmi7.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/
+type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/nebur/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/nebur/AppData/Local/
+Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/nebur/AppData
+/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/nebu
+r/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Us
+ers/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Us
+ers/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/U
+sers/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/U
+sers/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on main.pdf (10 pages, 247653 bytes).
 PDF statistics:
- 99 PDF objects out of 1000 (max. 8388607)
+ 107 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 13 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 18 words of extra memory for PDF output out of 10000 (max. 10000000)
 

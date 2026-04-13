@@ -7,12 +7,12 @@
         "-synctex=1",
         "-interaction=nonstopmode",
         "-file-line-error",
-        "%DOC%"
+        "%DOCFILE%"
       ]
     },
     {
-      "name": "biber",
-      "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/biber.exe",
+      "name": "bibtex",
+      "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/bibtex.exe",
       "args": [
         "%DOCFILE%"
       ]
@@ -24,7 +24,7 @@
         "-synctex=1",
         "-interaction=nonstopmode",
         "-file-line-error",
-        "%DOC%"
+        "%DOCFILE%"
       ]
     },
     {
@@ -34,7 +34,7 @@
         "-synctex=1",
         "-interaction=nonstopmode",
         "-file-line-error",
-        "%DOC%"
+        "%DOCFILE%"
       ]
     },
     {
@@ -47,28 +47,28 @@
   ],
   "latex-workshop.latex.recipes": [
     {
-      "name": "lualatex -> biber -> lualatex -> lualatex",
-      "tools": [
-        "lualatex",
-        "biber",
-        "lualatex",
-        "lualatex"
-      ]
-    },
-    {
-      "name": "pdflatex -> biber -> pdflatex -> pdflatex",
+      "name": "pdflatex -> bibtex -> pdflatex -> pdflatex",
       "tools": [
         "pdflatex",
-        "biber",
+        "bibtex",
         "pdflatex",
         "pdflatex"
       ]
     },
     {
-      "name": "xelatex -> biber -> xelatex -> xelatex",
+      "name": "lualatex -> bibtex -> lualatex -> lualatex",
+      "tools": [
+        "lualatex",
+        "bibtex",
+        "lualatex",
+        "lualatex"
+      ]
+    },
+    {
+      "name": "xelatex -> bibtex -> xelatex -> xelatex",
       "tools": [
         "xelatex",
-        "biber",
+        "bibtex",
         "xelatex",
         "xelatex"
       ]

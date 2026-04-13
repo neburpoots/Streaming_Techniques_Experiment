@@ -1,0 +1,78 @@
+<mxfile host="65bd71144e">
+    <diagram id="phase1-eval-map" name="Phase 1 Evaluation Map">
+        <mxGraphModel dx="1583" dy="949" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="frame" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFDF8;strokeColor=#D6D3D1;strokeWidth=2;shadow=0;arcSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="95" width="1090" height="590" as="geometry"/>
+                </mxCell>
+                <mxCell id="literatureBand" value="Recurring literature-backed evaluation concerns: transfer efficiency, pacing stability, overload behaviour, recovery, and operational cost" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEF2FF;strokeColor=#6366F1;strokeWidth=1.5;fontSize=13;fontColor=#312E81;align=center;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="180" y="110" width="800" height="56" as="geometry"/>
+                </mxCell>
+                <mxCell id="pipelineGroup" value="Common benchmark pipeline" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9FAFB;strokeColor=#9CA3AF;strokeWidth=2;fontSize=18;fontStyle=1;fontColor=#111827;align=center;verticalAlign=top;spacingTop=12;" parent="1" vertex="1">
+                    <mxGeometry x="315" y="245" width="530" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="producer" value="Producer&#xa;&#xa;Synthetic records or&#xa;chunked dataset input" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;strokeWidth=2;fontSize=16;fontColor=#064E3B;align=center;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="355" y="300" width="130" height="135" as="geometry"/>
+                </mxCell>
+                <mxCell id="transformer" value="Transformer&#xa;&#xa;Deterministic validation,&#xa;filtering, or hashing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;strokeWidth=2;fontSize=16;fontColor=#1E3A8A;align=center;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="515" y="300" width="130" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="sink" value="Sink&#xa;&#xa;Arrival times, latency,&#xa;throughput, correctness" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;strokeWidth=2;fontSize=16;fontColor=#831843;align=center;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="675" y="300" width="130" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="p2t" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="producer" target="transformer" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2s" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6B7280;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="transformer" target="sink" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bulk" value="Bulk transfer&#xa;&#xa;Primary property: transfer efficiency&#xa;Why it matters: efficient incremental movement of large datasets across a composed service chain" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontSize=14;fontColor=#7C2D12;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="180" width="225" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="continuous" value="Continuous steady-rate&#xa;&#xa;Primary property: pacing stability&#xa;Why it matters: sustained flows need regular delivery rhythm, not just high average throughput" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0284C7;strokeWidth=2;fontSize=14;fontColor=#0C4A6E;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="180" width="225" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="backpressure" value="Slow-consumer backpressure&#xa;&#xa;Primary property: overload response&#xa;Why it matters: unequal service rates must reveal whether pressure becomes throttling, queue growth, or delay" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;strokeWidth=2;fontSize=14;fontColor=#7F1D1D;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="435" width="225" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="recovery" value="Forced-restart recovery&#xa;&#xa;Primary property: reconnect and duplicate behaviour&#xa;Why it matters: ephemeral Kubernetes-style services require interpretable restart handling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#7C3AED;strokeWidth=2;fontSize=14;fontColor=#4C1D95;spacing=8;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="430" width="225" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="bulkEdge" value="scenario probe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D97706;strokeWidth=2;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;fontSize=12;fontColor=#92400E;labelBackgroundColor=#FFFDF8;" parent="1" source="bulk" target="pipelineGroup" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="163" y="350"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="continuousEdge" value="scenario probe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284C7;strokeWidth=2;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;fontSize=12;fontColor=#075985;labelBackgroundColor=#FFFDF8;" parent="1" source="continuous" target="pipelineGroup" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="993" y="320"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="backpressureEdge" value="scenario probe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=2;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;fontSize=12;fontColor=#991B1B;labelBackgroundColor=#FFFDF8;entryX=-0.001;entryY=0.779;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="backpressure" target="pipelineGroup" edge="1">
+                    <mxGeometry x="0.029" y="-11" relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="163" y="409"/>
+                        </Array>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="recoveryEdge" value="scenario probe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;strokeWidth=2;dashed=1;dashPattern=8 6;endArrow=block;endFill=1;fontSize=12;fontColor=#5B21B6;labelBackgroundColor=#FFFDF8;entryX=1.001;entryY=0.81;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="recovery" target="pipelineGroup" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="993" y="415"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="footer" value="The scenario suite is not an arbitrary set of tests. It maps recurring literature-backed concerns onto a common relevant pipeline so that mechanisms can be compared on interpretable properties, not just one headline metric." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;fontSize=13;fontColor=#374151;align=center;verticalAlign=middle;spacing=10;" parent="1" vertex="1">
+                    <mxGeometry x="210" y="615" width="740" height="52" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
