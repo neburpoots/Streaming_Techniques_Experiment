@@ -1,0 +1,145 @@
+{
+  "run_id": "synthetic-clean-stream-p256-c16",
+  "transport_mode": "client-streaming",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 256,
+  "concurrency": 16,
+  "target_messages_per_second": 0,
+  "producer_started_at": "2026-04-04T15:17:34.041605956Z",
+  "producer_finished_at": "2026-04-04T15:17:34.154273891Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151114356
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151146890
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151177717
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151185685
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151202948
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151209967
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151219832
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151234629
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151245157
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151320186
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151327489
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151333370
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151341717
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151361351
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854151455825
+    },
+    {
+      "run_id": "synthetic-clean-stream-p256-c16",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 320000,
+      "finished_at_unix_nano": 1775315854152583051
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "sink_summary": {
+    "run_id": "synthetic-clean-stream-p256-c16",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 5120000,
+    "duration_seconds": 0.141455467,
+    "throughput_messages_per_second": 141387.25370013446,
+    "throughput_megabytes_per_second": 34.51837248538439,
+    "p50_latency_ms": 27.929687,
+    "p95_latency_ms": 36.617888,
+    "p99_latency_ms": 38.922138,
+    "max_latency_ms": 41.287284,
+    "started_at_unix_nano": 1775315854072115061,
+    "finished_at_unix_nano": 1775315854151353194,
+    "transport_mode": "client-streaming"
+  }
+}

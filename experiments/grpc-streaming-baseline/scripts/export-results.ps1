@@ -69,7 +69,7 @@ function Get-ContainerRole {
         return $null
     }
 
-    if ($ContainerName -like 'grpc-streaming-baseline-producer-run-*') {
+    if ($ContainerName -like 'grpc-streaming-baseline-producer-run-*' -or $ContainerName -like 'grpc-streaming-baseline-producer-*') {
         return 'producer'
     }
     if ($ContainerName -like 'grpc-streaming-baseline-transformer-*') {
@@ -119,6 +119,9 @@ function Get-RunResourceSummary {
     )
 
     $statsPath = Join-Path $ResultsDirectory ("$RunId-docker-stats.ndjson")
+    if (-not (Test-Path $statsPath)) {
+        $statsPath = Join-Path $ResultsDirectory ("$RunId-k8s-stats.ndjson")
+    }
     $emptyRoleSummary = [PSCustomObject]@{ cpu_avg_pct = $null; cpu_peak_pct = $null; memory_avg_mib = $null; memory_peak_mib = $null; samples = 0 }
     if (-not (Test-Path $statsPath)) {
         return [PSCustomObject]@{

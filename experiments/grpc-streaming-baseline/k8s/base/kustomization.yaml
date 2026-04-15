@@ -4,6 +4,7 @@ namespace: streaming-experiments
 resources:
   - namespace.yaml
   - configmap.yaml
+  - results-pvc.yaml
   - sink-deployment.yaml
   - sink-service.yaml
   - transformer-deployment.yaml

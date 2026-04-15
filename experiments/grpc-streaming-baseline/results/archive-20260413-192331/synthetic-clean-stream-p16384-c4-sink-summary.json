@@ -1,0 +1,17 @@
+{
+  "run_id": "synthetic-clean-stream-p16384-c4",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 327680000,
+  "duration_seconds": 0.877811572,
+  "throughput_messages_per_second": 22783.93295093175,
+  "throughput_megabytes_per_second": 355.9989523583086,
+  "p50_latency_ms": 9.356041,
+  "p95_latency_ms": 23.772845,
+  "p99_latency_ms": 30.64335,
+  "max_latency_ms": 36.707002,
+  "started_at_unix_nano": 1775315924173518784,
+  "finished_at_unix_nano": 1775315924995927898,
+  "transport_mode": "client-streaming"
+}

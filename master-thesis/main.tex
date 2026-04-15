@@ -35,7 +35,7 @@ Amsterdam, the Netherlands}
 \maketitle
 
 \begin{abstract}
-This paper investigates how streaming communication can be introduced into DYNAMOS, a policy-driven middleware for data exchange based on dynamically composed microservices. The current system relies on unary gRPC request-response interactions, which become increasingly inefficient for large or continuous transfers. The study combines a literature-guided comparison of candidate communication mechanisms with an initial controlled benchmark that establishes a gRPC reference baseline in a common \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink} pipeline. Phase 1 evaluates transfer efficiency, latency stability, overload behaviour, recovery characteristics, and resource cost. Preliminary results show that client-streaming gRPC provides substantially higher sustained throughput and steadier pacing for long-running transfers, while unary gRPC maintains lower per-message latency and cleaner restart behaviour. These findings establish a structured reference point for later comparison with broker-based alternatives such as Kafka, RabbitMQ streams, and NATS JetStream.
+This thesis investigates how streaming communication can be introduced into DYNAMOS, a policy-driven middleware for data exchange based on dynamically composed microservices. The current system relies on unary gRPC request-response interactions, which become increasingly inefficient for large or continuous transfers. To ground the broader architectural and comparative study, the thesis first reviews candidate streaming mechanisms and establishes a controlled evaluation baseline in a common \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink} pipeline. The current empirical results compare client-streaming and unary gRPC across transfer efficiency, latency stability, overload behaviour, recovery characteristics, and resource cost. They show that client-streaming gRPC provides substantially higher sustained throughput, steadier pacing, and much faster restart recovery for long-running transfers, while unary gRPC maintains lower per-message latency and duplicate-free delivery in the current prototype. These findings define the trade-off space that subsequent broker comparisons and DYNAMOS integration work must address.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -59,6 +59,8 @@ Integrating streaming communication into DYNAMOS is not straightforward. Streami
 The goal of this thesis is to investigate how streaming communication can be incorporated into DYNAMOS in a way that improves scalability and performance while preserving policy compliance and adaptive behavior. This involves analyzing existing streaming communication mechanisms, designing architectural extensions to the middleware, implementing streaming support, and evaluating the resulting system under realistic workloads.
 
 The main research question addressed in this thesis is how streaming communication can be integrated into a dynamically adaptive, policy-driven microservice-based data exchange middleware such as DYNAMOS while preserving compliance guarantees and improving scalability and performance. To answer this overarching question, the thesis is structured around three sub-questions: which streaming communication technologies, frameworks, and interaction patterns are suitable for large-scale and continuous data exchange in microservice-based systems such as DYNAMOS; how streaming communication can be integrated into a microservice-based architecture while preserving dynamic service composition, policy-driven orchestration, and isolation guarantees; and what impact streaming communication has on scalability, performance, and robustness compared to a traditional request--response approach under realistic workloads in a microservice-based architecture.
+
+The present document concentrates on the first empirical step in that broader programme. It narrows the design space through a literature-guided comparison, defines a reproducible benchmark for DYNAMOS-relevant streaming workloads, and reports the current gRPC baseline results. Later thesis stages build on this baseline by extending the comparison to broker-based transports and by evaluating architectural fit inside DYNAMOS itself.
 
 \section{Related Work}
 
@@ -118,9 +120,9 @@ Scalability in containerized streaming systems has been studied through systemat
 
 However, most existing evaluations assume static microservice topologies and fixed execution paths. Prior performance studies rarely consider adaptive middleware that dynamically constructs execution chains based on policy evaluation. As a result, there is limited empirical insight into how streaming communication scales when embedded within dynamically adaptive, policy-driven systems such as DYNAMOS. This lack of combined evaluation of streaming, scalability, and adaptivity motivates the experimental focus of this thesis.
 
-\section{Phase 1: Survey and Initial Benchmarking of Candidate Streaming Mechanisms}
+\section{Candidate Mechanisms and Benchmark Design}
 
-Phase 1 addresses \emph{RQ1}: which streaming communication technologies, frameworks, and interaction patterns are suitable for large-scale and continuous data exchange in microservice-based systems such as DYNAMOS? The phase combines a literature-backed comparison of candidate mechanisms with a first controlled benchmark that establishes a baseline within the gRPC family before broker-based alternatives are added.
+This section addresses \emph{RQ1}: which streaming communication technologies, frameworks, and interaction patterns are suitable for large-scale and continuous data exchange in microservice-based systems such as DYNAMOS? It combines a literature-backed comparison of candidate mechanisms with a controlled benchmark design that establishes a gRPC reference baseline before broker-based alternatives are added.
 
 \subsection{gRPC streaming}
 
@@ -146,21 +148,21 @@ The NATS ecosystem deserves separate consideration because it targets lightweigh
 
 For the thesis, NATS is interesting because it represents a lightweight alternative to Kafka and RabbitMQ rather than a direct substitute for either. JetStream supports durable streams, replay, replication, and scalable pull consumers, while core NATS preserves a simple request/reply and pub/sub model that is attractive for microservice systems \cite{nats2026reqreply,nats2026jetstream}. A key complication is that the literature still often discusses the older NATS Streaming layer rather than JetStream, which means published results do not always map perfectly to the current product. That mismatch should be made explicit in the thesis: the experiment should evaluate modern JetStream, but the literature review must interpret older NATS Streaming results with caution \cite{sharvari2019messaging,ciftci2025ipcmechanisms}. NATS with JetStream is most promising when lightweight deployment, elastic scaling, and a smaller operational surface are valued more highly than Kafka's larger ecosystem and benchmarking history.
 
-\subsection{Phase 1 Experimental Design}
+\subsection{Benchmark Design}
 
 \subsubsection{Methodological positioning}
 
-Phase 1 is not presented as a standard benchmark protocol copied directly from one prior study, nor as a completely novel framework. Instead, it adapts recurring benchmarking principles from streaming-system evaluation, distributed stream processing studies, and comparative IPC experiments to the specific constraints of DYNAMOS. In particular, the controlled multi-stage pipeline follows the style of prior streaming-pipeline evaluations such as DataXc \cite{coviello2022dataxc}; the insistence on identical business logic across mechanisms follows comparative benchmarking practice in distributed systems \cite{karimov2018benchmarking,Henning2021ScalabilityMetrics}; and the emphasis on throughput, latency, concurrency, resource pressure, and recovery reflects recurring evaluation dimensions in the literature \cite{systematicstreaming,ciftci2025ipcmechanisms}. The resulting design is therefore best understood as a literature-guided, thesis-specific operationalization of established evaluation concerns.
+The benchmark design is not presented as a standard protocol copied directly from one prior study, nor as a completely novel framework. Instead, it adapts recurring benchmarking principles from streaming-system evaluation, distributed stream processing studies, and comparative IPC experiments to the specific constraints of DYNAMOS. In particular, the controlled multi-stage pipeline follows the style of prior streaming-pipeline evaluations such as DataXc \cite{coviello2022dataxc}; the insistence on identical business logic across mechanisms follows comparative benchmarking practice in distributed systems \cite{karimov2018benchmarking,Henning2021ScalabilityMetrics}; and the emphasis on throughput, latency, concurrency, resource pressure, and recovery reflects recurring evaluation dimensions in the literature \cite{systematicstreaming,ciftci2025ipcmechanisms}. The resulting design is therefore best understood as a literature-guided, thesis-specific operationalization of established evaluation concerns.
 
 \subsubsection{Evaluation scope}
 
-The purpose of Phase 1 is not to identify a universally best communication mechanism in the abstract. Instead, it narrows the design space for DYNAMOS by asking which communication model best fits which workload condition and which operational constraint. The central question is therefore: \emph{which streaming mechanism best supports large, ordered, and concurrent inter-service data transfer in a microservice pipeline under varying workload intensity, resource pressure, and recovery requirements?}
+The purpose of this benchmark is not to identify a universally best communication mechanism in the abstract. Instead, it narrows the design space for DYNAMOS by asking which communication model best fits which workload condition and which operational constraint. The central question is therefore: \emph{which streaming mechanism best supports large, ordered, and concurrent inter-service data transfer in a microservice pipeline under varying workload intensity, resource pressure, and recovery requirements?}
 
 This framing matters for interpretation. The chapter body focuses on the argument and on the most informative comparisons, while exhaustive preset definitions, full run matrices, and supplementary plots are better treated as appendix material once the multi-technology comparison is complete.
 
 \subsubsection{Common testbed and fairness constraints}
 
-To ensure that observed differences can be attributed to the communication mechanism rather than to application logic, all candidate mechanisms should be evaluated with the same payload schema, the same transformation logic, and the same deployment environment. The common testbed is a Go-based microservice chain deployed on Kubernetes with three services: \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}. This topology is small enough to reason about directly, but still rich enough to expose backpressure, buffering, and multi-hop propagation effects \cite{coviello2022dataxc,karimov2018benchmarking}.
+To ensure that observed differences can be attributed to the communication mechanism rather than to application logic, all candidate mechanisms should be evaluated with the same payload schema, the same transformation logic, and the same deployment environment. The common testbed is a Go-based microservice chain deployed on Kubernetes with three services: \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}. The services are deployed in a dedicated namespace using Kustomize, with base manifests defining the common topology and overlay patches controlling the resource budget per experiment tier (CPU and memory requests and limits). Resource consumption is sampled at regular intervals via the Kubernetes metrics-server using \texttt{kubectl top}. This topology is small enough to reason about directly, but still rich enough to expose backpressure, buffering, and multi-hop propagation effects \cite{coviello2022dataxc,karimov2018benchmarking}.
 
 The mechanism-specific mappings should remain as close as possible to one another. For gRPC, the default implementation should use client-streaming, with bidirectional streaming reserved for an extended scenario. For Kafka, messages should be keyed by flow identifier so that per-flow ordering is preserved within a partition. For RabbitMQ, the preferred setup is a stream rather than a classic queue, with super streams used only if scale-out beyond a single stream is necessary. For NATS, JetStream should be used with explicit acknowledgements and pull consumers. Holding business logic and payload shape constant is essential, because otherwise performance differences could be caused by application behaviour instead of the communication layer itself \cite{karimov2018benchmarking,Henning2021ScalabilityMetrics}.
 
@@ -168,18 +170,18 @@ The service logic is intentionally simple. The producer emits synthetic records 
 
 \subsubsection{Evaluation dimensions}
 
-The literature supports evaluating streaming mechanisms along a small set of recurring dimensions rather than through a single headline metric. For Phase 1, five dimensions are treated as primary: transfer efficiency, meaning how much data the pipeline can move per second under comparable conditions; latency and pacing stability, meaning not only how fast messages arrive but how regularly they arrive under sustained flow \cite{coviello2022dataxc}; overload behaviour, meaning whether pressure is absorbed through queue growth, throttling, or admission failure; recovery and correctness, meaning how reconnects, retries, duplicates, and ordering behave when a running pipeline is interrupted; and resource and operational cost, meaning CPU, memory, network traffic, and the practical complexity of running the mechanism in Kubernetes.
+The literature supports evaluating streaming mechanisms along a small set of recurring dimensions rather than through a single headline metric. In this benchmark, five dimensions are treated as primary: transfer efficiency, meaning how much data the pipeline can move per second under comparable conditions; latency and pacing stability, meaning not only how fast messages arrive but how regularly they arrive under sustained flow \cite{coviello2022dataxc}; overload behaviour, meaning whether pressure is absorbed through queue growth, throttling, or admission failure; recovery and correctness, meaning how reconnects, retries, duplicates, and ordering behave when a running pipeline is interrupted; and resource and operational cost, meaning CPU, memory, network traffic, and the practical complexity of running the mechanism in Kubernetes.
 
 This dimensional view is important because it prevents the chapter from collapsing into a single throughput comparison. A mechanism may lead on bulk transport while still performing poorly under restart or overload, and such trade-offs are exactly what DYNAMOS must reason about.
 
 \subsubsection{Scenario set and scenario-to-property mapping}
 
-The full Phase 1 design distinguishes three workload families: \emph{bulk transfer}, \emph{continuous steady-rate flow}, and \emph{bursty transfer}. The currently completed gRPC reference study covers the first two directly and supplements them with two targeted stress probes that operationalize the properties most relevant to DYNAMOS: slow-consumer backpressure and forced-restart recovery. A bursty profile remains part of the planned cross-technology matrix, but it has not yet been executed in the current gRPC-only reference stage.
+The full benchmark design distinguishes three workload families: \emph{bulk transfer}, \emph{continuous steady-rate flow}, and \emph{bursty transfer}. The currently completed gRPC reference study covers the first two directly and supplements them with two targeted stress probes that operationalize the properties most relevant to DYNAMOS: slow-consumer backpressure and forced-restart recovery. A bursty profile remains part of the planned cross-technology matrix, but it has not yet been executed in the current gRPC-only reference stage.
 
 \begin{table*}[!t]
     \centering
     \footnotesize
-    \caption{Phase 1 scenario-to-property mapping.}
+    \caption{Scenario-to-property mapping used in the benchmark design.}
     \label{tab:phase1-scenario-map}
     \setlength{\tabcolsep}{5pt}
     \begin{tabular}{p{0.17\textwidth}p{0.22\textwidth}p{0.49\textwidth}}
@@ -197,13 +199,13 @@ The full Phase 1 design distinguishes three workload families: \emph{bulk transf
 \begin{figure*}[!b]
     \centering
     \includegraphics[width=0.92\textwidth]{figures/phase1-evaluation-map.png}
-    \caption{Phase 1 evaluation map showing the common benchmark pipeline and the four scenario probes used to operationalize the literature-backed evaluation dimensions.}
+    \caption{Evaluation map showing the common benchmark pipeline and the four scenario probes used to operationalize the literature-backed evaluation dimensions.}
     \label{fig:phase1-scenario-placeholder}
 \end{figure*}
 
 \subsubsection{Experimental factors}
 
-The independent variables cover the stress dimensions most frequently discussed in streaming-system and IPC benchmarking literature \cite{systematicstreaming,Henning2021ScalabilityMetrics,ciftci2025ipcmechanisms}: dataset size, to expose when buffering or backlog effects become significant; chunk or message size, to test the trade-off between per-message overhead and coarse-grained transfer latency; number of concurrent flows, to assess how each mechanism handles simultaneous transfers; pipeline depth, fixed here at a three-service chain so that raw transport overhead and multi-hop effects can still be distinguished; consumer speed mismatch, to expose backlog behaviour and flow-control effectiveness; resource budget, through explicit CPU and memory requests and limits for Kubernetes pods; durability mode and replication factor, where the mechanism supports such trade-offs; and fault scenario, at minimum service restart during an ongoing transfer.
+The independent variables cover the stress dimensions most frequently discussed in streaming-system and IPC benchmarking literature \cite{systematicstreaming,Henning2021ScalabilityMetrics,ciftci2025ipcmechanisms}: dataset size, to expose when buffering or backlog effects become significant; chunk or message size, to test the trade-off between per-message overhead and coarse-grained transfer latency; number of concurrent flows, to assess how each mechanism handles simultaneous transfers; pipeline depth, fixed here at a three-service chain so that raw transport overhead and multi-hop effects can still be distinguished; consumer speed mismatch, to expose backlog behaviour and flow-control effectiveness; resource budget, through explicit CPU and memory requests and limits for Kubernetes pods, defined as Kustomize overlay patches at three tiers (small: 100\,m\,CPU / 128\,MiB, medium: 250\,m\,CPU / 256\,MiB, large: 500\,m\,CPU / 512\,MiB); durability mode and replication factor, where the mechanism supports such trade-offs; and fault scenario, at minimum service restart during an ongoing transfer.
 
 Not every factor needs to be crossed exhaustively. A pragmatic design is to define a core matrix over mechanism, workload profile, resource budget, and concurrency, and then use targeted follow-up experiments for failure and durability scenarios. This keeps the study manageable while still covering the trade-offs the literature treats as most important \cite{sharvari2019messaging,ciftci2025ipcmechanisms}.
 
@@ -211,20 +213,37 @@ Not every factor needs to be crossed exhaustively. A pragmatic design is to defi
 
 The body of the thesis should present only the compact experiment matrix and a smaller set of focused figures that are necessary for the argument. A master table can summarize each run by mechanism, workload profile, dataset size, message size, concurrency level, resource budget, and durability mode, together with the most important metrics. The main text should then highlight the most informative sweeps, such as throughput versus concurrency, latency percentiles versus message size, and recovery behaviour by failure scenario. Full preset definitions, per-run outputs, and secondary plots should be moved to an appendix so that the chapter remains analytically clear rather than turning into an undifferentiated lab log.
 
-\subsection{Phase 1 Preliminary Results: gRPC Reference Baseline}
+\subsection{gRPC Baseline Results}
 
-\subsubsection{Why gRPC is evaluated first}
+\subsubsection{Metrics definitions}
 
-An initial implementation of the common benchmark has already been completed for gRPC. At this stage, the comparison is intentionally narrow: it contrasts \emph{client-streaming gRPC} with \emph{unary gRPC} in the same three-stage pipeline (\emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}), using identical business logic and payload schemas. This is useful because unary gRPC approximates the current direct request-response style used in DYNAMOS, whereas client-streaming represents the most direct streaming extension of that model. The broader comparison with Kafka, RabbitMQ, and NATS is still pending, so the results below should be read as a \emph{reference point within the gRPC family}, not yet as the final answer to the thesis question.
+Before presenting results, it is important to define the metrics used throughout the evaluation so that tables, figures, and prose refer to consistent quantities.
+
+\begin{itemize}
+    \item \textbf{Throughput (msg/s)} is the number of messages successfully received by the sink per second of wall-clock time, averaged over the entire run.
+    \item \textbf{Throughput (MiB/s)} is the data volume received by the sink per second, computed as $(\mathrm{msg}/\mathrm{s}) \times \mathrm{message\ size}$.
+    \item \textbf{Latency percentiles ($p_{50}$, $p_{95}$, $p_{99}$, max)} describe end-to-end message delivery delay from producer send to sink receipt. The $p_{95}$ latency, for example, means that 95\% of messages were delivered within that time or less.
+    \item \textbf{Inter-arrival time} is the elapsed time between consecutive message arrivals at the sink. The $p_{95}$ inter-arrival time captures near-worst-case spacing between deliveries.
+    \item \textbf{Jitter} is defined as the standard deviation of the inter-arrival times. Lower jitter indicates a more regular, predictable delivery rhythm.
+    \item \textbf{Duplicates} is the number of messages received more than once by the sink. In a correct delivery, this count is zero.
+    \item \textbf{Ordering violations} is the number of messages received out of their original send order.
+    \item \textbf{CPU usage (\%)} is the average and peak CPU consumption per role (producer, transformer, sink), sampled at two-second intervals via \texttt{kubectl top pods} during the focused Kubernetes reruns and computed as a percentage of a single core.
+    \item \textbf{Memory usage (MiB)} is the average and peak resident memory per role, sampled on the same interval.
+    \item \textbf{Recovery time (ms)} is the wall-clock time between the last message received before a failure and the first message received after the affected component has restarted.
+\end{itemize}
+
+\subsubsection{Current comparison scope}
+
+The currently completed implementation covers the gRPC portion of the benchmark. It contrasts \emph{client-streaming gRPC} with \emph{unary gRPC} in the same three-stage pipeline (\emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}), using identical business logic and payload schemas. This comparison is informative because unary gRPC approximates the current direct request-response style used in DYNAMOS, whereas client-streaming represents the most direct streaming extension of that model. The broader broker comparison with Kafka, RabbitMQ, and NATS remains future work, but the current gRPC study already establishes the first empirical baseline for the thesis.
 
 Two clean workload families were executed for this reference matrix. The first uses synthetic payloads with message sizes from 256 bytes to 16 KiB and concurrency levels from 1 to 16. The second is a smaller realism check that replays rows from the copied DYNAMOS CSV datasets by batching either 25 or 100 rows into one message. For each run, the sink records throughput, end-to-end latency percentiles, and correctness counters. In addition to these clean matrices, three focused stress scenarios were executed to probe the properties identified earlier: a continuous steady-rate jitter scenario, a slow-consumer backpressure scenario, and a recovery scenario with a forced mid-run transformer restart.
 
-For readers less familiar with streaming benchmarks, two metrics are especially important. \emph{Throughput} measures how much data the system can move per second, so higher values are better for large transfers. The \emph{$p_{95}$ latency} measures a near-worst-case delivery delay: 95\% of messages are delivered faster than this value, so lower values indicate more consistently responsive communication.
+The broad baseline matrices were executed as single runs per configuration on Docker Compose, where each service runs as an unrestricted container on the same host. The three focused stress scenarios were subsequently rerun three times on a Kubernetes cluster (single-node, with Kustomize-managed resource limits) and are reported below as arithmetic means over those repetitions. This two-environment split means that the bulk-transfer and CSV-replay results reflect Docker Compose performance, while the focused pacing, backpressure, and recovery results reflect Kubernetes performance. A full Kubernetes rerun of the broad matrix is planned once the cross-technology comparison is underway.
 
 \begin{table}[t]
     \centering
     \footnotesize
-    \caption{Preliminary gRPC baseline results averaged over the completed run matrices.}
+    \caption{gRPC baseline results averaged over the completed run matrices.}
     \label{tab:grpc-preliminary-results}
     \resizebox{\columnwidth}{!}{%
     \begin{tabular}{llll}
@@ -274,15 +293,34 @@ For readers less familiar with streaming benchmarks, two metrics are especially 
             \legend{Client-streaming,Unary}
         \end{axis}
     \end{tikzpicture}
-    \caption{Average throughput for the preliminary gRPC baseline, split by workload family and transport mode. Client-streaming sustains substantially higher throughput than unary gRPC in both workload families.}
+    \caption{Average throughput for the gRPC baseline, split by workload family and transport mode. Client-streaming sustains substantially higher throughput than unary gRPC in both workload families.}
     \label{fig:grpc-preliminary-throughput}
 \end{figure}
 
 \subsubsection{Clean baseline matrix}
 
-Several clear observations already follow from Table~\ref{tab:grpc-preliminary-results} and Fig.~\ref{fig:grpc-preliminary-throughput}. First, client-streaming gRPC is much better at moving large amounts of data through the pipeline. In the synthetic workload, client-streaming achieved roughly 13.5 times the average throughput of unary gRPC. In the CSV replay workload, the same pattern remained visible, with client-streaming achieving roughly 12.5 times the average throughput of unary. This strongly supports the idea that repeatedly opening many individual request-response exchanges adds substantial overhead when the main goal is bulk transfer.
+Table~\ref{tab:grpc-per-size} breaks the synthetic bulk-transfer results down by message size, averaging across concurrency levels 1--16 for each size. This disaggregation reveals that the streaming advantage is strongly size-dependent: client-streaming achieves roughly $21\times$ the throughput of unary at 256~B but only $4.8\times$ at 16~KiB. The grand averages in Table~\ref{tab:grpc-preliminary-results} (approximately $13.5\times$ for synthetic) therefore overstate the advantage for larger messages and understate it for smaller ones.
 
-Second, unary gRPC produced much lower $p_{95}$ latency than client-streaming in both workload families. This means unary calls are more responsive on a per-message basis, even though they are much less efficient for sustained high-volume transfer. In practical terms, unary gRPC appears more suitable for small control-style interactions or isolated requests, while client-streaming is more suitable for continuously sending many records to the next service in the pipeline.
+\begin{table}[t]
+    \centering
+    \scriptsize
+    \caption{Synthetic bulk-transfer throughput by message size, averaged across concurrency levels 1--16 (Docker Compose, single runs).}
+    \label{tab:grpc-per-size}
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{lrrrrc}
+        \toprule
+        Msg size & \shortstack{Stream\\msg/s} & \shortstack{Stream\\MiB/s} & \shortstack{Unary\\msg/s} & \shortstack{Unary\\MiB/s} & Ratio \\
+        \midrule
+        256 B   & 135{,}827 & 33.2  & 6{,}449 & 1.6  & $21.1\times$ \\
+        1 KiB   & 101{,}142 & 98.8  & 5{,}071 & 5.0  & $19.9\times$ \\
+        4 KiB   & 33{,}920  & 132.5 & 5{,}648 & 22.1 & $6.0\times$ \\
+        16 KiB  & 21{,}462  & 335.3 & 4{,}513 & 70.5 & $4.8\times$ \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+Two observations stand out. First, streaming throughput in msg/s drops substantially with message size (from 136{,}K to 21{,}K), but data throughput in MiB/s rises (from 33 to 335~MiB/s) because larger messages amortise per-message overhead more effectively. Unary msg/s, by contrast, remains relatively flat across sizes (4.5--6.4~K), indicating that per-call overhead rather than bandwidth capacity is the dominant bottleneck. Second, unary $p_{95}$ latency stays below 1.7~ms at every message size, whereas streaming $p_{95}$ latency varies between 29 and 80~ms depending on size and concurrency. This confirms that unary remains the lower-latency option on a per-message basis. The CSV replay workload (Table~\ref{tab:grpc-preliminary-results}) shows a broadly consistent pattern with a $12.5\times$ throughput ratio.
 
 Third, the clean baseline matrices did not reveal correctness problems in the implemented gRPC benchmark: no duplicate deliveries or ordering violations were observed in those completed bulk-transfer runs. This is important because raw throughput alone would not be useful if it came at the cost of lost ordering or inconsistent delivery.
 
@@ -297,7 +335,7 @@ The first focused experiment was a continuous steady-rate scenario. It used 1 Ki
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Focused gRPC continuous-stream jitter scenario.}
+    \caption{Focused gRPC continuous-stream jitter scenario averaged over three Kubernetes repetitions.}
     \label{tab:grpc-continuous-results}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -305,24 +343,24 @@ The first focused experiment was a continuous steady-rate scenario. It used 1 Ki
         \toprule
         Transport mode & Concur. & Throughput & Avg. $p_{95}$ & \shortstack{$p_{95}$ inter-\\arrival} & Jitter \\
         \midrule
-        Client-streaming & 4 & 918.20 & 4.68 & 1.61 & 0.66 \\
-        Client-streaming & 8 & 918.70 & 6.57 & 1.62 & 0.66 \\
-        Unary & 4 & 918.42 & 1.13 & 2.17 & 1.02 \\
-        Unary & 8 & 1,050.39 & 1.03 & 2.16 & 0.88 \\
+        Client-streaming & 4 & 918.81 & 12.64 & 1.66 & 0.72 \\
+        Client-streaming & 8 & 918.98 & 13.07 & 1.71 & 0.81 \\
+        Unary & 4 & 918.88 & 2.26 & 2.10 & 2.13 \\
+        Unary & 8 & 918.71 & 5.49 & 2.09 & 1.58 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-The continuous results show a clear split between delivery regularity and per-message responsiveness. Client-streaming maintained the tighter inter-arrival pattern in both concurrency settings: its jitter stayed around 0.66 ms and its $p_{95}$ inter-arrival delay remained near 1.6 ms. Unary delivered much lower end-to-end latency, but its inter-arrival spread was wider and, at concurrency 8, it exceeded the requested send rate by reaching roughly 1,050 messages per second. In other words, the current client-streaming implementation paces the flow more steadily, whereas unary remains the faster low-latency option. The CPU data also points in the same direction: unary required substantially more transformer CPU than client-streaming in this continuous scenario, indicating that the lower latency was not free.
+    The repeated continuous results show a clear split between delivery regularity and per-message responsiveness. Throughput was effectively identical in all four cases at roughly 919 messages per second, so the difference lies in how the flow is shaped. Client-streaming maintained the tighter inter-arrival pattern in both concurrency settings: its jitter stayed below 0.81 ms and its $p_{95}$ inter-arrival delay remained near 1.7 ms. Unary delivered much lower end-to-end latency, with average $p_{95}$ latency between 2.26 and 5.49 ms instead of roughly 13 ms, but its inter-arrival spread was wider and less stable. The CPU samples point in the same direction. Where measurements were consistently available, unary required more transformer and sink CPU than client-streaming, indicating that the lower latency was achieved by spending more processing effort to keep individual request-response exchanges moving.
 
 \paragraph{Slow-consumer backpressure scenario.}
 
-The second focused experiment was a backpressure scenario. It used the same 1 KiB payload size with concurrency 8, but the sink was slowed down by adding a 2 ms processing delay per message while the producer still targeted 4,000 messages per second. This scenario was designed to expose whether the transport absorbs overload through explicit throttling or through queue growth and accumulated delay.
+The second focused experiment was a backpressure scenario. It used the same 1 KiB payload size with concurrency 8, but the single sink instance was slowed down by adding a 2\,ms processing delay per message while the producer still targeted 4{,}000 messages per second. Because the sink can process at most $\lfloor 1000/2 \rfloor = 500$ messages per second per connection, the aggregate theoretical sink capacity is $500 \times 8 = 4{,}000$ messages per second, which means the scenario operates at the boundary of the sink's processing budget. Any transport overhead or scheduling jitter pushes the effective throughput below the requested rate, causing messages to accumulate in the gRPC transport buffers of the transformer (for client-streaming) or to be rejected and retried (for unary). This scenario was designed to expose whether the transport absorbs overload through explicit throttling or through queue growth and accumulated delay.
 
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Focused gRPC backpressure scenario with an intentionally slow sink.}
+    \caption{Focused gRPC backpressure scenario with an intentionally slow sink, averaged over three Kubernetes repetitions.}
     \label{tab:grpc-backpressure-results}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -330,22 +368,22 @@ The second focused experiment was a backpressure scenario. It used the same 1 Ki
         \toprule
         Transport mode & Throughput & Median lat. & Avg. $p_{95}$ & \shortstack{$p_{95}$ inter-\\arrival} & Jitter \\
         \midrule
-        Client-streaming & 3,395.94 & 1,427.58 & 1,760.95 & 2.07 & 0.63 \\
-        Unary & 2,386.17 & 0.44 & 0.83 & 3.18 & 1.06 \\
+        Client-streaming & 2,324.34 & 1,588.75 & 4,352.82 & 2.10 & 0.64 \\
+        Unary & 1,771.80 & 0.45 & 0.86 & 3.24 & 1.10 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-This result is important because it shows that higher throughput is not automatically the better outcome. Under backpressure, client-streaming kept much more of the nominal input rate, but it did so by allowing the pipeline to accumulate a very large queue. The median end-to-end latency increased to more than 1.4 seconds and the $p_{95}$ latency reached roughly 1.76 seconds. Unary behaved almost oppositely: it gave up throughput, but kept latency near the sub-millisecond range. The interpretation is that client-streaming preserves bulk movement under pressure, whereas unary currently protects responsiveness by throttling harder. For DYNAMOS this is a meaningful design trade-off, because some archetypes may prefer sustained throughput while others may require bounded latency or tighter admission control.
+    This result is important because it shows that higher throughput is not automatically the better outcome. Under backpressure, client-streaming kept substantially more of the nominal input rate, but it did so by allowing the pipeline to accumulate a very large queue. The median end-to-end latency increased to about 1.59 seconds and the average $p_{95}$ latency rose to 4.35 seconds. Unary behaved almost oppositely: it gave up throughput, but kept latency near the sub-millisecond range for successfully delivered requests. The interpretation is that client-streaming preserves bulk movement under pressure by buffering aggressively, whereas unary currently protects responsiveness by throttling harder and accepting a lower realized send rate. For DYNAMOS this remains a meaningful design trade-off, because some archetypes may prefer sustained throughput while others may require bounded latency or tighter admission control.
 
 \paragraph{Forced-restart recovery scenario.}
 
-The third focused experiment was a recovery scenario. This run used 4 KiB messages, concurrency 8, a continuous target rate of 2,000 messages per second, and a forced \textit{Transformer} restart after 3 seconds. The producer was allowed to retry up to 40 times with a 250 ms backoff. The purpose of this scenario was not to replace the main matrix, but to observe how the two gRPC transport styles behave when the pipeline is interrupted during an active stream.
+The third focused experiment was a recovery scenario. This run used 4 KiB messages, concurrency 8, a continuous target rate of 2,000 messages per second, and a forced \textit{Transformer} restart after 3 seconds. The producer was allowed to retry up to 120 times with a 250 ms backoff. The purpose of this scenario was not to replace the main matrix, but to observe how the two gRPC transport styles behave when the pipeline is interrupted during an active stream.
 
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Focused gRPC recovery scenario with a forced transformer restart.}
+    \caption{Focused gRPC recovery scenario with a forced transformer restart, averaged over three Kubernetes repetitions.}
     \label{tab:grpc-recovery-results}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -353,49 +391,166 @@ The third focused experiment was a recovery scenario. This run used 4 KiB messag
         \toprule
         Transport mode & Throughput & Avg. $p_{95}$ & Max lat. & Duplicates & Avg. recovery \\
         \midrule
-        Client-streaming & 1,376.11 & 12.33 & 32.93 & 7,163 & 1,003.14 \\
-        Unary & 2,097.03 & 2.74 & 1,274.57 & 0 & 1,273.31 \\
+        Client-streaming & 1,278.49 & 28.28 & 4,851.44 & 9,783 & 335.12 \\
+        Unary & 589.39 & 3.52 & 25,549.77 & 0 & 22,822.09 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-The recovery results change the interpretation in an important way. Unary gRPC sustained the intended rate more effectively after the restart and kept a much lower $p_{95}$ latency than client-streaming. It also completed the run without duplicates, because each request could simply be retried individually once the transformer became reachable again. In that sense, unary currently behaves more cleanly under restart in this benchmark implementation.
+    The repeated recovery results change the interpretation in an important way. Client-streaming, not unary, preserved the flow much more effectively after the restart. It recovered in about 335 ms on average, sustained 1,278 messages per second across the run, and limited worst-case latency to about 4.85 seconds. Unary still kept a much lower $p_{95}$ latency for successfully delivered requests, and it completed the run without duplicates, but it did so while the overall stream stalled for much longer: the average recovery interval exceeded 22.8 seconds, throughput dropped to 589 messages per second, and the worst-case latency exceeded 25.5 seconds.
 
-However, unary also showed a much larger worst-case stall: its maximum latency exceeded 1.27 seconds, whereas client-streaming remained below 33 ms. Client-streaming also showed slightly lower inter-arrival jitter and a shorter average recovery interval. The trade-off is that the current client-streaming recovery strategy replays a worker's sequence set after reconnect, which preserves completeness but introduces at-least-once behaviour under failure. This explains the 7,163 duplicate messages recorded in the streaming recovery run.
+    The trade-off is that the current client-streaming recovery strategy replays a worker's sequence set after reconnect, which preserves completeness but introduces at-least-once behaviour under failure. This explains the average 9{,}783 duplicate messages recorded in the streaming recovery runs. It is worth noting that the streaming recovery time showed high variance across repetitions, ranging from sub-millisecond (essentially instant reconnect in two of three runs) to roughly one second, so the 335\,ms mean should be interpreted with caution. Unary recovery, by contrast, was highly consistent across repetitions (22.6--23.1\,s). Unary avoids duplicate replay, but in this Kubernetes setting it pays for the cleaner sink-side outcome with a much longer and more predictable interruption window.
 
-The resource metrics reinforce this distinction. In the recovery preset, unary consumed substantially more CPU across all three roles, especially in the transformer stage, where average sampled CPU usage exceeded 111\% compared with roughly 44\% for client-streaming. This suggests that unary recovered the flow more aggressively, but at a higher processing cost. Client-streaming, by contrast, reduced CPU pressure at the cost of duplicate replay and worse tail latency.
+    The resource metrics reinforce this distinction, but in the opposite direction from the earlier single-run result. In the repeated recovery preset, client-streaming consumed more sampled CPU across all three roles: producer CPU averaged 29.9\% versus 5.46\% for unary, transformer CPU averaged 10.53\% versus 2.23\%, and sink CPU averaged 4.52\% versus 2.37\%. Memory stayed low for both modes, remaining in the single-digit MiB range per role. This suggests that client-streaming keeps more of the pipeline active during and after the restart, whereas unary falls into a lower-throughput, lower-CPU retry regime.
 
-\subsubsection{Phase 1 interpretation}
+\subsubsection{Discussion}
 
-The main conclusion at this stage is therefore more precise than a simple "streaming beats unary" statement. In the clean bulk-transfer baseline, client-streaming remains the stronger choice for high-volume inter-service data movement, while unary remains the lower-latency option for small request-response exchanges. In the continuous scenario, client-streaming also provides the steadier delivery rhythm, whereas unary provides lower latency at higher CPU cost and with less precise pacing. In the backpressure scenario, client-streaming preserves throughput by absorbing overload as queueing delay, while unary sacrifices throughput to protect latency. Under restart stress, unary is currently the operationally cleaner implementation in this prototype, whereas client-streaming still needs a more selective resume or deduplication strategy before it can claim equally strong recovery behaviour.
+The current results support a more precise conclusion than a simple "streaming beats unary" claim. In the clean bulk-transfer baseline, client-streaming is the stronger choice for high-volume inter-service data movement, with the throughput advantage varying from roughly $5\times$ for 16~KiB messages to $21\times$ for 256~B messages. Unary remains the lower-latency option for small request-response exchanges, with sub-2\,ms $p_{95}$ latency at every message size tested. In the continuous scenario, client-streaming also provides the steadier delivery rhythm, whereas unary provides lower latency at higher CPU cost and with less precise pacing. In the backpressure scenario, client-streaming preserves throughput by absorbing overload as queueing delay, while unary sacrifices throughput to protect latency. Under restart stress, the repeated Kubernetes reruns show that client-streaming now offers the stronger continuity story in this prototype, but only by accepting at-least-once replay and the need for downstream deduplication. Unary remains the cleaner duplicate-free option, yet its retry behaviour currently stretches recovery time and depresses throughput too severely to treat it as the better resilience mechanism overall.
 
-This is a more useful intermediate result for the thesis because it does not reduce the comparison to one metric. Instead, it identifies distinct transport strengths in bulk transfer, pacing regularity, overload response, and failure recovery before Kafka, RabbitMQ, and NATS are added. That is exactly why Phase 1 should be read as a literature-guided scenario evaluation: the properties being tested are grounded in prior work, but their concrete operationalization has been tailored here to DYNAMOS-relevant communication behaviour.
+These findings already make a useful thesis contribution because they identify concrete transport trade-offs in bulk transfer, pacing regularity, overload response, and failure recovery. That evidence is valuable even before the broker-based mechanisms are added, because it clarifies which properties later candidates must improve and which compromises they may introduce in return.
 
-Once the broker-based mechanisms have been benchmarked under the same workload definitions, the thesis will be able to assess whether their additional features, such as replay, decoupling, and backlog tolerance, justify their extra operational complexity relative to the gRPC reference baseline.
+Kafka, RabbitMQ, and NATS still need to be benchmarked under the same workload definitions, but the current gRPC baseline has already narrowed the evaluation space. The remainder of the thesis can therefore focus on whether broker-based mechanisms offer meaningful gains in replay, decoupling, or backlog tolerance without undermining the latency, recovery, and operational properties exposed here.
 
-\section{Phase 2: Streaming Feasibility of DYNAMOS Data-Sharing Archetypes}
+\subsection{Threats to Validity}
 
-Phase 2 will examine how the selected streaming communication model aligns with the data-sharing archetypes implemented by DYNAMOS. The central question is not only whether a streaming mechanism performs well in isolation, but whether it can be reconciled with the trust boundaries, orchestration rules, and policy assumptions that define DYNAMOS as middleware. This phase will build on the literature and early design analysis already outlined in the proposal and will connect streaming semantics to the system's archetype-based execution model.
+Several threats to validity should be acknowledged when interpreting the current results.
 
-\section{Phase 3: Integration Design for DYNAMOS}
+\paragraph{Internal validity.}
+The broad synthetic and CSV-replay matrices in the current gRPC baseline were executed as single runs per configuration on Docker Compose, so those portions of the study may be affected by transient system-level effects such as CPU scheduling variance, garbage collection pauses, or network contention from co-located workloads. To reduce that risk for the most thesis-critical claims, the three focused stress scenarios were rerun three times on Kubernetes and the reported tables use arithmetic means across those repetitions. Even so, the repeat count remains small and no confidence intervals are reported yet. The two-environment split (Docker Compose for the broad matrix, Kubernetes for focused scenarios) means that absolute numbers are not directly comparable across those sections, though the relative comparisons between transport modes remain valid within each environment. Additionally, short run durations (typically under one minute for bulk-transfer configurations) may not fully capture warm-up effects or long-term stability behaviour that would emerge in sustained production workloads.
 
-Phase 3 will translate the findings from the comparative study into an architectural integration design for DYNAMOS. This phase will specify how streaming channels are created, how sidecar responsibilities are divided, how policy enforcement boundaries are preserved, and how long-lived communication interacts with dynamic service composition and isolation guarantees. The output of this phase will be a documented integration design that can guide implementation decisions in a defensible way.
+\paragraph{External validity.}
+The benchmark uses a synthetic three-stage pipeline with lightweight deterministic logic, which does not replicate the full complexity of a DYNAMOS deployment. Real DYNAMOS chains may involve additional processing stages, policy-enforcement sidecars, and heterogeneous service implementations. Furthermore, the tests are conducted in a single-node Kubernetes cluster, whereas production DYNAMOS deployments span multiple nodes with network partitioning and scheduling constraints that may affect latency and throughput characteristics differently. The Go-based benchmark services share the same runtime and gRPC library version, so results may not generalize to polyglot microservice chains.
 
-\section{Phase 4: Prototype Implementation and System-Level Evaluation}
+\paragraph{Construct validity.}
+Jitter is operationalized as the standard deviation of inter-arrival times, which captures variability in delivery rhythm but does not distinguish between periodic jitter and isolated outliers. Alternative metrics such as mean absolute deviation or percentile-based spread could complement the current definition. Similarly, the recovery time metric measures wall-clock gap between the last pre-failure and first post-failure message, but does not account for the quality of the recovery (e.g., whether the resumed stream carries duplicates or ordering violations).
 
-Phase 4 will implement the selected streaming approach in DYNAMOS and evaluate it against the current unary request--response baseline. The focus will be on both feasibility and system behaviour: how much code and architectural change are required, whether policy-driven orchestration remains intact, and how performance, robustness, and scalability change once streaming is introduced into the middleware itself. The experimental logic prepared in Phase 1 will be reused here, but applied in the full DYNAMOS context rather than in an isolated benchmark pipeline.
+\section{Planned: Cross-Technology Benchmark Comparison}
 
-\section{Phase 5: Discussion and Final Recommendation}
+The benchmark design and gRPC baseline presented in section~III address the first part of \emph{RQ1}. The planned next step completes the comparison by evaluating Apache Kafka, RabbitMQ streams, and NATS JetStream under the same workload definitions, fairness constraints, and evaluation dimensions. These results will allow a structured recommendation of which mechanism best fits which workload condition, completing the answer to RQ1.
 
-Phase 5 will synthesize the evidence from the previous phases into a final discussion of trade-offs and a recommendation for DYNAMOS. This discussion will interpret not only performance outcomes, but also integration complexity, operational implications, compliance considerations, and external validity. The goal is to move from isolated benchmark observations and design proposals toward a justified answer to the thesis-level question of how streaming communication should be integrated into DYNAMOS.
+\section{Planned: Architectural Integration Design}
+
+This section will address \emph{RQ2}: how streaming communication can be integrated into DYNAMOS' microservice architecture while preserving dynamic service composition, policy-driven orchestration, and isolation guarantees. The work will examine how the selected streaming model aligns with the data-sharing archetypes implemented by DYNAMOS, specify how streaming channels are created and torn down within dynamically composed execution chains, define how sidecar responsibilities are divided for streaming versus non-streaming traffic, and address how long-lived connections interact with policy enforcement boundaries. The output will be a documented integration design accompanied by a prototype implementation that demonstrates feasibility.
+
+\section{Planned: System-Level Evaluation}
+
+This section will address \emph{RQ3}: what impact streaming communication has on scalability, performance, and robustness compared to the current request-response approach under realistic workloads in DYNAMOS. The benchmark logic and evaluation dimensions established in the current study will be reused, but applied within the full DYNAMOS context rather than in an isolated benchmark pipeline. The evaluation will assess whether the trade-offs identified in the gRPC baseline and cross-technology comparison carry over to the integrated system, or whether integration-specific effects such as policy enforcement overhead, sidecar latency, or orchestration coordination dominate.
 
 \section{Conclusion}
 
-The thesis is structured to move from broad design-space analysis to increasingly system-specific conclusions. At the current stage, the document already contains the core introduction, related work, and the first substantive results from Phase 1. The remaining phases will extend this foundation toward architectural integration, prototype validation, and a final recommendation grounded in both research literature and empirical evidence.
+This thesis establishes the first empirical basis for evaluating streaming communication in DYNAMOS. The literature review narrows the relevant design space to direct gRPC streaming and broker-based alternatives such as Kafka, RabbitMQ streams, and NATS JetStream. The current benchmark shows that client-streaming gRPC is markedly stronger for sustained bulk transfer, pacing stability, and restart continuity, while unary gRPC remains preferable when low per-message latency and duplicate-free delivery dominate. Rather than yielding a single winner, the present results identify a concrete trade-off space around throughput, regularity, overload handling, and recovery.
+
+That evidence provides a defensible baseline for the remainder of the thesis. The planned next phases extend the comparison to broker-based mechanisms, examine how the most promising options align with DYNAMOS' archetypes and policy model, and translate those findings into an integration design and system-level validation.
 
 \appendix
 
-This appendix section is reserved for the detailed benchmark materials that would otherwise make the Phase 1 chapter too dense. The intended contents are: complete preset definitions, the full run matrix across mechanisms and workloads, per-run summary tables, additional plots not used in the main argument, and configuration details needed for reproducibility. At the current stage of the thesis, these materials exist only for the gRPC reference runs and will be consolidated here once the broker-based comparisons have been executed under the same design.
+\section{Benchmark Preset Definitions}
+\label{app:presets}
+
+This appendix documents the complete preset definitions used in the benchmark. Each preset specifies the workload family, payload configuration, concurrency level, target rate (where applicable), failure injection parameters, and resource overlay tier. The five presets are: \emph{synthetic-clean} (bulk transfer baseline), \emph{csv-replay-check} (realism validation), \emph{synthetic-continuous} (steady-rate pacing), \emph{synthetic-backpressure} (slow-consumer overload), and \emph{synthetic-recovery} (forced-restart resilience).
+
+\begin{table}[h]
+    \centering
+    \scriptsize
+    \caption{Benchmark presets used in the current gRPC study.}
+    \label{tab:appendix-presets}
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{lp{2.7cm}p{3.9cm}}
+        \toprule
+        Preset & Key parameters & Purpose \\
+        \midrule
+        \texttt{synthetic-clean} & Synthetic payloads from 256 B to 16 KiB, concurrency 1--16, no injected failure & Baseline bulk-transfer throughput, latency, and correctness matrix \\
+        \texttt{csv-replay-check} & Copied DYNAMOS CSV rows batched as 25 or 100 rows per message & Realism check against non-synthetic payload structure \\
+        \texttt{synthetic-continuous} & 1 KiB payloads, 1{,}000 msg/s target, concurrency 4 and 8, three repetitions & Steady-rate pacing and jitter comparison \\
+        \texttt{synthetic-backpressure} & 1 KiB payloads, 4{,}000 msg/s target, concurrency 8, 2 ms sink delay, three repetitions & Slow-consumer overload and queueing behaviour \\
+        \texttt{synthetic-recovery} & 4 KiB payloads, 2{,}000 msg/s target, concurrency 8, transformer restart after 3 s, 120 retries at 250 ms backoff, three repetitions & Restart recovery, replay, and continuity analysis \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+\section{Full Run Matrix}
+\label{app:run-matrix}
+
+This appendix summarizes the run scopes used in the current thesis draft. The body of the thesis presents the most decision-relevant subsets, while the benchmark result directory stores the corresponding per-run JSON, NDJSON, and CSV exports generated by the execution scripts. The focused scenarios are repeated; the broad matrices are currently single-run baselines.
+
+\begin{table}[h]
+    \centering
+    \scriptsize
+    \caption{Execution scope of the current benchmark corpus.}
+    \label{tab:appendix-run-scope}
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{lp{2.3cm}p{2.6cm}p{1.3cm}p{2.6cm}}
+        \toprule
+        Scope & Transports & Variable dimensions & Repetitions & Role in thesis \\
+        \midrule
+        Synthetic clean matrix & Client-streaming, unary & Payload size and concurrency sweep & 1 & Main bulk-transfer baseline in Section III \\
+        CSV replay check & Client-streaming, unary & Batch size and concurrency subset & 1 & Realism validation against copied DYNAMOS datasets \\
+        Focused continuous & Client-streaming, unary & Concurrency 4 and 8 at fixed 1 KiB and 1{,}000 msg/s & 3 & Pacing and jitter evidence \\
+        Focused backpressure & Client-streaming, unary & Fixed 1 KiB, concurrency 8, 4{,}000 msg/s, 2 ms sink delay & 3 & Overload and queueing evidence \\
+        Focused recovery & Client-streaming, unary & Fixed 4 KiB, concurrency 8, forced transformer restart & 3 & Recovery and replay evidence \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+\section{Resource Utilisation Details}
+\label{app:resource-details}
+
+This appendix summarizes the resource metrics for the repeated Kubernetes reruns where CPU and memory data are most informative. The backpressure preset produced too few stable \texttt{kubectl top} samples to support a meaningful per-role comparison, so the appendix focuses on the continuous and recovery scenarios.
+
+\begin{table}[h]
+    \centering
+    \scriptsize
+    \caption{Continuous scenario CPU usage by role (avg./peak \%).}
+    \label{tab:appendix-continuous-cpu}
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{lrrrr}
+        \toprule
+        Mode & Concur. & Producer & Transformer & Sink \\
+        \midrule
+        Client-streaming & 4 & 26.10 / 26.10 & 10.54 / 25.63 & 6.11 / 14.77 \\
+        Client-streaming & 8 & -- & 9.75 / 25.53 & 5.69 / 14.80 \\
+        Unary & 4 & 34.40 / 34.40 & 14.63 / 39.27 & 8.18 / 21.93 \\
+        Unary & 8 & 37.83 / 37.83 & 16.50 / 42.10 & 9.05 / 23.10 \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \scriptsize
+    \caption{Recovery scenario CPU usage by role (avg./peak \%).}
+    \label{tab:appendix-recovery-cpu}
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{lrrr}
+        \toprule
+        Mode & Producer & Transformer & Sink \\
+        \midrule
+        Client-streaming & 29.90 / 29.90 & 10.53 / 26.17 & 4.52 / 17.33 \\
+        Unary & 5.46 / 5.60 & 2.23 / 9.27 & 2.37 / 5.73 \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \scriptsize
+    \caption{Recovery scenario memory usage by role (avg./peak MiB).}
+    \label{tab:appendix-recovery-memory}
+    \setlength{\tabcolsep}{3pt}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{lrrr}
+        \toprule
+        Mode & Producer & Transformer & Sink \\
+        \midrule
+        Client-streaming & 8.00 / 8.00 & 3.60 / 6.00 & 3.04 / 7.00 \\
+        Unary & 7.00 / 7.00 & 3.14 / 7.00 & 4.90 / 7.00 \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

@@ -1,0 +1,89 @@
+{
+  "run_id": "csv-replay-check-stream-r100-c8",
+  "transport_mode": "client-streaming",
+  "workload_source": "csv-replay",
+  "workload_descriptor": "csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=100:repeat=10",
+  "profile": "bulk",
+  "expected_messages": 10000,
+  "payload_bytes": 5134,
+  "concurrency": 8,
+  "target_messages_per_second": 0,
+  "producer_started_at": "2026-04-04T15:22:55.318884635Z",
+  "producer_finished_at": "2026-04-04T15:22:55.525439447Z",
+  "stream_acks": [
+    {
+      "run_id": "csv-replay-check-stream-r100-c8",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 6406455,
+      "finished_at_unix_nano": 1775316175509093436
+    },
+    {
+      "run_id": "csv-replay-check-stream-r100-c8",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 6402743,
+      "finished_at_unix_nano": 1775316175519775463
+    },
+    {
+      "run_id": "csv-replay-check-stream-r100-c8",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 6406850,
+      "finished_at_unix_nano": 1775316175519740891
+    },
+    {
+      "run_id": "csv-replay-check-stream-r100-c8",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 6405650,
+      "finished_at_unix_nano": 1775316175524381999
+    },
+    {
+      "run_id": "csv-replay-check-stream-r100-c8",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 6404139,
+      "finished_at_unix_nano": 1775316175524404887
+    },
+    {
+      "run_id": "csv-replay-check-stream-r100-c8",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 6402656,
+      "finished_at_unix_nano": 1775316175524616817
+    },
+    {
+      "run_id": "csv-replay-check-stream-r100-c8",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 6403470,
+      "finished_at_unix_nano": 1775316175524415709
+    },
+    {
+      "run_id": "csv-replay-check-stream-r100-c8",
+      "stage": "transformer",
+      "stream_messages": 1250,
+      "stream_bytes": 6402707,
+      "finished_at_unix_nano": 1775316175524501132
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "sink_summary": {
+    "run_id": "csv-replay-check-stream-r100-c8",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 10000,
+    "bytes_received": 51234670,
+    "duration_seconds": 0.229127434,
+    "throughput_messages_per_second": 43643.83533400894,
+    "throughput_megabytes_per_second": 213.2489682075775,
+    "p50_latency_ms": 31.260513,
+    "p95_latency_ms": 44.704526,
+    "p99_latency_ms": 52.429013,
+    "max_latency_ms": 58.17593,
+    "started_at_unix_nano": 1775316175347362283,
+    "finished_at_unix_nano": 1775316175523827131,
+    "transport_mode": "client-streaming"
+  }
+}

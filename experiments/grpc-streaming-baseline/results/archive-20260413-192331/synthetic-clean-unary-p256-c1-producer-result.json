@@ -1,0 +1,32 @@
+{
+  "run_id": "synthetic-clean-unary-p256-c1",
+  "transport_mode": "unary",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 256,
+  "concurrency": 1,
+  "target_messages_per_second": 0,
+  "producer_started_at": "2026-04-04T15:19:07.491009665Z",
+  "producer_finished_at": "2026-04-04T15:19:20.272045999Z",
+  "stream_acks": null,
+  "unary_acknowledged_requests": 20000,
+  "sink_summary": {
+    "run_id": "synthetic-clean-unary-p256-c1",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 5120000,
+    "duration_seconds": 12.812805524,
+    "throughput_messages_per_second": 1560.9383879695574,
+    "throughput_megabytes_per_second": 0.38108847362538023,
+    "p50_latency_ms": 0.279741,
+    "p95_latency_ms": 0.640832,
+    "p99_latency_ms": 1.40983,
+    "max_latency_ms": 22.11841,
+    "started_at_unix_nano": 1775315947513156184,
+    "finished_at_unix_nano": 1775315960269949782,
+    "transport_mode": "unary"
+  }
+}

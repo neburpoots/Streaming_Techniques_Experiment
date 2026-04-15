@@ -102,6 +102,37 @@ spec:
               value: grpc-stream-sink:50052
             - name: RESULT_DIR
               value: /results
+            - name: MAX_RETRY_ATTEMPTS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: MAX_RETRY_ATTEMPTS
+            - name: RETRY_BACKOFF_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RETRY_BACKOFF_MS
+            - name: FAILURE_ACTION
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: FAILURE_ACTION
+            - name: FAILURE_TARGET
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: FAILURE_TARGET
+            - name: FAILURE_AFTER_SECONDS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: FAILURE_AFTER_SECONDS
+          volumeMounts:
+            - name: results
+              mountPath: /results
+            - name: datasets
+              mountPath: /datasets
+              readOnly: true
           resources:
             requests:
               cpu: 250m
@@ -109,3 +140,11 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+      volumes:
+        - name: results
+          persistentVolumeClaim:
+            claimName: experiment-results
+        - name: datasets
+          configMap:
+            name: experiment-datasets
+            optional: true

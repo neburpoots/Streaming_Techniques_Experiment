@@ -1,0 +1,73 @@
+{
+  "run_id": "synthetic-continuous-stream-p1024-c4",
+  "transport_mode": "client-streaming",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "continuous",
+  "expected_messages": 20000,
+  "payload_bytes": 1024,
+  "concurrency": 4,
+  "target_messages_per_second": 1000,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-11T10:17:13.733054342Z",
+  "producer_finished_at": "2026-04-11T10:17:35.483655857Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c4",
+      "stage": "transformer",
+      "stream_messages": 5000,
+      "stream_bytes": 5120000,
+      "finished_at_unix_nano": 1775902655044722208
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c4",
+      "stage": "transformer",
+      "stream_messages": 5000,
+      "stream_bytes": 5120000,
+      "finished_at_unix_nano": 1775902655439488704
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c4",
+      "stage": "transformer",
+      "stream_messages": 5000,
+      "stream_bytes": 5120000,
+      "finished_at_unix_nano": 1775902655480597055
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c4",
+      "stage": "transformer",
+      "stream_messages": 5000,
+      "stream_bytes": 5120000,
+      "finished_at_unix_nano": 1775902655483018137
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-continuous-stream-p1024-c4",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 20480000,
+    "duration_seconds": 21.781762822,
+    "throughput_messages_per_second": 918.1993286511969,
+    "throughput_megabytes_per_second": 0.8966790318859345,
+    "p50_latency_ms": 0.271331,
+    "p95_latency_ms": 4.680191,
+    "p99_latency_ms": 12.006413,
+    "max_latency_ms": 13.268378,
+    "started_at_unix_nano": 1775902633766012943,
+    "finished_at_unix_nano": 1775902655480533622,
+    "transport_mode": "client-streaming",
+    "mean_inter_arrival_ms": 0.9494169008450442,
+    "p95_inter_arrival_ms": 1.613597,
+    "inter_arrival_jitter_ms": 0.6588074157851056
+  }
+}

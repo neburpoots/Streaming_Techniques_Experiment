@@ -1,0 +1,536 @@
+=== synthetic-clean ===
+Building container images...
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#2 DONE 0.5s
+
+#3 [internal] load metadata for docker.io/library/golang:1.24.0-bookworm
+#3 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:4724b8cc51e33e398f0e2e15e18d5ec2851ff0c2280647e1310bc1642182655d
+#5 resolve docker.io/library/debian:bookworm-slim@sha256:4724b8cc51e33e398f0e2e15e18d5ec2851ff0c2280647e1310bc1642182655d 0.0s done
+#5 DONE 0.0s
+
+#6 [builder 1/7] FROM docker.io/library/golang:1.24.0-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a
+#6 resolve docker.io/library/golang:1.24.0-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 53.24kB 0.0s done
+#7 DONE 0.0s
+
+#8 [builder 3/7] COPY go.mod go.sum ./
+#8 CACHED
+
+#9 [builder 2/7] WORKDIR /src
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 0.1s
+
+#12 [builder 6/7] RUN test -n "producer"
+#12 DONE 0.3s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/producer
+#13 DONE 12.8s
+
+#14 [stage-1 3/4] WORKDIR /app
+#14 CACHED
+
+#15 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:94000daaaa7e4ba72673020685897402ddb9238de86956533bc7895d1fbe614b done
+#17 exporting config sha256:a076b14f4260bf6ba7746c93ecde23c79bbf9e124193bde59ce20972ce8b3651 done
+#17 exporting attestation manifest sha256:b6e42214b7851d81a1500dd356a2bc79b5d6213bc119128a02e06ee94605783e 0.0s done
+#17 exporting manifest list sha256:48037ba1ef40b233ee88367bfbdb97c60a735544ba5750443a7fc6adf68736e8 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-producer:latest
+#17 naming to docker.io/library/grpc-streaming-baseline-producer:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-producer:latest done
+#17 DONE 0.1s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.24.0-bookworm
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.4s
+
+#2 [internal] load metadata for docker.io/library/golang:1.24.0-bookworm
+#2 DONE 0.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:4724b8cc51e33e398f0e2e15e18d5ec2851ff0c2280647e1310bc1642182655d
+#5 resolve docker.io/library/debian:bookworm-slim@sha256:4724b8cc51e33e398f0e2e15e18d5ec2851ff0c2280647e1310bc1642182655d 0.0s done
+#5 DONE 0.0s
+
+#6 [builder 1/7] FROM docker.io/library/golang:1.24.0-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a
+#6 resolve docker.io/library/golang:1.24.0-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 21.59kB 0.0s done
+#7 DONE 0.0s
+
+#8 [builder 3/7] COPY go.mod go.sum ./
+#8 CACHED
+
+#9 [builder 2/7] WORKDIR /src
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 0.1s
+
+#12 [builder 6/7] RUN test -n "transformer"
+#12 DONE 0.3s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/transformer
+#13 DONE 13.5s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:775a4d1a2b2cf5cc6f135ec07d35250f60c4e274e1877a874d6dc167cc05a93d done
+#17 exporting config sha256:995daeb3fa0b70493896cd1c722c925965920c08b09eb237edae5de417b2d6d9 done
+#17 exporting attestation manifest sha256:47bebdf564c74b12c1e4bc865f739ad9a52b9eda041ea0177afd156e1d091327 0.0s done
+#17 exporting manifest list sha256:f608785445faf704c013a185da193a64823d144ee3c657958c8fbbde168eeb35
+#17 exporting manifest list sha256:f608785445faf704c013a185da193a64823d144ee3c657958c8fbbde168eeb35 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-transformer:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-transformer:latest done
+#17 DONE 0.1s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.24.0-bookworm
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.2s
+
+#2 [internal] load metadata for docker.io/library/golang:1.24.0-bookworm
+#2 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/7] FROM docker.io/library/golang:1.24.0-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a
+#5 resolve docker.io/library/golang:1.24.0-bookworm@sha256:b970e6d47c09fdd34179acef5c4fecaf6410f0b597a759733b3cbea04b4e604a 0.0s done
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:4724b8cc51e33e398f0e2e15e18d5ec2851ff0c2280647e1310bc1642182655d
+#6 resolve docker.io/library/debian:bookworm-slim@sha256:4724b8cc51e33e398f0e2e15e18d5ec2851ff0c2280647e1310bc1642182655d 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 24.08kB 0.0s done
+#7 DONE 0.0s
+
+#8 [builder 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [builder 3/7] COPY go.mod go.sum ./
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 0.1s
+
+#12 [builder 6/7] RUN test -n "sink"
+#12 DONE 0.2s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/sink
+#13 DONE 11.4s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:c641c05a12a34c6ae59eb5bc9aef761d24db264b8b30f59c835e00c0bb5caf5b done
+#17 exporting config sha256:5ff178eb5a9ecd25002dbeb4f8cab950c6a827e10abb6415d3f5ec23a71b74cb done
+#17 exporting attestation manifest sha256:6f316c91f925aa90f7d822324bd0efd8d8baa6e53a40b7a7d69fe61b56f2a256 0.0s done
+#17 exporting manifest list sha256:48b83055fdd1d6627618c18b635b6fbf6a2eb7bb6d5f8e74af4de5149d237b5c
+#17 exporting manifest list sha256:48b83055fdd1d6627618c18b635b6fbf6a2eb7bb6d5f8e74af4de5149d237b5c 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-sink:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-sink:latest done
+#17 DONE 0.1s
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+namespace/streaming-experiments unchanged
+configmap/grpc-streaming-baseline-config unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium, repeat: 3)
+═══ Repetition 1/3 ═══
+━━━ Running: synthetic-clean-stream-p256-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p256-c1-rep1 created
+pod/results-helper-synthetic-clean-stream-p256-c1-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p256-c1-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p256-c1-rep1
+━━━ Running: synthetic-clean-stream-p256-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p256-c4-rep1 created
+pod/results-helper-synthetic-clean-stream-p256-c4-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p256-c4-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p256-c4-rep1
+━━━ Running: synthetic-clean-stream-p256-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p256-c8-rep1 created
+pod/results-helper-synthetic-clean-stream-p256-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p256-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p256-c8-rep1
+━━━ Running: synthetic-clean-stream-p256-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p256-c16-rep1 created
+pod/results-helper-synthetic-clean-stream-p256-c16-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p256-c16-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p256-c16-rep1
+━━━ Running: synthetic-clean-stream-p1024-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p1024-c1-rep1 created
+pod/results-helper-synthetic-clean-stream-p1024-c1-rep1 condition met
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p1024-c1-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p1024-c1-rep1
+━━━ Running: synthetic-clean-stream-p1024-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p1024-c4-rep1 created
+pod/results-helper-synthetic-clean-stream-p1024-c4-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p1024-c4-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p1024-c4-rep1
+━━━ Running: synthetic-clean-stream-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p1024-c8-rep1 created
+pod/results-helper-synthetic-clean-stream-p1024-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p1024-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p1024-c8-rep1
+━━━ Running: synthetic-clean-stream-p1024-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p1024-c16-rep1 created
+pod/results-helper-synthetic-clean-stream-p1024-c16-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p1024-c16-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p1024-c16-rep1
+━━━ Running: synthetic-clean-stream-p4096-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p4096-c1-rep1 created
+pod/results-helper-synthetic-clean-stream-p4096-c1-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p4096-c1-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p4096-c1-rep1
+━━━ Running: synthetic-clean-stream-p4096-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p4096-c4-rep1 created
+pod/results-helper-synthetic-clean-stream-p4096-c4-rep1 condition met
+pod "results-helper-synthetic-clean-stream-p4096-c4-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p4096-c4-rep1
+━━━ Running: synthetic-clean-stream-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p4096-c8-rep1 created
+pod/results-helper-synthetic-clean-stream-p4096-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p4096-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p4096-c8-rep1
+━━━ Running: synthetic-clean-stream-p4096-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p4096-c16-rep1 created
+pod/results-helper-synthetic-clean-stream-p4096-c16-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p4096-c16-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p4096-c16-rep1
+━━━ Running: synthetic-clean-stream-p16384-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p16384-c1-rep1 created
+pod/results-helper-synthetic-clean-stream-p16384-c1-rep1 condition met
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p16384-c1-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p16384-c1-rep1
+━━━ Running: synthetic-clean-stream-p16384-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p16384-c4-rep1 created
+pod/results-helper-synthetic-clean-stream-p16384-c4-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p16384-c4-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p16384-c4-rep1
+━━━ Running: synthetic-clean-stream-p16384-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p16384-c8-rep1 created
+pod/results-helper-synthetic-clean-stream-p16384-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p16384-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p16384-c8-rep1
+━━━ Running: synthetic-clean-stream-p16384-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-stream-p16384-c16-rep1 created
+pod/results-helper-synthetic-clean-stream-p16384-c16-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-clean-stream-p16384-c16-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-stream-p16384-c16-rep1
+━━━ Running: synthetic-clean-unary-p256-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...

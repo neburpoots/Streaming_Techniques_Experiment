@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-stream-p1024-c8-rep1",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 20480000,
+  "duration_seconds": 0.3234692,
+  "throughput_messages_per_second": 61829.68888537146,
+  "throughput_megabytes_per_second": 60.38055555212057,
+  "p50_latency_ms": 20.863602,
+  "p95_latency_ms": 89.477456,
+  "p99_latency_ms": 93.197654,
+  "max_latency_ms": 93.799721,
+  "started_at_unix_nano": 1776101446181177298,
+  "finished_at_unix_nano": 1776101446470994758,
+  "transport_mode": "client-streaming",
+  "mean_inter_arrival_ms": 0.014491597579880007,
+  "p95_inter_arrival_ms": 0.005683,
+  "inter_arrival_jitter_ms": 0.758326699224345
+}

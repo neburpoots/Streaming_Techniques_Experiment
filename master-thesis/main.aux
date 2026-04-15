@@ -11,10 +11,10 @@
 \citation{nuikka2021cloudnative}
 \citation{coviello2022dataxc}
 \citation{stutterheim2023thesis,stutterheim2023icsa}
-\citation{figueira2024selfadaptive}
 \@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Streaming communication technologies and interaction models}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Architectural integration of streaming in adaptive microservice middleware}{2}{}\protected@file@percent }
+\citation{figueira2024selfadaptive}
 \citation{figueira2024selfadaptive}
 \citation{stutterheim2023thesis,stutterheim2023icsa}
 \citation{neumaier2021policyaware}
@@ -24,11 +24,11 @@
 \citation{gan2018architectural}
 \citation{sodankoor2026grpcbench}
 \citation{restgrpccomparison,lahtevenoja2021communication}
-\citation{systematicstreaming}
-\citation{starck2023streaminglb}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Policy enforcement and compliance under continuous data exchange}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Resilience, backpressure, and fault handling in streaming workflows}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Validation practices, scalability, and performance evaluation}{3}{}\protected@file@percent }
+\citation{systematicstreaming}
+\citation{starck2023streaminglb}
 \citation{grpc2024coreconcepts}
 \citation{roohitavaf2019logplayer,restgrpccomparison,sodankoor2026grpcbench}
 \citation{kafka2026official}
@@ -37,13 +37,12 @@
 \citation{dobbelaere2017kafkarabbitmq,sharvari2019messaging}
 \citation{rabbitmq2026streams}
 \citation{dobbelaere2017kafkarabbitmq,sharvari2019messaging,rabbitmq2026streams}
-\citation{nats2026overview,nats2026reqreply,nats2026jetstream}
-\citation{nats2026jetstream}
-\@writefile{toc}{\contentsline {section}{\numberline {III}Phase 1: Survey and Initial Benchmarking of Candidate Streaming Mechanisms}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Candidate Mechanisms and Benchmark Design}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}gRPC streaming}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Apache Kafka}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}RabbitMQ}{4}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}NATS with JetStream persistence}{4}{}\protected@file@percent }
+\citation{nats2026overview,nats2026reqreply,nats2026jetstream}
+\citation{nats2026jetstream}
 \citation{nats2026reqreply,nats2026jetstream}
 \citation{sharvari2019messaging,ciftci2025ipcmechanisms}
 \citation{coviello2022dataxc}
@@ -52,38 +51,56 @@
 \citation{coviello2022dataxc,karimov2018benchmarking}
 \citation{karimov2018benchmarking,Henning2021ScalabilityMetrics}
 \citation{coviello2022dataxc}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Phase 1 Experimental Design}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}NATS with JetStream persistence}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Benchmark Design}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}1}Methodological positioning}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}2}Evaluation scope}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}3}Common testbed and fairness constraints}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}4}Evaluation dimensions}{5}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}5}Scenario set and scenario-to-property mapping}{5}{}\protected@file@percent }
 \citation{systematicstreaming,Henning2021ScalabilityMetrics,ciftci2025ipcmechanisms}
 \citation{sharvari2019messaging,ciftci2025ipcmechanisms}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}5}Scenario set and scenario-to-property mapping}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}6}Experimental factors}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}7}Result presentation and appendix boundary}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Phase 1 Preliminary Results: gRPC Reference Baseline}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}1}Why gRPC is evaluated first}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}2}Clean baseline matrix}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}3}Focused stress scenarios}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}3a}Continuous steady-rate scenario.}{6}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Phase 1 scenario-to-property mapping.}}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}gRPC Baseline Results}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}1}Metrics definitions}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}2}Current comparison scope}{6}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Scenario-to-property mapping used in the benchmark design.}}{7}{}\protected@file@percent }
 \newlabel{tab:phase1-scenario-map}{{I}{7}{}{table.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Preliminary gRPC baseline results averaged over the completed run matrices.}}{7}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces gRPC baseline results averaged over the completed run matrices.}}{7}{}\protected@file@percent }
 \newlabel{tab:grpc-preliminary-results}{{II}{7}{}{table.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Focused gRPC continuous-stream jitter scenario.}}{7}{}\protected@file@percent }
-\newlabel{tab:grpc-continuous-results}{{III}{7}{}{table.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Phase 1 evaluation map showing the common benchmark pipeline and the four scenario probes used to operationalize the literature-backed evaluation dimensions.}}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}3}Clean baseline matrix}{7}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Evaluation map showing the common benchmark pipeline and the four scenario probes used to operationalize the literature-backed evaluation dimensions.}}{7}{}\protected@file@percent }
 \newlabel{fig:phase1-scenario-placeholder}{{1}{7}{}{figure.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Average throughput for the preliminary gRPC baseline, split by workload family and transport mode. Client-streaming sustains substantially higher throughput than unary gRPC in both workload families.}}{8}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Average throughput for the gRPC baseline, split by workload family and transport mode. Client-streaming sustains substantially higher throughput than unary gRPC in both workload families.}}{8}{}\protected@file@percent }
 \newlabel{fig:grpc-preliminary-throughput}{{2}{8}{}{figure.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Focused gRPC backpressure scenario with an intentionally slow sink.}}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Focused gRPC continuous-stream jitter scenario averaged over three Kubernetes repetitions.}}{8}{}\protected@file@percent }
+\newlabel{tab:grpc-continuous-results}{{III}{8}{}{table.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}4}Focused stress scenarios}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}4a}Continuous steady-rate scenario.}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Focused gRPC backpressure scenario with an intentionally slow sink, averaged over three Kubernetes repetitions.}}{8}{}\protected@file@percent }
 \newlabel{tab:grpc-backpressure-results}{{IV}{8}{}{table.4}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}3b}Slow-consumer backpressure scenario.}{8}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}3c}Forced-restart recovery scenario.}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Focused gRPC recovery scenario with a forced transformer restart.}}{8}{}\protected@file@percent }
-\newlabel{tab:grpc-recovery-results}{{V}{8}{}{table.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}4}Phase 1 interpretation}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}4b}Slow-consumer backpressure scenario.}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}4c}Forced-restart recovery scenario.}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Focused gRPC recovery scenario with a forced transformer restart, averaged over three Kubernetes repetitions.}}{9}{}\protected@file@percent }
+\newlabel{tab:grpc-recovery-results}{{V}{9}{}{table.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}5}Discussion}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Threats to Validity}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0a}Internal validity.}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0b}External validity.}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0c}Construct validity.}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Planned: Cross-Technology Benchmark Comparison}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Planned: Architectural Integration Design}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Planned: System-Level Evaluation}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Appendix}{10}{}\protected@file@percent }
+\newlabel{app:presets}{{A}{10}{}{section.Appendix.A}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Benchmark presets used in the current gRPC study.}}{10}{}\protected@file@percent }
+\newlabel{tab:appendix-presets}{{VI}{10}{}{table.6}{}}
+\newlabel{app:run-matrix}{{A}{10}{}{table.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Execution scope of the current benchmark corpus.}}{10}{}\protected@file@percent }
+\newlabel{tab:appendix-run-scope}{{VII}{10}{}{table.7}{}}
+\newlabel{app:resource-details}{{A}{10}{}{table.7}{}}
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{stutterheim2023thesis}{1}
@@ -95,13 +112,6 @@
 \bibcite{coviello2022dataxc}{7}
 \bibcite{figueira2024selfadaptive}{8}
 \bibcite{neumaier2021policyaware}{9}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Phase 2: Streaming Feasibility of DYNAMOS Data-Sharing Archetypes}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Phase 3: Integration Design for DYNAMOS}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Phase 4: Prototype Implementation and System-Level Evaluation}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Phase 5: Discussion and Final Recommendation}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{Appendix}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{9}{}\protected@file@percent }
 \bibcite{thiyagarajan2025grpcsecurity}{10}
 \bibcite{rasheedh2021reactive}{11}
 \bibcite{guntupalli2023highvolume}{12}
@@ -122,4 +132,11 @@
 \bibcite{nats2026jetstream}{27}
 \bibcite{karimov2018benchmarking}{28}
 \bibcite{Henning2021ScalabilityMetrics}{29}
-\gdef \@abspage@last{10}
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Continuous scenario CPU usage by role (avg./peak \%).}}{11}{}\protected@file@percent }
+\newlabel{tab:appendix-continuous-cpu}{{VIII}{11}{}{table.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Recovery scenario CPU usage by role (avg./peak \%).}}{11}{}\protected@file@percent }
+\newlabel{tab:appendix-recovery-cpu}{{IX}{11}{}{table.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Recovery scenario memory usage by role (avg./peak MiB).}}{11}{}\protected@file@percent }
+\newlabel{tab:appendix-recovery-memory}{{X}{11}{}{table.10}{}}
+\@writefile{toc}{\contentsline {section}{References}{11}{}\protected@file@percent }
+\gdef \@abspage@last{12}

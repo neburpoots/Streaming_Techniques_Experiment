@@ -1,0 +1,17 @@
+{
+  "run_id": "synthetic-clean-stream-p4096-c16",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 81920000,
+  "duration_seconds": 0.835433413,
+  "throughput_messages_per_second": 23939.669743613667,
+  "throughput_megabytes_per_second": 93.51433493599089,
+  "p50_latency_ms": 50.65205,
+  "p95_latency_ms": 89.54871,
+  "p99_latency_ms": 111.190464,
+  "max_latency_ms": 147.731645,
+  "started_at_unix_nano": 1775315910141388434,
+  "finished_at_unix_nano": 1775315910739491799,
+  "transport_mode": "client-streaming"
+}

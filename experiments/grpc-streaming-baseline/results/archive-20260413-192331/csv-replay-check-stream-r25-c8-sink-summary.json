@@ -1,0 +1,17 @@
+{
+  "run_id": "csv-replay-check-stream-r25-c8",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 10000,
+  "bytes_received": 12753531,
+  "duration_seconds": 0.144665727,
+  "throughput_messages_per_second": 69124.87295626006,
+  "throughput_megabytes_per_second": 84.0746126288151,
+  "p50_latency_ms": 15.788064,
+  "p95_latency_ms": 23.917143,
+  "p99_latency_ms": 26.217301,
+  "max_latency_ms": 28.954973,
+  "started_at_unix_nano": 1775316161810375078,
+  "finished_at_unix_nano": 1775316161900316681,
+  "transport_mode": "client-streaming"
+}

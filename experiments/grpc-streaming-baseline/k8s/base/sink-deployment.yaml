@@ -34,6 +34,9 @@ spec:
               name: grpc
             - containerPort: 9102
               name: metrics
+          volumeMounts:
+            - name: results
+              mountPath: /results
           resources:
             requests:
               cpu: 250m
@@ -41,3 +44,7 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+      volumes:
+        - name: results
+          persistentVolumeClaim:
+            claimName: experiment-results

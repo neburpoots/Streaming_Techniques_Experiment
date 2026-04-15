@@ -1,0 +1,581 @@
+=== synthetic-continuous ===
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+namespace/streaming-experiments unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer unchanged
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-continuous (overlay: resource-medium, repeat: 3)
+═══ Repetition 1/3 ═══
+━━━ Running: synthetic-continuous-stream-p1024-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-stream-p1024-c4-rep1 created
+pod/results-helper-synthetic-continuous-stream-p1024-c4-rep1 condition met
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-stream-p1024-c4-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-stream-p1024-c4-rep1
+━━━ Running: synthetic-continuous-stream-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-stream-p1024-c8-rep1 created
+pod/results-helper-synthetic-continuous-stream-p1024-c8-rep1 condition met
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-stream-p1024-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-stream-p1024-c8-rep1
+━━━ Running: synthetic-continuous-unary-p1024-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-unary-p1024-c4-rep1 created
+pod/results-helper-synthetic-continuous-unary-p1024-c4-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-unary-p1024-c4-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-unary-p1024-c4-rep1
+━━━ Running: synthetic-continuous-unary-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-unary-p1024-c8-rep1 created
+pod/results-helper-synthetic-continuous-unary-p1024-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-unary-p1024-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-unary-p1024-c8-rep1
+═══ Repetition 2/3 ═══
+━━━ Running: synthetic-continuous-stream-p1024-c4-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-stream-p1024-c4-rep2 created
+pod/results-helper-synthetic-continuous-stream-p1024-c4-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-stream-p1024-c4-rep2" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-stream-p1024-c4-rep2
+━━━ Running: synthetic-continuous-stream-p1024-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-stream-p1024-c8-rep2 created
+pod/results-helper-synthetic-continuous-stream-p1024-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-stream-p1024-c8-rep2" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-stream-p1024-c8-rep2
+━━━ Running: synthetic-continuous-unary-p1024-c4-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-unary-p1024-c4-rep2 created
+pod/results-helper-synthetic-continuous-unary-p1024-c4-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-unary-p1024-c4-rep2" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-unary-p1024-c4-rep2
+━━━ Running: synthetic-continuous-unary-p1024-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-unary-p1024-c8-rep2 created
+pod/results-helper-synthetic-continuous-unary-p1024-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-unary-p1024-c8-rep2" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-unary-p1024-c8-rep2
+═══ Repetition 3/3 ═══
+━━━ Running: synthetic-continuous-stream-p1024-c4-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-stream-p1024-c4-rep3 created
+pod/results-helper-synthetic-continuous-stream-p1024-c4-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-stream-p1024-c4-rep3" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-stream-p1024-c4-rep3
+━━━ Running: synthetic-continuous-stream-p1024-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-stream-p1024-c8-rep3 created
+pod/results-helper-synthetic-continuous-stream-p1024-c8-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-stream-p1024-c8-rep3" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-stream-p1024-c8-rep3
+━━━ Running: synthetic-continuous-unary-p1024-c4-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-unary-p1024-c4-rep3 created
+pod/results-helper-synthetic-continuous-unary-p1024-c4-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-unary-p1024-c4-rep3" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-unary-p1024-c4-rep3
+━━━ Running: synthetic-continuous-unary-p1024-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-continuous-unary-p1024-c8-rep3 created
+pod/results-helper-synthetic-continuous-unary-p1024-c8-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-continuous-unary-p1024-c8-rep3" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-continuous-unary-p1024-c8-rep3
+Exporting summary CSV...
+PowerShell (pwsh) not found; skipping CSV export.
+Run manually: pwsh /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/scripts/export-results.ps1 -ResultsDir /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results -RunIdPrefix synthetic-continuous
+Finished preset: synthetic-continuous
+=== synthetic-backpressure ===
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+namespace/streaming-experiments unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-backpressure (overlay: resource-medium, repeat: 3)
+═══ Repetition 1/3 ═══
+━━━ Running: synthetic-backpressure-stream-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-backpressure-stream-p1024-c8-rep1 created
+pod/results-helper-synthetic-backpressure-stream-p1024-c8-rep1 condition met
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-backpressure-stream-p1024-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-backpressure-stream-p1024-c8-rep1
+━━━ Running: synthetic-backpressure-unary-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-backpressure-unary-p1024-c8-rep1 created
+pod/results-helper-synthetic-backpressure-unary-p1024-c8-rep1 condition met
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-backpressure-unary-p1024-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-backpressure-unary-p1024-c8-rep1
+═══ Repetition 2/3 ═══
+━━━ Running: synthetic-backpressure-stream-p1024-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-backpressure-stream-p1024-c8-rep2 created
+pod/results-helper-synthetic-backpressure-stream-p1024-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-backpressure-stream-p1024-c8-rep2" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-backpressure-stream-p1024-c8-rep2
+━━━ Running: synthetic-backpressure-unary-p1024-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-backpressure-unary-p1024-c8-rep2 created
+pod/results-helper-synthetic-backpressure-unary-p1024-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-backpressure-unary-p1024-c8-rep2" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-backpressure-unary-p1024-c8-rep2
+═══ Repetition 3/3 ═══
+━━━ Running: synthetic-backpressure-stream-p1024-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-backpressure-stream-p1024-c8-rep3 created
+pod/results-helper-synthetic-backpressure-stream-p1024-c8-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-backpressure-stream-p1024-c8-rep3" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-backpressure-stream-p1024-c8-rep3
+━━━ Running: synthetic-backpressure-unary-p1024-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-backpressure-unary-p1024-c8-rep3 created
+pod/results-helper-synthetic-backpressure-unary-p1024-c8-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-backpressure-unary-p1024-c8-rep3" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-backpressure-unary-p1024-c8-rep3
+Exporting summary CSV...
+PowerShell (pwsh) not found; skipping CSV export.
+Run manually: pwsh /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/scripts/export-results.ps1 -ResultsDir /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results -RunIdPrefix synthetic-backpressure
+Finished preset: synthetic-backpressure
+=== synthetic-recovery ===
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+namespace/streaming-experiments unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-recovery (overlay: resource-medium, repeat: 3)
+═══ Repetition 1/3 ═══
+━━━ Running: synthetic-recovery-stream-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-66848d588c-7q9b4" deleted from streaming-experiments namespace
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-recovery-stream-p4096-c8-rep1 created
+pod/results-helper-synthetic-recovery-stream-p4096-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-recovery-stream-p4096-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-recovery-stream-p4096-c8-rep1
+━━━ Running: synthetic-recovery-unary-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-55b4d6d5fd-tfk68" deleted from streaming-experiments namespace
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+namespace/streaming-experiments unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-recovery (overlay: resource-medium, repeat: 3)
+═══ Repetition 1/3 ═══
+━━━ Running: synthetic-recovery-stream-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-cdc94d5bb-m8j7j" deleted from streaming-experiments namespace
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-recovery-stream-p4096-c8-rep1 created
+pod/results-helper-synthetic-recovery-stream-p4096-c8-rep1 condition met
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-recovery-stream-p4096-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-recovery-stream-p4096-c8-rep1
+━━━ Running: synthetic-recovery-unary-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-fc4784547-njwwp" deleted from streaming-experiments namespace
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-recovery-unary-p4096-c8-rep1 created
+pod/results-helper-synthetic-recovery-unary-p4096-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-recovery-unary-p4096-c8-rep1" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-recovery-unary-p4096-c8-rep1
+═══ Repetition 2/3 ═══
+━━━ Running: synthetic-recovery-stream-p4096-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-dd89764b5-qdk72" deleted from streaming-experiments namespace
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-recovery-stream-p4096-c8-rep2 created
+pod/results-helper-synthetic-recovery-stream-p4096-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-recovery-stream-p4096-c8-rep2" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-recovery-stream-p4096-c8-rep2
+━━━ Running: synthetic-recovery-unary-p4096-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-74457dc96d-r8sjz" deleted from streaming-experiments namespace
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-recovery-unary-p4096-c8-rep2 created
+pod/results-helper-synthetic-recovery-unary-p4096-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-recovery-unary-p4096-c8-rep2" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-recovery-unary-p4096-c8-rep2
+═══ Repetition 3/3 ═══
+━━━ Running: synthetic-recovery-stream-p4096-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-54d8bf7f98-pn4m8" deleted from streaming-experiments namespace
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-recovery-stream-p4096-c8-rep3 created
+pod/results-helper-synthetic-recovery-stream-p4096-c8-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-recovery-stream-p4096-c8-rep3" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-recovery-stream-p4096-c8-rep3
+━━━ Running: synthetic-recovery-unary-p4096-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-799457b6cb-w24w7" deleted from streaming-experiments namespace
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-recovery-unary-p4096-c8-rep3 created
+pod/results-helper-synthetic-recovery-unary-p4096-c8-rep3 condition met
+tar: removing leading '/' from member names
+pod "results-helper-synthetic-recovery-unary-p4096-c8-rep3" force deleted from streaming-experiments namespace
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-recovery-unary-p4096-c8-rep3
+Exporting summary CSV...
+PowerShell (pwsh) not found; skipping CSV export.
+Run manually: pwsh /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/scripts/export-results.ps1 -ResultsDir /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results -RunIdPrefix synthetic-recovery
+Finished preset: synthetic-recovery

@@ -1,0 +1,17 @@
+{
+  "run_id": "csv-replay-check-unary-r25-c8",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 10000,
+  "bytes_received": 12753531,
+  "duration_seconds": 1.257544959,
+  "throughput_messages_per_second": 7952.001976893137,
+  "throughput_megabytes_per_second": 9.671793339192192,
+  "p50_latency_ms": 0.397148,
+  "p95_latency_ms": 1.217122,
+  "p99_latency_ms": 2.822672,
+  "max_latency_ms": 21.560381,
+  "started_at_unix_nano": 1775316196705091149,
+  "finished_at_unix_nano": 1775316197918796744,
+  "transport_mode": "unary"
+}

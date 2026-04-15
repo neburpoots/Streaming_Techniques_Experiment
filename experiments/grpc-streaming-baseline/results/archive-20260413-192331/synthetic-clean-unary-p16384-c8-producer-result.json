@@ -1,0 +1,32 @@
+{
+  "run_id": "synthetic-clean-unary-p16384-c8",
+  "transport_mode": "unary",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 16384,
+  "concurrency": 8,
+  "target_messages_per_second": 0,
+  "producer_started_at": "2026-04-04T15:22:01.520862425Z",
+  "producer_finished_at": "2026-04-04T15:22:05.909187745Z",
+  "stream_acks": null,
+  "unary_acknowledged_requests": 20000,
+  "sink_summary": {
+    "run_id": "synthetic-clean-unary-p16384-c8",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 327680000,
+    "duration_seconds": 4.414679155,
+    "throughput_messages_per_second": 4530.340552007794,
+    "throughput_megabytes_per_second": 70.78657112512178,
+    "p50_latency_ms": 0.547939,
+    "p95_latency_ms": 1.709074,
+    "p99_latency_ms": 2.984765,
+    "max_latency_ms": 903.231561,
+    "started_at_unix_nano": 1775316121542336015,
+    "finished_at_unix_nano": 1775316125906851144,
+    "transport_mode": "unary"
+  }
+}

@@ -1,0 +1,6 @@
+{"Name":"grpc-streaming-baseline-producer-1","CPUPerc":"38.60%","MemUsage":"7MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"28.00%","MemUsage":"7MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"49.90%","MemUsage":"7MiB / 0B"}
+{"Name":"grpc-streaming-baseline-producer-1","CPUPerc":"38.60%","MemUsage":"7MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"28.00%","MemUsage":"7MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"49.90%","MemUsage":"7MiB / 0B"}

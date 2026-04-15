@@ -1,0 +1,40 @@
+{
+  "run_id": "csv-replay-check-stream-r25-c1",
+  "transport_mode": "client-streaming",
+  "workload_source": "csv-replay",
+  "workload_descriptor": "csv-replay[Personen.csv+Aanstellingen.csv]:rows-per-message=25:repeat=10",
+  "profile": "bulk",
+  "expected_messages": 10000,
+  "payload_bytes": 1283,
+  "concurrency": 1,
+  "target_messages_per_second": 0,
+  "producer_started_at": "2026-04-04T15:22:33.592783458Z",
+  "producer_finished_at": "2026-04-04T15:22:33.691297324Z",
+  "stream_acks": [
+    {
+      "run_id": "csv-replay-check-stream-r25-c1",
+      "stage": "transformer",
+      "stream_messages": 10000,
+      "stream_bytes": 12753531,
+      "finished_at_unix_nano": 1775316153689888776
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "sink_summary": {
+    "run_id": "csv-replay-check-stream-r25-c1",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 10000,
+    "bytes_received": 12753531,
+    "duration_seconds": 0.121097878,
+    "throughput_messages_per_second": 82577.83014166441,
+    "throughput_megabytes_per_second": 100.43706098789706,
+    "p50_latency_ms": 1.442277,
+    "p95_latency_ms": 3.168467,
+    "p99_latency_ms": 3.962428,
+    "max_latency_ms": 4.324627,
+    "started_at_unix_nano": 1775316153611674294,
+    "finished_at_unix_nano": 1775316153689073351,
+    "transport_mode": "client-streaming"
+  }
+}
