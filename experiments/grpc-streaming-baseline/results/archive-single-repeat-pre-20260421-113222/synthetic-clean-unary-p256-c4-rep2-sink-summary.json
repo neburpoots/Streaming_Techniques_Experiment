@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-unary-p256-c4-rep2",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 5120000,
+  "duration_seconds": 9.308002284,
+  "throughput_messages_per_second": 2148.688772281354,
+  "throughput_megabytes_per_second": 0.5245822197952524,
+  "p50_latency_ms": 0.332108,
+  "p95_latency_ms": 0.566591,
+  "p99_latency_ms": 6.267522,
+  "max_latency_ms": 18961.776398,
+  "started_at_unix_nano": 1776719781214931105,
+  "finished_at_unix_nano": 1776719790480871878,
+  "transport_mode": "unary",
+  "mean_inter_arrival_ms": 0.3270227408870437,
+  "p95_inter_arrival_ms": 0.66605,
+  "inter_arrival_jitter_ms": 2.565721350118749
+}

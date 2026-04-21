@@ -1,0 +1,45 @@
+{
+  "run_id": "smoke-streaming-2",
+  "transport_mode": "client-streaming",
+  "profile": "bulk",
+  "expected_messages": 1000,
+  "payload_bytes": 1024,
+  "concurrency": 2,
+  "target_messages_per_second": 0,
+  "producer_started_at": "2026-04-03T17:59:03.848619087Z",
+  "producer_finished_at": "2026-04-03T17:59:03.895536173Z",
+  "stream_acks": [
+    {
+      "run_id": "smoke-streaming-2",
+      "stage": "transformer",
+      "stream_messages": 500,
+      "stream_bytes": 512000,
+      "finished_at_unix_nano": 1775239143893816116
+    },
+    {
+      "run_id": "smoke-streaming-2",
+      "stage": "transformer",
+      "stream_messages": 500,
+      "stream_bytes": 512000,
+      "finished_at_unix_nano": 1775239143893781740
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "sink_summary": {
+    "run_id": "smoke-streaming-2",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 1000,
+    "bytes_received": 1024000,
+    "duration_seconds": 0.078615679,
+    "throughput_messages_per_second": 12720.108923819129,
+    "throughput_megabytes_per_second": 12.421981370917118,
+    "p50_latency_ms": 9.319125,
+    "p95_latency_ms": 12.187626,
+    "p99_latency_ms": 12.550524,
+    "max_latency_ms": 12.568429,
+    "started_at_unix_nano": 1775239143883918421,
+    "finished_at_unix_nano": 1775239143892786149,
+    "transport_mode": "client-streaming"
+  }
+}

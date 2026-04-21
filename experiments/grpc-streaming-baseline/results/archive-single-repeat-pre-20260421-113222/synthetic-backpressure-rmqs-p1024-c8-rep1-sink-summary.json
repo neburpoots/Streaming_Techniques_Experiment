@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-backpressure-rmqs-p1024-c8-rep1",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 20480000,
+  "duration_seconds": 59.079484458,
+  "throughput_messages_per_second": 338.5269892498492,
+  "throughput_megabytes_per_second": 0.33059276293930584,
+  "p50_latency_ms": 12388.183629,
+  "p95_latency_ms": 17035.228804,
+  "p99_latency_ms": 17230.18693,
+  "max_latency_ms": 27906.873812,
+  "started_at_unix_nano": 1776605729285637014,
+  "finished_at_unix_nano": 1776605788065055300,
+  "transport_mode": "rabbitmq-streams",
+  "mean_inter_arrival_ms": 2.6655099130956725,
+  "p95_inter_arrival_ms": 5.453526,
+  "inter_arrival_jitter_ms": 10.210877009608007
+}

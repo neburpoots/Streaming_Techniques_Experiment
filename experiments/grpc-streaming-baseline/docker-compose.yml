@@ -1,4 +1,21 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    command:
+      - /bin/sh
+      - -c
+      - rabbitmq-plugins enable --offline rabbitmq_stream rabbitmq_stream_management && rabbitmq-server
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-/}
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:-benchmark-cookie}
+      RABBITMQ_LOGS: "-"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "5552:5552"
+
   sink:
     build:
       context: .
@@ -9,7 +26,17 @@ services:
       LISTEN_ADDR: ":50052"
       METRICS_ADDR: ":9102"
       RESULT_DIR: /results
+      TRANSPORT_MODE: ${TRANSPORT_MODE:-client-streaming}
       SINK_PROCESS_DELAY_MS: ${SINK_PROCESS_DELAY_MS:-0}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-rabbitmq}
+      RABBITMQ_AMQP_PORT: ${RABBITMQ_AMQP_PORT:-5672}
+      RABBITMQ_STREAM_PORT: ${RABBITMQ_STREAM_PORT:-5552}
+      RABBITMQ_MANAGEMENT_PORT: ${RABBITMQ_MANAGEMENT_PORT:-15672}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
+      RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM: ${RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM:-producer-to-transformer}
+      RABBITMQ_TRANSFORMER_TO_SINK_STREAM: ${RABBITMQ_TRANSFORMER_TO_SINK_STREAM:-transformer-to-sink}
     ports:
       - "50052:50052"
       - "9102:9102"
@@ -24,11 +51,24 @@ services:
         SERVICE: transformer
     depends_on:
       - sink
+      - rabbitmq
     environment:
+      RUN_ID: ${RUN_ID:-grpc-stream-local}
       LISTEN_ADDR: ":50051"
       METRICS_ADDR: ":9101"
+      CONCURRENCY: ${CONCURRENCY:-1}
+      TRANSPORT_MODE: ${TRANSPORT_MODE:-client-streaming}
       SINK_ADDR: sink:50052
       TRANSFORMER_WORK_ITERATIONS: ${TRANSFORMER_WORK_ITERATIONS:-0}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-rabbitmq}
+      RABBITMQ_AMQP_PORT: ${RABBITMQ_AMQP_PORT:-5672}
+      RABBITMQ_STREAM_PORT: ${RABBITMQ_STREAM_PORT:-5552}
+      RABBITMQ_MANAGEMENT_PORT: ${RABBITMQ_MANAGEMENT_PORT:-15672}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
+      RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM: ${RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM:-producer-to-transformer}
+      RABBITMQ_TRANSFORMER_TO_SINK_STREAM: ${RABBITMQ_TRANSFORMER_TO_SINK_STREAM:-transformer-to-sink}
     ports:
       - "50051:50051"
       - "9101:9101"
@@ -42,6 +82,7 @@ services:
     depends_on:
       - sink
       - transformer
+      - rabbitmq
     environment:
       RUN_ID: ${RUN_ID:-grpc-stream-local}
       TRANSPORT_MODE: ${TRANSPORT_MODE:-client-streaming}
@@ -67,6 +108,15 @@ services:
       FAILURE_AFTER_SECONDS: ${FAILURE_AFTER_SECONDS:-0}
       SUMMARY_POLL_MILLISECONDS: ${SUMMARY_POLL_MILLISECONDS:-250}
       MAX_SUMMARY_WAIT_SECONDS: ${MAX_SUMMARY_WAIT_SECONDS:-30}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-rabbitmq}
+      RABBITMQ_AMQP_PORT: ${RABBITMQ_AMQP_PORT:-5672}
+      RABBITMQ_STREAM_PORT: ${RABBITMQ_STREAM_PORT:-5552}
+      RABBITMQ_MANAGEMENT_PORT: ${RABBITMQ_MANAGEMENT_PORT:-15672}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
+      RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM: ${RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM:-producer-to-transformer}
+      RABBITMQ_TRANSFORMER_TO_SINK_STREAM: ${RABBITMQ_TRANSFORMER_TO_SINK_STREAM:-transformer-to-sink}
     volumes:
       - ./results:/results
       - ../../datasets:/datasets:ro

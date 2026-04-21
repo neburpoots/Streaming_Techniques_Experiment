@@ -67,10 +67,14 @@ function Get-MatrixCases {
     switch ($PresetName) {
         'synthetic-clean' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
                 foreach ($payloadBytes in @(256, 1024, 4096, 16384)) {
                     foreach ($concurrency in @(1, 4, 8, 16)) {
-                        $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
+                        $transportShort = switch ($transportMode) {
+                            'client-streaming' { 'stream' }
+                            'unary' { 'unary' }
+                            'rabbitmq-streams' { 'rmqs' }
+                        }
                         $cases += New-RunCase `
                             -RunId "synthetic-clean-$transportShort-p$payloadBytes-c$concurrency" `
                             -TransportMode $transportMode `
@@ -87,10 +91,14 @@ function Get-MatrixCases {
         }
         'csv-replay-check' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
                 foreach ($rowsPerMessage in @(25, 100)) {
                     foreach ($concurrency in @(1, 8)) {
-                        $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
+                        $transportShort = switch ($transportMode) {
+                            'client-streaming' { 'stream' }
+                            'unary' { 'unary' }
+                            'rabbitmq-streams' { 'rmqs' }
+                        }
                         $cases += New-RunCase `
                             -RunId "csv-replay-check-$transportShort-r$rowsPerMessage-c$concurrency" `
                             -TransportMode $transportMode `
@@ -110,9 +118,13 @@ function Get-MatrixCases {
         }
         'synthetic-continuous' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
                 foreach ($concurrency in @(4, 8)) {
-                    $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
+                    $transportShort = switch ($transportMode) {
+                        'client-streaming' { 'stream' }
+                        'unary' { 'unary' }
+                        'rabbitmq-streams' { 'rmqs' }
+                    }
                     $cases += New-RunCase `
                         -RunId "synthetic-continuous-$transportShort-p1024-c$concurrency" `
                         -TransportMode $transportMode `
@@ -128,8 +140,12 @@ function Get-MatrixCases {
         }
         'synthetic-backpressure' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary')) {
-                $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
+                $transportShort = switch ($transportMode) {
+                    'client-streaming' { 'stream' }
+                    'unary' { 'unary' }
+                    'rabbitmq-streams' { 'rmqs' }
+                }
                 $cases += New-RunCase `
                     -RunId "synthetic-backpressure-$transportShort-p1024-c8" `
                     -TransportMode $transportMode `
@@ -145,8 +161,12 @@ function Get-MatrixCases {
         }
         'synthetic-recovery' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary')) {
-                $transportShort = if ($transportMode -eq 'client-streaming') { 'stream' } else { 'unary' }
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
+                $transportShort = switch ($transportMode) {
+                    'client-streaming' { 'stream' }
+                    'unary' { 'unary' }
+                    'rabbitmq-streams' { 'rmqs' }
+                }
                 $cases += New-RunCase `
                     -RunId "synthetic-recovery-$transportShort-p4096-c8" `
                     -TransportMode $transportMode `
@@ -168,14 +188,23 @@ function Get-MatrixCases {
 }
 
 function Wait-ForHealth {
+    param([string]$TransportMode = 'client-streaming')
+
     for ($i = 0; $i -lt 60; $i++) {
         try {
             Invoke-WebRequest -UseBasicParsing http://localhost:9101/healthz | Out-Null
             Invoke-WebRequest -UseBasicParsing http://localhost:9102/healthz | Out-Null
+            if ($TransportMode -ne 'rabbitmq-streams') {
+                return
+            }
+            docker compose exec -T rabbitmq rabbitmq-diagnostics -q ping | Out-Null
             return
         } catch {
             Start-Sleep -Seconds 1
         }
+    }
+    if ($TransportMode -eq 'rabbitmq-streams') {
+        throw 'Timed out waiting for transformer, sink, and RabbitMQ health endpoints.'
     }
     throw 'Timed out waiting for transformer and sink health endpoints.'
 }
@@ -227,16 +256,11 @@ function Start-FailureInjection {
 function Invoke-RunCase {
     param([pscustomobject]$Case)
 
-    docker compose up -d sink transformer | Out-Null
-    Wait-ForHealth
-
     $statsPath = Join-Path $resultsDir "$($Case.run_id)-docker-stats.ndjson"
     $stopFile = Join-Path $resultsDir "$($Case.run_id)-stop.txt"
     if (Test-Path $statsPath) { Remove-Item $statsPath -Force }
     if (Test-Path $stopFile) { Remove-Item $stopFile -Force }
 
-    $statsJob = Start-DockerStatsSampling -OutputPath $statsPath -StopFile $stopFile
-    $failureJob = Start-FailureInjection -Case $Case -ComposeRoot $resolvedRoot
     try {
         $env:RUN_ID = $Case.run_id
         $env:TRANSPORT_MODE = $Case.transport_mode
@@ -259,12 +283,20 @@ function Invoke-RunCase {
         $env:FAILURE_TARGET = $Case.failure_target
         $env:FAILURE_AFTER_SECONDS = $Case.failure_after_seconds
 
+        docker compose up -d sink transformer rabbitmq | Out-Null
+        Wait-ForHealth -TransportMode $Case.transport_mode
+
+        $statsJob = Start-DockerStatsSampling -OutputPath $statsPath -StopFile $stopFile
+        $failureJob = Start-FailureInjection -Case $Case -ComposeRoot $resolvedRoot
+
         Write-Host "Running $($Case.run_id)"
         docker compose run --rm producer
     } finally {
         'stop' | Out-File -FilePath $stopFile -Encoding ascii
-        Wait-Job $statsJob | Out-Null
-        Remove-Job $statsJob -Force | Out-Null
+        if ($statsJob) {
+            Wait-Job $statsJob | Out-Null
+            Remove-Job $statsJob -Force | Out-Null
+        }
         Remove-Item $stopFile -Force -ErrorAction SilentlyContinue
         if ($failureJob) {
             Wait-Job $failureJob | Out-Null

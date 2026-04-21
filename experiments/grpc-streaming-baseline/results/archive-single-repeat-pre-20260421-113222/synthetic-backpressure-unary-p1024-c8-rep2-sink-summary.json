@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-backpressure-unary-p1024-c8-rep2",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 20480000,
+  "duration_seconds": 11.262905767,
+  "throughput_messages_per_second": 1775.7406848416902,
+  "throughput_megabytes_per_second": 1.734121762540713,
+  "p50_latency_ms": 0.4543,
+  "p95_latency_ms": 0.827017,
+  "p99_latency_ms": 1.465475,
+  "max_latency_ms": 23.858534,
+  "started_at_unix_nano": 1776102790758663576,
+  "finished_at_unix_nano": 1776102801969109260,
+  "transport_mode": "unary",
+  "mean_inter_arrival_ms": 0.42423662178109284,
+  "p95_inter_arrival_ms": 3.239224,
+  "inter_arrival_jitter_ms": 1.0822643143098427
+}

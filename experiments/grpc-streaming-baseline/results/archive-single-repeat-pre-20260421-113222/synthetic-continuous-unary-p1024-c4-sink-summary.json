@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-continuous-unary-p1024-c4",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 20480000,
+  "duration_seconds": 19.048008006,
+  "throughput_messages_per_second": 1049.9785591070797,
+  "throughput_megabytes_per_second": 1.0253696866280075,
+  "p50_latency_ms": 0.301766,
+  "p95_latency_ms": 0.67595,
+  "p99_latency_ms": 4.993633,
+  "max_latency_ms": 66.963225,
+  "started_at_unix_nano": 1776420560320080151,
+  "finished_at_unix_nano": 1776420579317367988,
+  "transport_mode": "unary",
+  "mean_inter_arrival_ms": 0.9499118920445974,
+  "p95_inter_arrival_ms": 1.945441,
+  "inter_arrival_jitter_ms": 1.4106932599669806
+}

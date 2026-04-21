@@ -18,11 +18,21 @@ import (
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/config"
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/metrics"
 	pb "github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/pb"
+	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/transport"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+type sinkConfig struct {
+	listenAddr    string
+	metricsAddr   string
+	resultDir     string
+	processDelay  time.Duration
+	transportMode string
+	rabbitMQ      transport.RabbitMQConfig
+}
 
 type sinkMetrics struct {
 	messages           prometheus.Counter
@@ -37,6 +47,7 @@ type sinkMetrics struct {
 
 type runState struct {
 	config             *pb.RunConfig
+	consumerCancel     context.CancelFunc
 	registeredAt       time.Time
 	startedAt          time.Time
 	finishedAt         time.Time
@@ -57,20 +68,19 @@ type sinkServer struct {
 	pb.UnimplementedSinkServer
 	pb.UnimplementedExperimentAdminServer
 
+	ctx          context.Context
 	mu           sync.Mutex
 	runs         map[string]*runState
 	metrics      sinkMetrics
 	resultDir    string
+	rabbitMQ     transport.RabbitMQConfig
 	processDelay time.Duration
 }
 
 func main() {
-	listenAddr := config.String("LISTEN_ADDR", ":50052")
-	metricsAddr := config.String("METRICS_ADDR", ":9102")
-	resultDir := config.String("RESULT_DIR", "/results")
-	processDelay, err := config.DurationMillis("SINK_PROCESS_DELAY_MS", 0)
+	cfg, err := loadConfig()
 	if err != nil {
-		log.Fatalf("invalid SINK_PROCESS_DELAY_MS: %v", err)
+		log.Fatalf("load config: %v", err)
 	}
 
 	registry := prometheus.NewRegistry()
@@ -124,22 +134,24 @@ func main() {
 	defer cancel()
 
 	go func() {
-		if err := metrics.Serve(ctx, metricsAddr, registry); err != nil {
+		if err := metrics.Serve(ctx, cfg.metricsAddr, registry); err != nil {
 			log.Fatalf("metrics server: %v", err)
 		}
 	}()
 
-	listener, err := net.Listen("tcp", listenAddr)
+	listener, err := net.Listen("tcp", cfg.listenAddr)
 	if err != nil {
-		log.Fatalf("listen %s: %v", listenAddr, err)
+		log.Fatalf("listen %s: %v", cfg.listenAddr, err)
 	}
 
 	grpcServer := grpc.NewServer()
 	server := &sinkServer{
+		ctx:          ctx,
 		runs:         make(map[string]*runState),
 		metrics:      serverMetrics,
-		resultDir:    resultDir,
-		processDelay: processDelay,
+		resultDir:    cfg.resultDir,
+		rabbitMQ:     cfg.rabbitMQ,
+		processDelay: cfg.processDelay,
 	}
 	pb.RegisterSinkServer(grpcServer, server)
 	pb.RegisterExperimentAdminServer(grpcServer, server)
@@ -149,10 +161,34 @@ func main() {
 		grpcServer.GracefulStop()
 	}()
 
-	log.Printf("sink listening on %s", listenAddr)
+	log.Printf("sink listening on %s via %s", cfg.listenAddr, cfg.transportMode)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("serve gRPC: %v", err)
 	}
+}
+
+func loadConfig() (*sinkConfig, error) {
+	processDelay, err := config.DurationMillis("SINK_PROCESS_DELAY_MS", 0)
+	if err != nil {
+		return nil, fmt.Errorf("invalid SINK_PROCESS_DELAY_MS: %w", err)
+	}
+	transportMode := config.String("TRANSPORT_MODE", transport.ModeClientStreaming)
+	if !transport.IsSupportedMode(transportMode) {
+		return nil, fmt.Errorf("unsupported TRANSPORT_MODE %q", transportMode)
+	}
+	rabbitMQConfig, err := transport.LoadRabbitMQConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return &sinkConfig{
+		listenAddr:    config.String("LISTEN_ADDR", ":50052"),
+		metricsAddr:   config.String("METRICS_ADDR", ":9102"),
+		resultDir:     config.String("RESULT_DIR", "/results"),
+		processDelay:  processDelay,
+		transportMode: transportMode,
+		rabbitMQ:      rabbitMQConfig,
+	}, nil
 }
 
 func (s *sinkServer) RegisterRun(_ context.Context, in *pb.RunConfig) (*pb.RegisterRunResponse, error) {
@@ -160,10 +196,13 @@ func (s *sinkServer) RegisterRun(_ context.Context, in *pb.RunConfig) (*pb.Regis
 		return nil, status.Error(codes.InvalidArgument, "run_id is required")
 	}
 
+	var runCtx context.Context
+	var startConsumers bool
+
 	s.mu.Lock()
-	defer s.mu.Unlock()
 
 	if _, exists := s.runs[in.GetRunId()]; exists {
+		s.mu.Unlock()
 		return &pb.RegisterRunResponse{Accepted: true}, nil
 	}
 
@@ -172,7 +211,7 @@ func (s *sinkServer) RegisterRun(_ context.Context, in *pb.RunConfig) (*pb.Regis
 		registeredAt = time.Now()
 	}
 
-	s.runs[in.GetRunId()] = &runState{
+	state := &runState{
 		config:             in,
 		registeredAt:       registeredAt,
 		latenciesMillis:    make([]float64, 0, in.GetExpectedTotalMessages()),
@@ -180,7 +219,17 @@ func (s *sinkServer) RegisterRun(_ context.Context, in *pb.RunConfig) (*pb.Regis
 		seenSequences:      make(map[uint64]struct{}),
 		lastByWorker:       make(map[uint64]uint64),
 	}
+	if in.GetTransportMode() == transport.ModeRabbitMQStreams {
+		runCtx, state.consumerCancel = context.WithCancel(s.ctx)
+		startConsumers = true
+	}
+	s.runs[in.GetRunId()] = state
 	s.metrics.activeRuns.Inc()
+	s.mu.Unlock()
+
+	if startConsumers {
+		s.startRabbitMQRunConsumers(runCtx, in)
+	}
 	return &pb.RegisterRunResponse{Accepted: true}, nil
 }
 
@@ -305,15 +354,22 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 	s.metrics.latencyMillis.Observe(latencyMillis)
 
 	completed := !state.completed && state.config.GetExpectedTotalMessages() > 0 && state.messagesReceived >= state.config.GetExpectedTotalMessages()
+	var cancelConsumers context.CancelFunc
 	if completed {
 		state.completed = true
 		state.finishedAt = now
 		state.summary = buildSummary(chunk.GetRunId(), state)
+		cancelConsumers = state.consumerCancel
+		state.consumerCancel = nil
 		if err := app.WriteJSON(s.resultDir, fmt.Sprintf("%s-sink-summary.json", chunk.GetRunId()), state.summary); err != nil {
 			log.Printf("write sink summary: %v", err)
 		}
 	}
 	s.mu.Unlock()
+
+	if cancelConsumers != nil {
+		cancelConsumers()
+	}
 
 	if s.processDelay > 0 {
 		time.Sleep(s.processDelay)

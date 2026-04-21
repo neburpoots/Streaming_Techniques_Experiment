@@ -16,6 +16,7 @@ import (
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/app"
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/config"
 	pb "github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/pb"
+	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/transport"
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/workload"
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
@@ -49,6 +50,7 @@ type producerConfig struct {
 	failureAfterSeconds       int
 	pollInterval              time.Duration
 	maxSummaryWait            time.Duration
+	rabbitMQ                  transport.RabbitMQConfig
 }
 
 type producerDiagnostics struct {
@@ -276,10 +278,18 @@ func loadConfig() (*producerConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	transportMode := config.String("TRANSPORT_MODE", transport.ModeClientStreaming)
+	if !transport.IsSupportedMode(transportMode) {
+		return nil, fmt.Errorf("unsupported TRANSPORT_MODE %q (supported: %s)", transportMode, strings.Join(transport.SupportedModes(), ", "))
+	}
+	rabbitMQConfig, err := transport.LoadRabbitMQConfig()
+	if err != nil {
+		return nil, err
+	}
 
 	return &producerConfig{
 		runID:                     config.String("RUN_ID", fmt.Sprintf("grpc-stream-%d", time.Now().Unix())),
-		transportMode:             config.String("TRANSPORT_MODE", "client-streaming"),
+		transportMode:             transportMode,
 		workloadSource:            config.String("WORKLOAD_SOURCE", "synthetic"),
 		transformerAddr:           config.String("TRANSFORMER_ADDR", "localhost:50051"),
 		sinkAdminAddr:             config.String("SINK_ADMIN_ADDR", "localhost:50052"),
@@ -302,6 +312,7 @@ func loadConfig() (*producerConfig, error) {
 		failureAfterSeconds:       failureAfterSeconds,
 		pollInterval:              time.Duration(pollMillis) * time.Millisecond,
 		maxSummaryWait:            time.Duration(maxWaitSeconds) * time.Second,
+		rabbitMQ:                  rabbitMQConfig,
 	}, nil
 }
 
@@ -336,9 +347,113 @@ func runTransport(ctx context.Context, client pb.TransformerClient, cfg *produce
 	case "unary":
 		count, err := sendBulkUnary(ctx, client, cfg, limiter, payloadSource, diagnostics)
 		return nil, count, err
+	case transport.ModeRabbitMQStreams:
+		acks, err := sendBulkRabbitMQStreams(ctx, cfg, limiter, payloadSource, diagnostics)
+		return acks, 0, err
 	default:
 		return nil, 0, fmt.Errorf("unsupported TRANSPORT_MODE %q", cfg.transportMode)
 	}
+}
+
+func sendBulkRabbitMQStreams(ctx context.Context, cfg *producerConfig, limiter *rate.Limiter, payloadSource workload.Source, diagnostics *producerDiagnostics) ([]*pb.StreamAck, error) {
+	ackChan := make(chan *pb.StreamAck, cfg.concurrency)
+	errChan := make(chan error, cfg.concurrency)
+	var wg sync.WaitGroup
+
+	for worker := 0; worker < cfg.concurrency; worker++ {
+		worker := worker
+		workerSequences := make([]uint64, 0, int((cfg.expectedTotalMessages+uint64(cfg.concurrency)-1)/uint64(cfg.concurrency)))
+		for sequence := uint64(worker + 1); sequence <= cfg.expectedTotalMessages; sequence += uint64(cfg.concurrency) {
+			workerSequences = append(workerSequences, sequence)
+		}
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			publisher, err := openRabbitMQPublisher(ctx, cfg, worker, diagnostics, false, time.Time{})
+			if err != nil {
+				errChan <- fmt.Errorf("worker %d open rabbitmq publisher: %w", worker, err)
+				return
+			}
+			defer func() {
+				_ = publisher.Close()
+			}()
+
+			streamName := cfg.rabbitMQ.ProducerToTransformerRunWorkerStream(cfg.runID, worker)
+			var streamBytes uint64
+			nextIndex := 0
+
+			for nextIndex < len(workerSequences) {
+				sequence := workerSequences[nextIndex]
+				if limiter != nil {
+					if err := limiter.Wait(ctx); err != nil {
+						errChan <- fmt.Errorf("worker %d rate limit: %w", worker, err)
+						return
+					}
+				}
+
+				chunk := &pb.DataChunk{
+					RunId:             cfg.runID,
+					Sequence:          sequence,
+					ProducerWorker:    uint64(worker),
+					CreatedAtUnixNano: time.Now().UnixNano(),
+					Payload:           payloadSource.Payload(sequence),
+				}
+
+				attempt := 0
+				recoveryStartedAt := time.Time{}
+				for {
+					if err := publisher.PublishChunk(ctx, chunk); err == nil {
+						break
+					} else {
+						_ = publisher.Close()
+						if !canRetry(err, attempt, cfg.maxRetryAttempts) {
+							errChan <- fmt.Errorf("worker %d publish sequence %d to %s: %w", worker, sequence, streamName, err)
+							return
+						}
+						if recoveryStartedAt.IsZero() {
+							recoveryStartedAt = time.Now()
+						}
+						diagnostics.recordRetry()
+						attempt++
+						publisher, err = openRabbitMQPublisher(ctx, cfg, worker, diagnostics, true, recoveryStartedAt)
+						if err != nil {
+							errChan <- fmt.Errorf("worker %d reopen rabbitmq publisher after sequence %d failure: %w", worker, sequence, err)
+							return
+						}
+					}
+				}
+
+				streamBytes += uint64(len(chunk.GetPayload()))
+				nextIndex++
+			}
+
+			ackChan <- &pb.StreamAck{
+				RunId:              cfg.runID,
+				Stage:              "producer",
+				StreamMessages:     uint64(len(workerSequences)),
+				StreamBytes:        streamBytes,
+				FinishedAtUnixNano: time.Now().UnixNano(),
+			}
+		}()
+	}
+
+	wg.Wait()
+	close(ackChan)
+	close(errChan)
+
+	for err := range errChan {
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	acks := make([]*pb.StreamAck, 0, cfg.concurrency)
+	for ack := range ackChan {
+		acks = append(acks, ack)
+	}
+	return acks, nil
 }
 
 func sendBulkStreaming(ctx context.Context, client pb.TransformerClient, cfg *producerConfig, limiter *rate.Limiter, payloadSource workload.Source, diagnostics *producerDiagnostics) ([]*pb.StreamAck, error) {
@@ -550,6 +665,34 @@ func openStream(ctx context.Context, client pb.TransformerClient, cfg *producerC
 			return stream, nil
 		}
 		if !canRetry(err, attempt, cfg.maxRetryAttempts) {
+			return nil, err
+		}
+		diagnostics.recordRetry()
+		attempt++
+		if err := sleepWithContext(ctx, cfg.retryBackoff); err != nil {
+			return nil, err
+		}
+	}
+}
+
+func openRabbitMQPublisher(ctx context.Context, cfg *producerConfig, worker int, diagnostics *producerDiagnostics, reconnect bool, recoveryStartedAt time.Time) (*transport.RabbitMQStreamPublisher, error) {
+	attempt := 0
+	maxRetryAttempts := cfg.maxRetryAttempts
+	if !reconnect && maxRetryAttempts < 30 {
+		maxRetryAttempts = 30
+	}
+	for {
+		publisher, err := transport.NewRabbitMQStreamPublisher(cfg.rabbitMQ, cfg.rabbitMQ.ProducerToTransformerRunWorkerStream(cfg.runID, worker))
+		if err == nil {
+			if reconnect {
+				diagnostics.recordStreamReconnect()
+				if !recoveryStartedAt.IsZero() {
+					diagnostics.recordRecovery(time.Since(recoveryStartedAt))
+				}
+			}
+			return publisher, nil
+		}
+		if !canRetry(err, attempt, maxRetryAttempts) {
 			return nil, err
 		}
 		diagnostics.recordRetry()

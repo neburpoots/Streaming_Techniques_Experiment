@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grpc-stream-rabbitmq-config
+  namespace: streaming-experiments
+data:
+  rabbitmq.conf: |
+    stream.listeners.tcp.default = 5552
+    stream.advertised_host = grpc-stream-rabbitmq
+    stream.advertised_port = 5552

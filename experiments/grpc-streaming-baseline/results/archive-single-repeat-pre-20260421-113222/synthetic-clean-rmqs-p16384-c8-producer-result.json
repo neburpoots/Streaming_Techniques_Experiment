@@ -1,0 +1,101 @@
+{
+  "run_id": "synthetic-clean-rmqs-p16384-c8",
+  "transport_mode": "rabbitmq-streams",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 16384,
+  "concurrency": 8,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-19T14:13:31.178204774Z",
+  "producer_finished_at": "2026-04-19T14:14:31.51355816Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-clean-rmqs-p16384-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 40960000,
+      "finished_at_unix_nano": 1776608055366342100
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p16384-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 40960000,
+      "finished_at_unix_nano": 1776608055464114778
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p16384-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 40960000,
+      "finished_at_unix_nano": 1776608055467190194
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p16384-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 40960000,
+      "finished_at_unix_nano": 1776608055473833003
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p16384-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 40960000,
+      "finished_at_unix_nano": 1776608055476349436
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p16384-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 40960000,
+      "finished_at_unix_nano": 1776608055569879780
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p16384-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 40960000,
+      "finished_at_unix_nano": 1776608055581734022
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p16384-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 40960000,
+      "finished_at_unix_nano": 1776608055669221424
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-clean-rmqs-p16384-c8",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 327680000,
+    "duration_seconds": 60.122008014,
+    "throughput_messages_per_second": 332.65688656544546,
+    "throughput_megabytes_per_second": 5.197763852585085,
+    "p50_latency_ms": 13089.246653,
+    "p95_latency_ms": 16345.897957,
+    "p99_latency_ms": 16479.62882,
+    "max_latency_ms": 28261.207213,
+    "started_at_unix_nano": 1776608011240878101,
+    "finished_at_unix_nano": 1776608071272855880,
+    "transport_mode": "rabbitmq-streams",
+    "mean_inter_arrival_ms": 2.839534469523504,
+    "p95_inter_arrival_ms": 7.531201,
+    "inter_arrival_jitter_ms": 10.031148112999853
+  }
+}

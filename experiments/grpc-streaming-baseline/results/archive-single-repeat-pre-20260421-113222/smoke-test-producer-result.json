@@ -1,0 +1,42 @@
+{
+  "run_id": "smoke-test",
+  "profile": "bulk",
+  "expected_messages": 2000,
+  "payload_bytes": 1024,
+  "concurrency": 2,
+  "target_messages_per_second": 0,
+  "producer_started_at": "2026-04-03T17:48:44.366429131Z",
+  "producer_finished_at": "2026-04-03T17:48:44.431662023Z",
+  "stream_acks": [
+    {
+      "run_id": "smoke-test",
+      "stage": "transformer",
+      "stream_messages": 1000,
+      "stream_bytes": 1024000,
+      "finished_at_unix_nano": 1775238524430000275
+    },
+    {
+      "run_id": "smoke-test",
+      "stage": "transformer",
+      "stream_messages": 1000,
+      "stream_bytes": 1024000,
+      "finished_at_unix_nano": 1775238524429956866
+    }
+  ],
+  "sink_summary": {
+    "run_id": "smoke-test",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 2000,
+    "bytes_received": 2048000,
+    "duration_seconds": 0.107622757,
+    "throughput_messages_per_second": 18583.43026837716,
+    "throughput_megabytes_per_second": 18.14788112146207,
+    "p50_latency_ms": 8.885584,
+    "p95_latency_ms": 10.451345,
+    "p99_latency_ms": 11.162795,
+    "max_latency_ms": 11.317068,
+    "started_at_unix_nano": 1775238524412658503,
+    "finished_at_unix_nano": 1775238524429265490
+  }
+}

@@ -78,6 +78,9 @@ function Get-ContainerRole {
     if ($ContainerName -like 'grpc-streaming-baseline-sink-*') {
         return 'sink'
     }
+    if ($ContainerName -like 'grpc-streaming-baseline-rabbitmq-*') {
+        return 'rabbitmq'
+    }
 
     return $null
 }
@@ -128,6 +131,7 @@ function Get-RunResourceSummary {
             producer = $emptyRoleSummary
             transformer = $emptyRoleSummary
             sink = $emptyRoleSummary
+            rabbitmq = $emptyRoleSummary
         }
     }
 
@@ -135,6 +139,7 @@ function Get-RunResourceSummary {
         producer = (New-ResourceStatSummary)
         transformer = (New-ResourceStatSummary)
         sink = (New-ResourceStatSummary)
+        rabbitmq = (New-ResourceStatSummary)
     }
 
     Get-Content $statsPath | ForEach-Object {
@@ -161,7 +166,7 @@ function Get-RunResourceSummary {
     }
 
     $summary = @{}
-    foreach ($role in @('producer', 'transformer', 'sink')) {
+    foreach ($role in @('producer', 'transformer', 'sink', 'rabbitmq')) {
         $cpuStats = Get-StatsAggregate -Values $byRole[$role].cpu_values
         $memoryStats = Get-StatsAggregate -Values $byRole[$role].memory_values_mib
         $summary[$role] = [PSCustomObject]@{
@@ -177,6 +182,7 @@ function Get-RunResourceSummary {
         producer = $summary.producer
         transformer = $summary.transformer
         sink = $summary.sink
+        rabbitmq = $summary.rabbitmq
     }
 }
 
@@ -251,6 +257,11 @@ $rows = Get-ChildItem -Path $resolvedResultsDir -Filter '*-producer-result.json'
             sink_memory_avg_mib = $resourceSummary.sink.memory_avg_mib
             sink_memory_peak_mib = $resourceSummary.sink.memory_peak_mib
             sink_samples = $resourceSummary.sink.samples
+            rabbitmq_cpu_avg_pct = $resourceSummary.rabbitmq.cpu_avg_pct
+            rabbitmq_cpu_peak_pct = $resourceSummary.rabbitmq.cpu_peak_pct
+            rabbitmq_memory_avg_mib = $resourceSummary.rabbitmq.memory_avg_mib
+            rabbitmq_memory_peak_mib = $resourceSummary.rabbitmq.memory_peak_mib
+            rabbitmq_samples = $resourceSummary.rabbitmq.samples
         }
     } |
     Where-Object { $_ -ne $null } |

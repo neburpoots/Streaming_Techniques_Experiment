@@ -1,0 +1,17 @@
+{
+  "run_id": "smoke-csv",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 500,
+  "bytes_received": 484376,
+  "duration_seconds": 0.05417737,
+  "throughput_messages_per_second": 9228.945591120424,
+  "throughput_megabytes_per_second": 8.526381968773931,
+  "p50_latency_ms": 5.734461,
+  "p95_latency_ms": 8.305175,
+  "p99_latency_ms": 8.74136,
+  "max_latency_ms": 8.743981,
+  "started_at_unix_nano": 1775314696934137683,
+  "finished_at_unix_nano": 1775314696939539522,
+  "transport_mode": "client-streaming"
+}

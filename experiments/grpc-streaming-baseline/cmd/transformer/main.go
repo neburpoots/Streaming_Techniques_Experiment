@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/sha256"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -14,10 +15,22 @@ import (
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/config"
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/metrics"
 	pb "github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/pb"
+	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/transport"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+type transformerConfig struct {
+	listenAddr    string
+	metricsAddr   string
+	sinkAddr      string
+	runID         string
+	transportMode string
+	workIters     int
+	concurrency   int
+	rabbitMQ      transport.RabbitMQConfig
+}
 
 type transformerServer struct {
 	pb.UnimplementedTransformerServer
@@ -35,12 +48,9 @@ type transformerMetrics struct {
 }
 
 func main() {
-	listenAddr := config.String("LISTEN_ADDR", ":50051")
-	metricsAddr := config.String("METRICS_ADDR", ":9101")
-	sinkAddr := config.String("SINK_ADDR", "sink:50052")
-	workIters, err := config.Int("TRANSFORMER_WORK_ITERATIONS", 0)
+	cfg, err := loadConfig()
 	if err != nil {
-		log.Fatalf("invalid TRANSFORMER_WORK_ITERATIONS: %v", err)
+		log.Fatalf("load config: %v", err)
 	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -73,38 +83,76 @@ func main() {
 	registry.MustRegister(serverMetrics.messages, serverMetrics.bytes, serverMetrics.streams, serverMetrics.unary, serverMetrics.workNanos)
 
 	go func() {
-		if err := metrics.Serve(ctx, metricsAddr, registry); err != nil {
+		if err := metrics.Serve(ctx, cfg.metricsAddr, registry); err != nil {
 			log.Fatalf("metrics server: %v", err)
 		}
 	}()
 
-	conn, err := grpc.NewClient(sinkAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(cfg.sinkAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("connect sink %s: %v", sinkAddr, err)
+		log.Fatalf("connect sink %s: %v", cfg.sinkAddr, err)
 	}
 	defer conn.Close()
 
-	listener, err := net.Listen("tcp", listenAddr)
+	listener, err := net.Listen("tcp", cfg.listenAddr)
 	if err != nil {
-		log.Fatalf("listen %s: %v", listenAddr, err)
+		log.Fatalf("listen %s: %v", cfg.listenAddr, err)
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterTransformerServer(grpcServer, &transformerServer{
+	server := &transformerServer{
 		sinkClient: pb.NewSinkClient(conn),
 		metrics:    serverMetrics,
-		workIters:  workIters,
-	})
+		workIters:  cfg.workIters,
+	}
+	pb.RegisterTransformerServer(grpcServer, server)
+
+	if cfg.transportMode == transport.ModeRabbitMQStreams {
+		startRabbitMQBridge(ctx, server, cfg)
+	}
 
 	go func() {
 		<-ctx.Done()
 		grpcServer.GracefulStop()
 	}()
 
-	log.Printf("transformer listening on %s, forwarding to %s", listenAddr, sinkAddr)
+	log.Printf("transformer listening on %s, forwarding to %s via %s", cfg.listenAddr, cfg.sinkAddr, cfg.transportMode)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("serve gRPC: %v", err)
 	}
+}
+
+func loadConfig() (*transformerConfig, error) {
+	workIters, err := config.Int("TRANSFORMER_WORK_ITERATIONS", 0)
+	if err != nil {
+		return nil, fmt.Errorf("invalid TRANSFORMER_WORK_ITERATIONS: %w", err)
+	}
+	concurrency, err := config.Int("CONCURRENCY", 1)
+	if err != nil {
+		return nil, fmt.Errorf("invalid CONCURRENCY: %w", err)
+	}
+	if concurrency <= 0 {
+		return nil, fmt.Errorf("CONCURRENCY must be positive")
+	}
+	transportMode := config.String("TRANSPORT_MODE", transport.ModeClientStreaming)
+	if !transport.IsSupportedMode(transportMode) {
+		return nil, fmt.Errorf("unsupported TRANSPORT_MODE %q", transportMode)
+	}
+	rabbitMQConfig, err := transport.LoadRabbitMQConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return &transformerConfig{
+		listenAddr:    config.String("LISTEN_ADDR", ":50051"),
+		metricsAddr:   config.String("METRICS_ADDR", ":9101"),
+		sinkAddr:      config.String("SINK_ADDR", "sink:50052"),
+		runID:         config.String("RUN_ID", "grpc-stream-local"),
+		transportMode: transportMode,
+		workIters:     workIters,
+		concurrency:   concurrency,
+		rabbitMQ:      rabbitMQConfig,
+	}, nil
 }
 
 func (s *transformerServer) Push(stream pb.Transformer_PushServer) error {

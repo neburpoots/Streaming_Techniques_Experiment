@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-stream-p4096-c4-rep2",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 81920000,
+  "duration_seconds": 0.573031191,
+  "throughput_messages_per_second": 34902.11408055796,
+  "throughput_megabytes_per_second": 136.33638312717954,
+  "p50_latency_ms": 34.46511,
+  "p95_latency_ms": 87.131372,
+  "p99_latency_ms": 95.481014,
+  "max_latency_ms": 98.144848,
+  "started_at_unix_nano": 1776719492502742797,
+  "finished_at_unix_nano": 1776719493031448569,
+  "transport_mode": "client-streaming",
+  "mean_inter_arrival_ms": 0.026436610430521555,
+  "p95_inter_arrival_ms": 0.012833,
+  "inter_arrival_jitter_ms": 0.7320122797603592
+}

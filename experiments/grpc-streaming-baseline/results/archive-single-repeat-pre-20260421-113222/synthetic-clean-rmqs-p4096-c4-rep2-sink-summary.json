@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-rmqs-p4096-c4-rep2",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 81920000,
+  "duration_seconds": 41.525048211,
+  "throughput_messages_per_second": 481.63700854420665,
+  "throughput_megabytes_per_second": 1.8813945646258072,
+  "p50_latency_ms": 194.845674,
+  "p95_latency_ms": 386.333947,
+  "p99_latency_ms": 476.321193,
+  "max_latency_ms": 19154.729321,
+  "started_at_unix_nano": 1776721020157645193,
+  "finished_at_unix_nano": 1776721061603421477,
+  "transport_mode": "rabbitmq-streams",
+  "mean_inter_arrival_ms": 1.936265662883131,
+  "p95_inter_arrival_ms": 2.429624,
+  "inter_arrival_jitter_ms": 8.774028272083564
+}

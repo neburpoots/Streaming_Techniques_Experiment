@@ -1,0 +1,101 @@
+{
+  "run_id": "synthetic-continuous-stream-p1024-c8",
+  "transport_mode": "client-streaming",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "continuous",
+  "expected_messages": 20000,
+  "payload_bytes": 1024,
+  "concurrency": 8,
+  "target_messages_per_second": 1000,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-17T10:08:14.010609139Z",
+  "producer_finished_at": "2026-04-17T10:08:33.034286432Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c8",
+      "stage": "transformer",
+      "stream_messages": 2500,
+      "stream_bytes": 2560000,
+      "finished_at_unix_nano": 1776420512894007390
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c8",
+      "stage": "transformer",
+      "stream_messages": 2500,
+      "stream_bytes": 2560000,
+      "finished_at_unix_nano": 1776420512903563089
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c8",
+      "stage": "transformer",
+      "stream_messages": 2500,
+      "stream_bytes": 2560000,
+      "finished_at_unix_nano": 1776420512919808529
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c8",
+      "stage": "transformer",
+      "stream_messages": 2500,
+      "stream_bytes": 2560000,
+      "finished_at_unix_nano": 1776420512997879461
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c8",
+      "stage": "transformer",
+      "stream_messages": 2500,
+      "stream_bytes": 2560000,
+      "finished_at_unix_nano": 1776420513007373193
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c8",
+      "stage": "transformer",
+      "stream_messages": 2500,
+      "stream_bytes": 2560000,
+      "finished_at_unix_nano": 1776420513022603975
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c8",
+      "stage": "transformer",
+      "stream_messages": 2500,
+      "stream_bytes": 2560000,
+      "finished_at_unix_nano": 1776420513028136332
+    },
+    {
+      "run_id": "synthetic-continuous-stream-p1024-c8",
+      "stage": "transformer",
+      "stream_messages": 2500,
+      "stream_bytes": 2560000,
+      "finished_at_unix_nano": 1776420513033666123
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-continuous-stream-p1024-c8",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 20480000,
+    "duration_seconds": 19.046498348,
+    "throughput_messages_per_second": 1050.0617822015627,
+    "throughput_megabytes_per_second": 1.0254509591812135,
+    "p50_latency_ms": 0.252633,
+    "p95_latency_ms": 12.011815,
+    "p99_latency_ms": 22.784114,
+    "max_latency_ms": 26.380839,
+    "started_at_unix_nano": 1776420494046012543,
+    "finished_at_unix_nano": 1776420513031134565,
+    "transport_mode": "client-streaming",
+    "mean_inter_arrival_ms": 0.9493035662783099,
+    "p95_inter_arrival_ms": 1.508374,
+    "inter_arrival_jitter_ms": 0.6622385105340514
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "run_id": "synthetic-recovery-stream-p4096-c8",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 81920000,
+  "duplicates": 9774,
+  "duration_seconds": 16.662359883,
+  "throughput_messages_per_second": 1200.3101685737367,
+  "throughput_megabytes_per_second": 4.688711595991159,
+  "p50_latency_ms": 0.257584,
+  "p95_latency_ms": 8.088758,
+  "p99_latency_ms": 30.368154,
+  "max_latency_ms": 14561.652107,
+  "started_at_unix_nano": 1776421711629080515,
+  "finished_at_unix_nano": 1776421728229689890,
+  "transport_mode": "client-streaming",
+  "mean_inter_arrival_ms": 0.4660010536391992,
+  "p95_inter_arrival_ms": 1.4663,
+  "inter_arrival_jitter_ms": 0.6388712006996855
+}

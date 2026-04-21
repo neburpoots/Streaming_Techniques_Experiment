@@ -12,11 +12,12 @@ set -euo pipefail
 #
 # Presets:
 #   synthetic-clean, csv-replay-check, synthetic-continuous,
-#   synthetic-backpressure, synthetic-recovery
+#   synthetic-backpressure, synthetic-recovery, rabbitmq-smoke
 #
 # Options:
 #   --overlay <name>    Kustomize overlay to use (default: resource-medium)
 #   --repeat <n>        Number of repetitions per case (default: 1)
+#   --transport <mode>  Transport filter: all, client-streaming, unary, rabbitmq-streams
 #   --skip-build        Skip container image build
 #   --skip-load         Skip image load into cluster (kind)
 #   --namespace <ns>    Kubernetes namespace (default: streaming-experiments)
@@ -32,6 +33,7 @@ AGGREGATE_SCRIPT="${ROOT}/scripts/aggregate-repeat-results.ps1"
 PRESET=""
 OVERLAY="resource-medium"
 REPEAT=1
+TRANSPORT_FILTER="all"
 SKIP_BUILD=false
 SKIP_LOAD=false
 NAMESPACE="streaming-experiments"
@@ -42,6 +44,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --overlay)    OVERLAY="$2"; shift 2 ;;
         --repeat)     REPEAT="$2"; shift 2 ;;
+        --transport)  TRANSPORT_FILTER="$2"; shift 2 ;;
         --skip-build) SKIP_BUILD=true; shift ;;
         --skip-load)  SKIP_LOAD=true; shift ;;
         --namespace)  NAMESPACE="$2"; shift 2 ;;
@@ -67,11 +70,66 @@ done
 
 if [[ -z "${PRESET}" ]]; then
     echo "Usage: $0 <preset> [options]" >&2
-    echo "Presets: synthetic-clean, csv-replay-check, synthetic-continuous, synthetic-backpressure, synthetic-recovery" >&2
+    echo "Presets: synthetic-clean, csv-replay-check, synthetic-continuous, synthetic-backpressure, synthetic-recovery, rabbitmq-smoke" >&2
     exit 1
 fi
 
 mkdir -p "${RESULTS_DIR}"
+
+validate_transport_filter() {
+    case "${TRANSPORT_FILTER}" in
+        all|client-streaming|unary|rabbitmq-streams) ;;
+        *)
+            echo "Invalid --transport value: ${TRANSPORT_FILTER}" >&2
+            echo "Expected one of: all, client-streaming, unary, rabbitmq-streams" >&2
+            exit 1
+            ;;
+    esac
+}
+
+selected_transport_modes() {
+    case "${TRANSPORT_FILTER}" in
+        all) echo "client-streaming unary rabbitmq-streams" ;;
+        *) echo "${TRANSPORT_FILTER}" ;;
+    esac
+}
+
+validate_transport_filter
+
+POWERSHELL_EXE="/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+
+run_export_powershell() {
+    local script_path="$1"
+    shift
+
+    if command -v pwsh &>/dev/null; then
+        pwsh -File "${script_path}" "$@"
+        return
+    fi
+
+    if [[ -x "${POWERSHELL_EXE}" ]] && command -v wslpath &>/dev/null; then
+        local windows_script
+        windows_script="$(wslpath -w "${script_path}")"
+
+        local translated_args=()
+        local arg=""
+        for arg in "$@"; do
+            case "${arg}" in
+                /*)
+                    translated_args+=("$(wslpath -w "${arg}")")
+                    ;;
+                *)
+                    translated_args+=("${arg}")
+                    ;;
+            esac
+        done
+
+        "${POWERSHELL_EXE}" -NoProfile -ExecutionPolicy Bypass -File "${windows_script}" "${translated_args[@]}"
+        return
+    fi
+
+    return 1
+}
 
 # ── Image build and load ──
 
@@ -161,23 +219,52 @@ patch_configmap() {
         --from-literal=FAILURE_ACTION="${failure_action}" \
         --from-literal=FAILURE_TARGET="${failure_target}" \
         --from-literal=FAILURE_AFTER_SECONDS="${failure_after}" \
+        --from-literal=RABBITMQ_HOST="${RABBITMQ_HOST:-grpc-stream-rabbitmq}" \
+        --from-literal=RABBITMQ_AMQP_PORT="${RABBITMQ_AMQP_PORT:-5672}" \
+        --from-literal=RABBITMQ_STREAM_PORT="${RABBITMQ_STREAM_PORT:-5552}" \
+        --from-literal=RABBITMQ_MANAGEMENT_PORT="${RABBITMQ_MANAGEMENT_PORT:-15672}" \
+        --from-literal=RABBITMQ_USER="${RABBITMQ_USER:-guest}" \
+        --from-literal=RABBITMQ_PASSWORD="${RABBITMQ_PASSWORD:-guest}" \
+        --from-literal=RABBITMQ_VHOST="${RABBITMQ_VHOST:-/}" \
+        --from-literal=RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM="${RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM:-producer-to-transformer}" \
+        --from-literal=RABBITMQ_TRANSFORMER_TO_SINK_STREAM="${RABBITMQ_TRANSFORMER_TO_SINK_STREAM:-transformer-to-sink}" \
         --dry-run=client -o yaml | kubectl apply -f -
 }
 
 # ── Wait for deployments to be ready ──
+wait_for_rabbitmq_ready() {
+    echo "  Waiting for RabbitMQ to be ready..."
+    kubectl rollout status deployment/grpc-stream-rabbitmq -n "${NAMESPACE}" --timeout=120s
+
+    local rabbitmq_pod=""
+    for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+        rabbitmq_pod="$(kubectl get pods -n "${NAMESPACE}" -l app=grpc-stream-rabbitmq -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
+        if [[ -n "${rabbitmq_pod}" ]] && kubectl exec -n "${NAMESPACE}" "${rabbitmq_pod}" -- rabbitmq-diagnostics -q ping >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep 2
+    done
+
+    echo "  Warning: RabbitMQ did not report ready state before the producer job started" >&2
+}
+
 wait_for_ready() {
+    local transport_mode="${1:-client-streaming}"
     echo "  Waiting for sink and transformer to be ready..."
     kubectl rollout status deployment/grpc-stream-sink -n "${NAMESPACE}" --timeout=120s
     kubectl rollout status deployment/grpc-stream-transformer -n "${NAMESPACE}" --timeout=120s
-    # Additional health check via port-forward is not needed; rollout status confirms readiness
+    if [[ "${transport_mode}" == "rabbitmq-streams" ]]; then
+        wait_for_rabbitmq_ready
+    fi
     sleep 2
 }
 
 # ── Restart deployments to pick up new ConfigMap values ──
 restart_deployments() {
+    local transport_mode="${1:-client-streaming}"
     kubectl rollout restart deployment/grpc-stream-sink -n "${NAMESPACE}"
     kubectl rollout restart deployment/grpc-stream-transformer -n "${NAMESPACE}"
-    wait_for_ready
+    wait_for_ready "${transport_mode}"
 }
 
 wait_for_metrics_ready() {
@@ -205,6 +292,13 @@ copy_results_from_pvc() {
 
     # Create a temporary pod to access the PVC
     local helper_pod="results-helper-${run_id//[^a-zA-Z0-9-]/-}"
+    kubectl delete pod "${helper_pod}" -n "${NAMESPACE}" --ignore-not-found=true --grace-period=0 --force >/dev/null 2>&1 || true
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+        if ! kubectl get pod "${helper_pod}" -n "${NAMESPACE}" >/dev/null 2>&1; then
+            break
+        fi
+        sleep 1
+    done
     kubectl run "${helper_pod}" -n "${NAMESPACE}" \
         --image=busybox:latest \
         --restart=Never \
@@ -227,7 +321,7 @@ copy_results_from_pvc() {
                 }]
             }
         }' \
-        2>/dev/null
+        >/dev/null 2>&1
 
     kubectl wait --for=condition=Ready pod/"${helper_pod}" -n "${NAMESPACE}" --timeout=60s
 
@@ -252,7 +346,7 @@ copy_results_from_pvc() {
     done
 
     # Clean up helper pod
-    kubectl delete pod "${helper_pod}" -n "${NAMESPACE}" --grace-period=0 --force 2>/dev/null || true
+    kubectl delete pod "${helper_pod}" -n "${NAMESPACE}" --ignore-not-found=true --grace-period=0 --force >/dev/null 2>&1 || true
 }
 
 # ── Failure injection ──
@@ -312,7 +406,7 @@ run_case() {
         "${dataset_files}" "${dataset_rows_per_msg}" "${dataset_repeat}"
 
     # 2. Restart deployments to pick up new ConfigMap
-    restart_deployments
+    restart_deployments "${transport_mode}"
     wait_for_metrics_ready
 
     # 3. Delete any previous producer job
@@ -362,7 +456,7 @@ run_case() {
 # ── Matrix definitions (matching run-matrix.ps1) ──
 
 run_synthetic_clean() {
-    for transport_mode in client-streaming unary; do
+    for transport_mode in $(selected_transport_modes); do
         local ts; ts=$(transport_short "${transport_mode}")
         for payload in 256 1024 4096 16384; do
             for conc in 1 4 8 16; do
@@ -374,21 +468,21 @@ run_synthetic_clean() {
 }
 
 run_csv_replay_check() {
-    for transport_mode in client-streaming unary; do
+    for transport_mode in $(selected_transport_modes); do
         local ts; ts=$(transport_short "${transport_mode}")
         for rows in 25 100; do
             for conc in 1 8; do
                 run_case "csv-replay-check-${ts}-r${rows}-c${conc}" \
                     "${transport_mode}" "csv-replay" "bulk" "10000" "1024" "${conc}" "0" \
                     "0" "0" "0" "500" "" "" "0" \
-                    "Personen.csv,Aanstellingen.csv" "${rows}" "10"
+                    "Personen_test.csv,Aanstellingen_test.csv" "${rows}" "10"
             done
         done
     done
 }
 
 run_synthetic_continuous() {
-    for transport_mode in client-streaming unary; do
+    for transport_mode in $(selected_transport_modes); do
         local ts; ts=$(transport_short "${transport_mode}")
         for conc in 4 8; do
             run_case "synthetic-continuous-${ts}-p1024-c${conc}" \
@@ -398,7 +492,7 @@ run_synthetic_continuous() {
 }
 
 run_synthetic_backpressure() {
-    for transport_mode in client-streaming unary; do
+    for transport_mode in $(selected_transport_modes); do
         local ts; ts=$(transport_short "${transport_mode}")
         run_case "synthetic-backpressure-${ts}-p1024-c8" \
             "${transport_mode}" "synthetic" "continuous" "20000" "1024" "8" "4000" \
@@ -407,7 +501,7 @@ run_synthetic_backpressure() {
 }
 
 run_synthetic_recovery() {
-    for transport_mode in client-streaming unary; do
+    for transport_mode in $(selected_transport_modes); do
         local ts; ts=$(transport_short "${transport_mode}")
         run_case "synthetic-recovery-${ts}-p4096-c8" \
             "${transport_mode}" "synthetic" "continuous" "20000" "4096" "8" "2000" \
@@ -415,12 +509,19 @@ run_synthetic_recovery() {
     done
 }
 
+run_rabbitmq_smoke() {
+    run_case "rabbitmq-smoke-rmqs-p1024-c4" \
+        "rabbitmq-streams" "synthetic" "continuous" "4000" "1024" "4" "500" \
+        "0" "0" "5" "500" "" "" "0"
+}
+
 transport_short() {
-    if [[ "$1" == "client-streaming" ]]; then
-        echo "stream"
-    else
-        echo "unary"
-    fi
+    case "$1" in
+        client-streaming) echo "stream" ;;
+        unary) echo "unary" ;;
+        rabbitmq-streams) echo "rmqs" ;;
+        *) echo "$1" ;;
+    esac
 }
 
 # ── Main ──
@@ -432,11 +533,29 @@ if [[ "${PRESET}" == "csv-replay-check" ]]; then
     DATASETS_DIR="${ROOT}/../../datasets"
     if [[ -d "${DATASETS_DIR}" ]]; then
         echo "Creating datasets ConfigMap..."
+        DATASET_PERSONEN_SOURCE="${DATASETS_DIR}/Personen_test.csv"
+        DATASET_AANSTELLINGEN_SOURCE="${DATASETS_DIR}/Aanstellingen_test.csv"
+        if [[ ! -f "${DATASET_PERSONEN_SOURCE}" || ! -f "${DATASET_AANSTELLINGEN_SOURCE}" ]]; then
+            echo "Warning: test CSV datasets not found; falling back to full datasets" >&2
+            DATASET_PERSONEN_SOURCE="${DATASETS_DIR}/Personen.csv"
+            DATASET_AANSTELLINGEN_SOURCE="${DATASETS_DIR}/Aanstellingen.csv"
+        fi
+
+        DATASET_TMP_DIR="$(mktemp -d)"
+        DATASET_PERSONEN="${DATASET_TMP_DIR}/Personen_test.csv"
+        DATASET_AANSTELLINGEN="${DATASET_TMP_DIR}/Aanstellingen_test.csv"
+        set +o pipefail
+        tr '\r' '\n' < "${DATASET_PERSONEN_SOURCE}" | head -n 2501 > "${DATASET_PERSONEN}"
+        tr '\r' '\n' < "${DATASET_AANSTELLINGEN_SOURCE}" | head -n 2501 > "${DATASET_AANSTELLINGEN}"
+        set -o pipefail
+
+        kubectl delete configmap experiment-datasets -n "${NAMESPACE}" --ignore-not-found=true >/dev/null 2>&1 || true
         kubectl create configmap experiment-datasets \
             -n "${NAMESPACE}" \
-            --from-file="${DATASETS_DIR}/Personen.csv" \
-            --from-file="${DATASETS_DIR}/Aanstellingen.csv" \
-            --dry-run=client -o yaml | kubectl apply -f -
+            --from-file="${DATASET_PERSONEN}" \
+            --from-file="${DATASET_AANSTELLINGEN}"
+
+        rm -rf "${DATASET_TMP_DIR}"
     else
         echo "Warning: datasets directory not found at ${DATASETS_DIR}" >&2
     fi
@@ -450,7 +569,7 @@ kubectl delete job grpc-stream-producer -n "${NAMESPACE}" --ignore-not-found=tru
 
 wait_for_ready
 
-echo "Starting preset: ${PRESET} (overlay: ${OVERLAY}, repeat: ${REPEAT})"
+echo "Starting preset: ${PRESET} (overlay: ${OVERLAY}, repeat: ${REPEAT}, transport: ${TRANSPORT_FILTER})"
 
 for ((r = 1; r <= REPEAT; r++)); do
     if [[ "${REPEAT}" -gt 1 ]]; then
@@ -466,6 +585,7 @@ for ((r = 1; r <= REPEAT; r++)); do
         synthetic-continuous)  run_synthetic_continuous ;;
         synthetic-backpressure) run_synthetic_backpressure ;;
         synthetic-recovery)    run_synthetic_recovery ;;
+        rabbitmq-smoke)        run_rabbitmq_smoke ;;
         *)
             echo "Unknown preset: ${PRESET}" >&2
             exit 1
@@ -475,17 +595,18 @@ done
 
 # Export summary CSV
 echo "Exporting summary CSV..."
-if command -v pwsh &>/dev/null; then
-    pwsh -File "${EXPORT_SCRIPT}" -ResultsDir "${RESULTS_DIR}" -RunIdPrefix "${PRESET}" \
-        -OutputPath "${RESULTS_DIR}/${PRESET}-summary.csv"
+if run_export_powershell "${EXPORT_SCRIPT}" \
+    -ResultsDir "${RESULTS_DIR}" \
+    -RunIdPrefix "${PRESET}" \
+    -OutputPath "${RESULTS_DIR}/${PRESET}-summary.csv"; then
     if [[ "${REPEAT}" -gt 1 && -f "${AGGREGATE_SCRIPT}" ]]; then
-        pwsh -File "${AGGREGATE_SCRIPT}" \
+        run_export_powershell "${AGGREGATE_SCRIPT}" \
             -SummaryPath "${RESULTS_DIR}/${PRESET}-summary.csv" \
             -OutputPath "${RESULTS_DIR}/${PRESET}-summary-aggregated.csv"
     fi
 else
-    echo "PowerShell (pwsh) not found; skipping CSV export."
-    echo "Run manually: pwsh ${EXPORT_SCRIPT} -ResultsDir ${RESULTS_DIR} -RunIdPrefix ${PRESET}"
+    echo "PowerShell not found; skipping CSV export."
+    echo "Run manually with pwsh or powershell.exe for ${EXPORT_SCRIPT}"
 fi
 
 echo "Finished preset: ${PRESET}"

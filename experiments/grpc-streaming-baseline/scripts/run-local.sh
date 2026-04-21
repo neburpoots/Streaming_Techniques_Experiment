@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUN_ID="${RUN_ID:-grpc-stream-$(date +%s)}"
+export RUN_ID
 
 cleanup() {
   if [[ -n "${FAILURE_PID:-}" ]]; then
@@ -16,12 +17,19 @@ cleanup() {
 trap cleanup EXIT
 
 pushd "${ROOT}" >/dev/null
-docker compose up -d sink transformer
+docker compose up -d sink transformer rabbitmq
 
 until curl -fsS http://localhost:9101/healthz >/dev/null && curl -fsS http://localhost:9102/healthz >/dev/null; do
   printf 'waiting for transformer and sink to become ready\n'
   sleep 1
 done
+
+if [[ "${TRANSPORT_MODE:-client-streaming}" == "rabbitmq-streams" ]]; then
+  until docker compose exec -T rabbitmq rabbitmq-diagnostics -q ping >/dev/null 2>&1; do
+    printf 'waiting for rabbitmq to become ready\n'
+    sleep 1
+  done
+fi
 
 INTERVAL_SECONDS=1 "${ROOT}/scripts/collect-docker-stats.sh" "${ROOT}/results/${RUN_ID}-docker-stats.ndjson" &
 STATS_PID=$!

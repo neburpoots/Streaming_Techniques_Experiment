@@ -4,6 +4,9 @@ namespace: streaming-experiments
 resources:
   - namespace.yaml
   - configmap.yaml
+  - rabbitmq-stream-configmap.yaml
+  - rabbitmq-deployment.yaml
+  - rabbitmq-service.yaml
   - results-pvc.yaml
   - sink-deployment.yaml
   - sink-service.yaml

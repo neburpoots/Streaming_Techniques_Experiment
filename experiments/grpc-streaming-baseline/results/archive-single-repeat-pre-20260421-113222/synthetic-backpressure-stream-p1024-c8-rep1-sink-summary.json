@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-backpressure-stream-p1024-c8-rep1",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 20480000,
+  "duration_seconds": 8.601146028,
+  "throughput_messages_per_second": 2325.271531827549,
+  "throughput_megabytes_per_second": 2.270772980300341,
+  "p50_latency_ms": 1597.29869,
+  "p95_latency_ms": 4415.421453,
+  "p99_latency_ms": 4556.749592,
+  "max_latency_ms": 9151.66504,
+  "started_at_unix_nano": 1776102692359465657,
+  "finished_at_unix_nano": 1776102700900852920,
+  "transport_mode": "client-streaming",
+  "mean_inter_arrival_ms": 0.2907670399019935,
+  "p95_inter_arrival_ms": 2.092199,
+  "inter_arrival_jitter_ms": 0.6501803840533565
+}

@@ -74,37 +74,40 @@
 \newlabel{fig:phase1-scenario-placeholder}{{1}{7}{}{figure.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Average throughput for the gRPC baseline, split by workload family and transport mode. Client-streaming sustains substantially higher throughput than unary gRPC in both workload families.}}{8}{}\protected@file@percent }
 \newlabel{fig:grpc-preliminary-throughput}{{2}{8}{}{figure.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Focused gRPC continuous-stream jitter scenario averaged over three Kubernetes repetitions.}}{8}{}\protected@file@percent }
-\newlabel{tab:grpc-continuous-results}{{III}{8}{}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces RabbitMQ streams pilot results averaged over the completed Kubernetes baseline matrices.}}{8}{}\protected@file@percent }
+\newlabel{tab:rabbitmq-preliminary-results}{{III}{8}{}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Synthetic bulk-transfer throughput by message size, averaged across concurrency levels 1--16 (Docker Compose, single runs).}}{8}{}\protected@file@percent }
+\newlabel{tab:grpc-per-size}{{IV}{8}{}{table.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Focused continuous-stream scenario averaged over three Kubernetes repetitions.}}{8}{}\protected@file@percent }
+\newlabel{tab:grpc-continuous-results}{{V}{8}{}{table.5}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}4}Focused stress scenarios}{8}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}4a}Continuous steady-rate scenario.}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Focused gRPC backpressure scenario with an intentionally slow sink, averaged over three Kubernetes repetitions.}}{8}{}\protected@file@percent }
-\newlabel{tab:grpc-backpressure-results}{{IV}{8}{}{table.4}{}}
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}4b}Slow-consumer backpressure scenario.}{8}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}4c}Forced-restart recovery scenario.}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Focused gRPC recovery scenario with a forced transformer restart, averaged over three Kubernetes repetitions.}}{9}{}\protected@file@percent }
-\newlabel{tab:grpc-recovery-results}{{V}{9}{}{table.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}5}Discussion}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Threats to Validity}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0a}Internal validity.}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0b}External validity.}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0c}Construct validity.}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Planned: Cross-Technology Benchmark Comparison}{10}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Planned: Architectural Integration Design}{10}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Planned: System-Level Evaluation}{10}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{10}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{Appendix}{10}{}\protected@file@percent }
-\newlabel{app:presets}{{A}{10}{}{section.Appendix.A}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Benchmark presets used in the current gRPC study.}}{10}{}\protected@file@percent }
-\newlabel{tab:appendix-presets}{{VI}{10}{}{table.6}{}}
-\newlabel{app:run-matrix}{{A}{10}{}{table.6}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Execution scope of the current benchmark corpus.}}{10}{}\protected@file@percent }
-\newlabel{tab:appendix-run-scope}{{VII}{10}{}{table.7}{}}
-\newlabel{app:resource-details}{{A}{10}{}{table.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Focused backpressure scenario with an intentionally slow sink, averaged over three Kubernetes repetitions.}}{9}{}\protected@file@percent }
+\newlabel{tab:grpc-backpressure-results}{{VI}{9}{}{table.6}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}4b}Slow-consumer backpressure scenario.}{9}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Focused recovery scenario with a forced transformer restart, averaged over three Kubernetes repetitions.}}{9}{}\protected@file@percent }
+\newlabel{tab:grpc-recovery-results}{{VII}{9}{}{table.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-F}4c}Forced-restart recovery scenario.}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}5}Discussion}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Threats to Validity}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0a}Internal validity.}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0b}External validity.}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-G}0c}Construct validity.}{10}{}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{stutterheim2023thesis}{1}
 \bibcite{stutterheim2023icsa}{2}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Planned: Cross-Technology Benchmark Comparison}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Planned: Architectural Integration Design}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Planned: System-Level Evaluation}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Appendix}{11}{}\protected@file@percent }
+\newlabel{app:presets}{{A}{11}{}{section.Appendix.A}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Benchmark presets used in the current transport study.}}{11}{}\protected@file@percent }
+\newlabel{tab:appendix-presets}{{VIII}{11}{}{table.8}{}}
+\newlabel{app:run-matrix}{{A}{11}{}{table.8}{}}
+\newlabel{app:resource-details}{{A}{11}{}{table.9}{}}
+\@writefile{toc}{\contentsline {section}{References}{11}{}\protected@file@percent }
 \bibcite{starck2023streaminglb}{3}
 \bibcite{sodankoor2026grpcbench}{4}
 \bibcite{ibrahim2026brokers}{5}
@@ -132,11 +135,12 @@
 \bibcite{nats2026jetstream}{27}
 \bibcite{karimov2018benchmarking}{28}
 \bibcite{Henning2021ScalabilityMetrics}{29}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Continuous scenario CPU usage by role (avg./peak \%).}}{11}{}\protected@file@percent }
-\newlabel{tab:appendix-continuous-cpu}{{VIII}{11}{}{table.8}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Recovery scenario CPU usage by role (avg./peak \%).}}{11}{}\protected@file@percent }
-\newlabel{tab:appendix-recovery-cpu}{{IX}{11}{}{table.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Recovery scenario memory usage by role (avg./peak MiB).}}{11}{}\protected@file@percent }
-\newlabel{tab:appendix-recovery-memory}{{X}{11}{}{table.10}{}}
-\@writefile{toc}{\contentsline {section}{References}{11}{}\protected@file@percent }
-\gdef \@abspage@last{12}
+\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Execution scope of the current benchmark corpus.}}{12}{}\protected@file@percent }
+\newlabel{tab:appendix-run-scope}{{IX}{12}{}{table.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Continuous scenario CPU usage by role (avg./peak \%).}}{12}{}\protected@file@percent }
+\newlabel{tab:appendix-continuous-cpu}{{X}{12}{}{table.10}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XI}{\ignorespaces Recovery scenario CPU usage by role (avg./peak \%).}}{12}{}\protected@file@percent }
+\newlabel{tab:appendix-recovery-cpu}{{XI}{12}{}{table.11}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XII}{\ignorespaces Recovery scenario memory usage by role (avg./peak MiB).}}{12}{}\protected@file@percent }
+\newlabel{tab:appendix-recovery-memory}{{XII}{12}{}{table.12}{}}
+\gdef \@abspage@last{13}

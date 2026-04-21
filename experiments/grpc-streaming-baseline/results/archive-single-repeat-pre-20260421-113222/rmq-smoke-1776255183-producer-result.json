@@ -1,0 +1,59 @@
+{
+  "run_id": "rmq-smoke-1776255183",
+  "transport_mode": "rabbitmq-streams",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 200,
+  "payload_bytes": 256,
+  "concurrency": 2,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 5,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-15T12:13:11.060799956Z",
+  "producer_finished_at": "2026-04-15T12:13:19.459653678Z",
+  "stream_acks": [
+    {
+      "run_id": "rmq-smoke-1776255183",
+      "stage": "producer",
+      "stream_messages": 100,
+      "stream_bytes": 25600,
+      "finished_at_unix_nano": 1776255198704624862
+    },
+    {
+      "run_id": "rmq-smoke-1776255183",
+      "stage": "producer",
+      "stream_messages": 100,
+      "stream_bytes": 25600,
+      "finished_at_unix_nano": 1776255198705619079
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 30,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "rmq-smoke-1776255183",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 200,
+    "bytes_received": 51200,
+    "duration_seconds": 8.308078524999999,
+    "throughput_messages_per_second": 24.072954943574036,
+    "throughput_megabytes_per_second": 0.005877186265521005,
+    "p50_latency_ms": 630.100823,
+    "p95_latency_ms": 632.742381,
+    "p99_latency_ms": 633.097406,
+    "max_latency_ms": 633.210247,
+    "started_at_unix_nano": 1776255199248283754,
+    "finished_at_unix_nano": 1776255199333284044,
+    "transport_mode": "rabbitmq-streams",
+    "mean_inter_arrival_ms": 0.42713713567839157,
+    "p95_inter_arrival_ms": 0.95755,
+    "inter_arrival_jitter_ms": 0.348501754427293
+  }
+}

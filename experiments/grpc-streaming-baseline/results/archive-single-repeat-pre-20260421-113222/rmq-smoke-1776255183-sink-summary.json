@@ -1,0 +1,20 @@
+{
+  "run_id": "rmq-smoke-1776255183",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 200,
+  "bytes_received": 51200,
+  "duration_seconds": 8.308078524999999,
+  "throughput_messages_per_second": 24.072954943574036,
+  "throughput_megabytes_per_second": 0.005877186265521005,
+  "p50_latency_ms": 630.100823,
+  "p95_latency_ms": 632.742381,
+  "p99_latency_ms": 633.097406,
+  "max_latency_ms": 633.210247,
+  "started_at_unix_nano": 1776255199248283754,
+  "finished_at_unix_nano": 1776255199333284044,
+  "transport_mode": "rabbitmq-streams",
+  "mean_inter_arrival_ms": 0.42713713567839157,
+  "p95_inter_arrival_ms": 0.95755,
+  "inter_arrival_jitter_ms": 0.348501754427293
+}

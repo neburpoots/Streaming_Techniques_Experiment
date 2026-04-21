@@ -1,0 +1,21 @@
+{
+  "run_id": "synthetic-recovery-rmqs-p4096-c8-rep2",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 81920000,
+  "duplicates": 437,
+  "duration_seconds": 59.989508319,
+  "throughput_messages_per_second": 333.3916306439464,
+  "throughput_megabytes_per_second": 1.3023110572029157,
+  "p50_latency_ms": 16004.400308,
+  "p95_latency_ms": 19431.01952,
+  "p99_latency_ms": 19628.250065,
+  "max_latency_ms": 33876.568854,
+  "started_at_unix_nano": 1776606134793991674,
+  "finished_at_unix_nano": 1776606194626964772,
+  "transport_mode": "rabbitmq-streams",
+  "mean_inter_arrival_ms": 2.6610868637698326,
+  "p95_inter_arrival_ms": 4.333084,
+  "inter_arrival_jitter_ms": 14.783020176151615
+}

@@ -1,0 +1,20 @@
+{
+  "run_id": "rabbitmq-smoke-rmqs-p1024-c4",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 4000,
+  "bytes_received": 4096000,
+  "duration_seconds": 8.320855101,
+  "throughput_messages_per_second": 480.71982403819055,
+  "throughput_megabytes_per_second": 0.46945295316229546,
+  "p50_latency_ms": 79.20751,
+  "p95_latency_ms": 185.232417,
+  "p99_latency_ms": 202.196069,
+  "max_latency_ms": 290.614998,
+  "started_at_unix_nano": 1776716693397265456,
+  "finished_at_unix_nano": 1776716701571857937,
+  "transport_mode": "rabbitmq-streams",
+  "mean_inter_arrival_ms": 2.044159160040009,
+  "p95_inter_arrival_ms": 3.509801,
+  "inter_arrival_jitter_ms": 8.723600654437677
+}

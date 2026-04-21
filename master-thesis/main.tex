@@ -234,11 +234,11 @@ Before presenting results, it is important to define the metrics used throughout
 
 \subsubsection{Current comparison scope}
 
-The currently completed implementation covers the gRPC portion of the benchmark. It contrasts \emph{client-streaming gRPC} with \emph{unary gRPC} in the same three-stage pipeline (\emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}), using identical business logic and payload schemas. This comparison is informative because unary gRPC approximates the current direct request-response style used in DYNAMOS, whereas client-streaming represents the most direct streaming extension of that model. The broader broker comparison with Kafka, RabbitMQ, and NATS remains future work, but the current gRPC study already establishes the first empirical baseline for the thesis.
+The currently completed implementation covers three transport mappings in the same three-stage pipeline (\emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}): \emph{client-streaming gRPC}, \emph{unary gRPC}, and \emph{RabbitMQ streams}. The two gRPC variants remain informative because unary approximates the current direct request-response style used in DYNAMOS, whereas client-streaming represents the most direct streaming extension of that model. RabbitMQ streams now adds a broker-mediated reference point in which the producer publishes into a durable stream and the downstream stages consume through the broker rather than over a single long-lived RPC. Kafka and NATS remain future work.
 
 Two clean workload families were executed for this reference matrix. The first uses synthetic payloads with message sizes from 256 bytes to 16 KiB and concurrency levels from 1 to 16. The second is a smaller realism check that replays rows from the copied DYNAMOS CSV datasets by batching either 25 or 100 rows into one message. For each run, the sink records throughput, end-to-end latency percentiles, and correctness counters. In addition to these clean matrices, three focused stress scenarios were executed to probe the properties identified earlier: a continuous steady-rate jitter scenario, a slow-consumer backpressure scenario, and a recovery scenario with a forced mid-run transformer restart.
 
-The broad baseline matrices were executed as single runs per configuration on Docker Compose, where each service runs as an unrestricted container on the same host. The three focused stress scenarios were subsequently rerun three times on a Kubernetes cluster (single-node, with Kustomize-managed resource limits) and are reported below as arithmetic means over those repetitions. This two-environment split means that the bulk-transfer and CSV-replay results reflect Docker Compose performance, while the focused pacing, backpressure, and recovery results reflect Kubernetes performance. A full Kubernetes rerun of the broad matrix is planned once the cross-technology comparison is underway.
+The broad baseline matrices are now split across two environments. The original gRPC bulk-transfer and CSV-replay baselines were executed as single runs per configuration on Docker Compose, where each service runs as an unrestricted container on the same host. The RabbitMQ bulk-transfer and CSV-replay baselines were executed later on a single-node Kubernetes cluster, because the broker path and the corresponding Kubernetes runner support were added after the initial gRPC study. The three focused stress scenarios were then rerun three times on that Kubernetes cluster (with Kustomize-managed resource limits) for all currently implemented transports and are reported below as arithmetic means over those repetitions. This split means that the broad gRPC and RabbitMQ baseline tables should not be read as directly comparable absolute performance numbers. Additionally, the Kubernetes RabbitMQ CSV-replay pilot mounts truncated test copies of the DYNAMOS CSV files through a ConfigMap, because the full copied datasets exceed the practical object-size limits of the cluster control plane.
 
 \begin{table}[t]
     \centering
@@ -297,6 +297,22 @@ The broad baseline matrices were executed as single runs per configuration on Do
     \label{fig:grpc-preliminary-throughput}
 \end{figure}
 
+\begin{table}[t]
+    \centering
+    \footnotesize
+    \caption{RabbitMQ streams pilot results averaged over the completed Kubernetes baseline matrices.}
+    \label{tab:rabbitmq-preliminary-results}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{lll}
+        \toprule
+        Workload & Avg. throughput (msg/s) & Avg. $p_{95}$ latency (ms) \\
+        \midrule
+        Synthetic & 312.43 & 20,137.58 \\
+        CSV replay & 361.41 & 8,632.07 \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
 \subsubsection{Clean baseline matrix}
 
 Table~\ref{tab:grpc-per-size} breaks the synthetic bulk-transfer results down by message size, averaging across concurrency levels 1--16 for each size. This disaggregation reveals that the streaming advantage is strongly size-dependent: client-streaming achieves roughly $21\times$ the throughput of unary at 256~B but only $4.8\times$ at 16~KiB. The grand averages in Table~\ref{tab:grpc-preliminary-results} (approximately $13.5\times$ for synthetic) therefore overstate the advantage for larger messages and understate it for smaller ones.
@@ -322,6 +338,8 @@ Table~\ref{tab:grpc-per-size} breaks the synthetic bulk-transfer results down by
 
 Two observations stand out. First, streaming throughput in msg/s drops substantially with message size (from 136{,}K to 21{,}K), but data throughput in MiB/s rises (from 33 to 335~MiB/s) because larger messages amortise per-message overhead more effectively. Unary msg/s, by contrast, remains relatively flat across sizes (4.5--6.4~K), indicating that per-call overhead rather than bandwidth capacity is the dominant bottleneck. Second, unary $p_{95}$ latency stays below 1.7~ms at every message size, whereas streaming $p_{95}$ latency varies between 29 and 80~ms depending on size and concurrency. This confirms that unary remains the lower-latency option on a per-message basis. The CSV replay workload (Table~\ref{tab:grpc-preliminary-results}) shows a broadly consistent pattern with a $12.5\times$ throughput ratio.
 
+The RabbitMQ pilot baseline in Table~\ref{tab:rabbitmq-preliminary-results} occupies a very different operating region. Average throughput is only 312 messages per second for the synthetic clean matrix and 361 messages per second for the CSV replay matrix, while average $p_{95}$ latency rises into the multi-second range. Across the synthetic size sweep, throughput in msg/s remains nearly flat at roughly 309--320 messages per second, but the data rate still increases from about 0.08~MiB/s at 256~B to about 4.93~MiB/s at 16~KiB as larger payloads amortise the broker overhead more effectively. The clean RabbitMQ runs did, however, preserve correctness: no duplicate deliveries or ordering violations were observed in the baseline matrices, so the current limitation is performance rather than obvious delivery corruption.
+
 Third, the clean baseline matrices did not reveal correctness problems in the implemented gRPC benchmark: no duplicate deliveries or ordering violations were observed in those completed bulk-transfer runs. This is important because raw throughput alone would not be useful if it came at the cost of lost ordering or inconsistent delivery.
 
 The clean matrices alone, however, are not enough to judge whether a transport is suitable for long-lived, policy-constrained data exchange. DYNAMOS-style workflows also care about pacing regularity, behaviour under consumer mismatch, and failure recovery. Three focused stress scenarios were therefore added after the baseline.
@@ -335,7 +353,7 @@ The first focused experiment was a continuous steady-rate scenario. It used 1 Ki
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Focused gRPC continuous-stream jitter scenario averaged over three Kubernetes repetitions.}
+    \caption{Focused continuous-stream scenario averaged over three Kubernetes repetitions.}
     \label{tab:grpc-continuous-results}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -347,20 +365,22 @@ The first focused experiment was a continuous steady-rate scenario. It used 1 Ki
         Client-streaming & 8 & 918.98 & 13.07 & 1.71 & 0.81 \\
         Unary & 4 & 918.88 & 2.26 & 2.10 & 2.13 \\
         Unary & 8 & 918.71 & 5.49 & 2.09 & 1.58 \\
+        RabbitMQ streams & 4 & 395.41 & 14,643.54 & 3.61 & 9.44 \\
+        RabbitMQ streams & 8 & 357.22 & 17,193.05 & 5.55 & 10.12 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-    The repeated continuous results show a clear split between delivery regularity and per-message responsiveness. Throughput was effectively identical in all four cases at roughly 919 messages per second, so the difference lies in how the flow is shaped. Client-streaming maintained the tighter inter-arrival pattern in both concurrency settings: its jitter stayed below 0.81 ms and its $p_{95}$ inter-arrival delay remained near 1.7 ms. Unary delivered much lower end-to-end latency, with average $p_{95}$ latency between 2.26 and 5.49 ms instead of roughly 13 ms, but its inter-arrival spread was wider and less stable. The CPU samples point in the same direction. Where measurements were consistently available, unary required more transformer and sink CPU than client-streaming, indicating that the lower latency was achieved by spending more processing effort to keep individual request-response exchanges moving.
+    The repeated continuous results show a clear split between delivery regularity and per-message responsiveness. Throughput was effectively identical in the four gRPC cases at roughly 919 messages per second, so the difference there lies in how the flow is shaped. Client-streaming maintained the tighter inter-arrival pattern in both concurrency settings: its jitter stayed below 0.81 ms and its $p_{95}$ inter-arrival delay remained near 1.7 ms. Unary delivered much lower end-to-end latency, with average $p_{95}$ latency between 2.26 and 5.49 ms instead of roughly 13 ms, but its inter-arrival spread was wider and less stable. The CPU samples point in the same direction. Where measurements were consistently available, unary required more transformer and sink CPU than client-streaming, indicating that the lower latency was achieved by spending more processing effort to keep individual request-response exchanges moving. RabbitMQ streams sits in a different regime altogether: throughput drops to 395 and 357 messages per second, while $p_{95}$ latency rises to roughly 14.6 and 17.2 seconds. Its $p_{95}$ inter-arrival delay remains in the low single-digit milliseconds, but that regularity is dominated by accumulated queueing delay in the brokered path rather than by fast end-to-end delivery.
 
 \paragraph{Slow-consumer backpressure scenario.}
 
-The second focused experiment was a backpressure scenario. It used the same 1 KiB payload size with concurrency 8, but the single sink instance was slowed down by adding a 2\,ms processing delay per message while the producer still targeted 4{,}000 messages per second. Because the sink can process at most $\lfloor 1000/2 \rfloor = 500$ messages per second per connection, the aggregate theoretical sink capacity is $500 \times 8 = 4{,}000$ messages per second, which means the scenario operates at the boundary of the sink's processing budget. Any transport overhead or scheduling jitter pushes the effective throughput below the requested rate, causing messages to accumulate in the gRPC transport buffers of the transformer (for client-streaming) or to be rejected and retried (for unary). This scenario was designed to expose whether the transport absorbs overload through explicit throttling or through queue growth and accumulated delay.
+The second focused experiment was a backpressure scenario. It used the same 1 KiB payload size with concurrency 8, but the single sink instance was slowed down by adding a 2\,ms processing delay per message while the producer still targeted 4{,}000 messages per second. Because the sink can process at most $\lfloor 1000/2 \rfloor = 500$ messages per second per connection, the aggregate theoretical sink capacity is $500 \times 8 = 4{,}000$ messages per second, which means the scenario operates at the boundary of the sink's processing budget. Any transport overhead or scheduling jitter pushes the effective throughput below the requested rate, causing messages to accumulate either in the gRPC transport buffers of the transformer or in the RabbitMQ broker path. This scenario was designed to expose whether the transport absorbs overload through explicit throttling or through queue growth and accumulated delay.
 
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Focused gRPC backpressure scenario with an intentionally slow sink, averaged over three Kubernetes repetitions.}
+    \caption{Focused backpressure scenario with an intentionally slow sink, averaged over three Kubernetes repetitions.}
     \label{tab:grpc-backpressure-results}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -370,20 +390,21 @@ The second focused experiment was a backpressure scenario. It used the same 1 Ki
         \midrule
         Client-streaming & 2,324.34 & 1,588.75 & 4,352.82 & 2.10 & 0.64 \\
         Unary & 1,771.80 & 0.45 & 0.86 & 3.24 & 1.10 \\
+        RabbitMQ streams & 366.80 & 11,924.53 & 16,161.30 & 6.10 & 9.50 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-    This result is important because it shows that higher throughput is not automatically the better outcome. Under backpressure, client-streaming kept substantially more of the nominal input rate, but it did so by allowing the pipeline to accumulate a very large queue. The median end-to-end latency increased to about 1.59 seconds and the average $p_{95}$ latency rose to 4.35 seconds. Unary behaved almost oppositely: it gave up throughput, but kept latency near the sub-millisecond range for successfully delivered requests. The interpretation is that client-streaming preserves bulk movement under pressure by buffering aggressively, whereas unary currently protects responsiveness by throttling harder and accepting a lower realized send rate. For DYNAMOS this remains a meaningful design trade-off, because some archetypes may prefer sustained throughput while others may require bounded latency or tighter admission control.
+    This result is important because it shows that higher throughput is not automatically the better outcome. Under backpressure, client-streaming kept substantially more of the nominal input rate, but it did so by allowing the pipeline to accumulate a very large queue. The median end-to-end latency increased to about 1.59 seconds and the average $p_{95}$ latency rose to 4.35 seconds. Unary behaved almost oppositely: it gave up throughput, but kept latency near the sub-millisecond range for successfully delivered requests. The interpretation is that client-streaming preserves bulk movement under pressure by buffering aggressively, whereas unary currently protects responsiveness by throttling harder and accepting a lower realized send rate. RabbitMQ streams pushed this queue-absorbing behaviour further: it sustained only 367 messages per second, yet still accumulated about 11.9 seconds of median end-to-end delay and a $p_{95}$ latency above 16 seconds. In the current brokered prototype, overload is therefore translated primarily into persistent backlog and long delivery delay rather than into improved realized throughput.
 
 \paragraph{Forced-restart recovery scenario.}
 
-The third focused experiment was a recovery scenario. This run used 4 KiB messages, concurrency 8, a continuous target rate of 2,000 messages per second, and a forced \textit{Transformer} restart after 3 seconds. The producer was allowed to retry up to 120 times with a 250 ms backoff. The purpose of this scenario was not to replace the main matrix, but to observe how the two gRPC transport styles behave when the pipeline is interrupted during an active stream.
+The third focused experiment was a recovery scenario. This run used 4 KiB messages, concurrency 8, a continuous target rate of 2,000 messages per second, and a forced \textit{Transformer} restart after 3 seconds. The producer was allowed to retry up to 120 times with a 250 ms backoff. The purpose of this scenario was not to replace the main matrix, but to observe how the currently implemented transport mappings behave when the pipeline is interrupted during an active stream.
 
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Focused gRPC recovery scenario with a forced transformer restart, averaged over three Kubernetes repetitions.}
+    \caption{Focused recovery scenario with a forced transformer restart, averaged over three Kubernetes repetitions.}
     \label{tab:grpc-recovery-results}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -393,11 +414,12 @@ The third focused experiment was a recovery scenario. This run used 4 KiB messag
         \midrule
         Client-streaming & 1,278.49 & 28.28 & 4,851.44 & 9,783 & 335.12 \\
         Unary & 589.39 & 3.52 & 25,549.77 & 0 & 22,822.09 \\
+        RabbitMQ streams & 340.87 & 20,365.46 & 34,762.02 & 590 & 0.00 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-    The repeated recovery results change the interpretation in an important way. Client-streaming, not unary, preserved the flow much more effectively after the restart. It recovered in about 335 ms on average, sustained 1,278 messages per second across the run, and limited worst-case latency to about 4.85 seconds. Unary still kept a much lower $p_{95}$ latency for successfully delivered requests, and it completed the run without duplicates, but it did so while the overall stream stalled for much longer: the average recovery interval exceeded 22.8 seconds, throughput dropped to 589 messages per second, and the worst-case latency exceeded 25.5 seconds.
+    The repeated recovery results change the interpretation in an important way. Client-streaming, not unary, preserved the flow much more effectively after the restart. It recovered in about 335 ms on average, sustained 1,278 messages per second across the run, and limited worst-case latency to about 4.85 seconds. Unary still kept a much lower $p_{95}$ latency for successfully delivered requests, and it completed the run without duplicates, but it did so while the overall stream stalled for much longer: the average recovery interval exceeded 22.8 seconds, throughput dropped to 589 messages per second, and the worst-case latency exceeded 25.5 seconds. RabbitMQ streams changes the semantics rather than mirroring either gRPC row directly. Because the producer publishes into a broker, the forced \textit{Transformer} restart is not observed as a producer-side reconnect event, so the average recovery interval remains zero in the table. The sink-side outcome is nonetheless not free: throughput stays near 341 messages per second, $p_{95}$ latency exceeds 20.3 seconds, and about 590 duplicate messages are observed on average during replay after the restart.
 
     The trade-off is that the current client-streaming recovery strategy replays a worker's sequence set after reconnect, which preserves completeness but introduces at-least-once behaviour under failure. This explains the average 9{,}783 duplicate messages recorded in the streaming recovery runs. It is worth noting that the streaming recovery time showed high variance across repetitions, ranging from sub-millisecond (essentially instant reconnect in two of three runs) to roughly one second, so the 335\,ms mean should be interpreted with caution. Unary recovery, by contrast, was highly consistent across repetitions (22.6--23.1\,s). Unary avoids duplicate replay, but in this Kubernetes setting it pays for the cleaner sink-side outcome with a much longer and more predictable interruption window.
 
@@ -407,16 +429,18 @@ The third focused experiment was a recovery scenario. This run used 4 KiB messag
 
 The current results support a more precise conclusion than a simple "streaming beats unary" claim. In the clean bulk-transfer baseline, client-streaming is the stronger choice for high-volume inter-service data movement, with the throughput advantage varying from roughly $5\times$ for 16~KiB messages to $21\times$ for 256~B messages. Unary remains the lower-latency option for small request-response exchanges, with sub-2\,ms $p_{95}$ latency at every message size tested. In the continuous scenario, client-streaming also provides the steadier delivery rhythm, whereas unary provides lower latency at higher CPU cost and with less precise pacing. In the backpressure scenario, client-streaming preserves throughput by absorbing overload as queueing delay, while unary sacrifices throughput to protect latency. Under restart stress, the repeated Kubernetes reruns show that client-streaming now offers the stronger continuity story in this prototype, but only by accepting at-least-once replay and the need for downstream deduplication. Unary remains the cleaner duplicate-free option, yet its retry behaviour currently stretches recovery time and depresses throughput too severely to treat it as the better resilience mechanism overall.
 
-These findings already make a useful thesis contribution because they identify concrete transport trade-offs in bulk transfer, pacing regularity, overload response, and failure recovery. That evidence is valuable even before the broker-based mechanisms are added, because it clarifies which properties later candidates must improve and which compromises they may introduce in return.
+RabbitMQ streams adds a third point in this trade-off space. It preserved correctness in the clean and CSV-replay baselines and reduced producer-visible recovery events to zero under the forced transformer restart, but it did so with much lower sustained throughput and very high end-to-end latency in every evaluated scenario. The broker itself also carries a visible operational cost in the focused Kubernetes runs, consuming roughly 31--34\% average CPU and 323--487~MiB of memory in the continuous and recovery presets. In its current single-broker form, RabbitMQ therefore behaves more like a decoupling and backlog-tolerant buffering layer than a performance-oriented replacement for direct gRPC streaming.
 
-Kafka, RabbitMQ, and NATS still need to be benchmarked under the same workload definitions, but the current gRPC baseline has already narrowed the evaluation space. The remainder of the thesis can therefore focus on whether broker-based mechanisms offer meaningful gains in replay, decoupling, or backlog tolerance without undermining the latency, recovery, and operational properties exposed here.
+These findings already make a useful thesis contribution because they identify concrete transport trade-offs in bulk transfer, pacing regularity, overload response, and failure recovery across both direct RPC and broker-mediated transport styles. That evidence clarifies which properties later candidates must improve and which compromises they may introduce in return.
+
+Kafka and NATS still need to be benchmarked under the same workload definitions, but the current gRPC baseline and the first RabbitMQ streams comparison have already narrowed the evaluation space. The remainder of the thesis can therefore focus on whether other broker-based mechanisms offer meaningful gains in replay, decoupling, or backlog tolerance without further undermining the latency, recovery, and operational properties exposed here.
 
 \subsection{Threats to Validity}
 
 Several threats to validity should be acknowledged when interpreting the current results.
 
 \paragraph{Internal validity.}
-The broad synthetic and CSV-replay matrices in the current gRPC baseline were executed as single runs per configuration on Docker Compose, so those portions of the study may be affected by transient system-level effects such as CPU scheduling variance, garbage collection pauses, or network contention from co-located workloads. To reduce that risk for the most thesis-critical claims, the three focused stress scenarios were rerun three times on Kubernetes and the reported tables use arithmetic means across those repetitions. Even so, the repeat count remains small and no confidence intervals are reported yet. The two-environment split (Docker Compose for the broad matrix, Kubernetes for focused scenarios) means that absolute numbers are not directly comparable across those sections, though the relative comparisons between transport modes remain valid within each environment. Additionally, short run durations (typically under one minute for bulk-transfer configurations) may not fully capture warm-up effects or long-term stability behaviour that would emerge in sustained production workloads.
+The broad synthetic and CSV-replay matrices in the original gRPC baseline were executed as single runs per configuration on Docker Compose, so those portions of the study may be affected by transient system-level effects such as CPU scheduling variance, garbage collection pauses, or network contention from co-located workloads. To reduce that risk for the most thesis-critical claims, the three focused stress scenarios were rerun three times on Kubernetes and the reported tables use arithmetic means across those repetitions. RabbitMQ was introduced after that initial baseline and therefore its broad matrices were also executed on Kubernetes rather than Docker Compose. Even so, the repeat count remains small and no confidence intervals are reported yet. The two-environment split means that absolute numbers are not directly comparable across all broad-baseline sections, though the relative comparisons between transport modes remain valid within each environment. Additionally, short run durations (typically under one minute for bulk-transfer configurations) may not fully capture warm-up effects or long-term stability behaviour that would emerge in sustained production workloads. The Kubernetes RabbitMQ CSV-replay pilot also uses truncated test snapshots of the copied DYNAMOS CSVs because the full files exceeded ConfigMap size limits; the replay source cycles over the loaded rows, so the workload remains valid as a realism check, but the payload mix is narrower than in the full Docker-based CSV baseline.
 
 \paragraph{External validity.}
 The benchmark uses a synthetic three-stage pipeline with lightweight deterministic logic, which does not replicate the full complexity of a DYNAMOS deployment. Real DYNAMOS chains may involve additional processing stages, policy-enforcement sidecars, and heterogeneous service implementations. Furthermore, the tests are conducted in a single-node Kubernetes cluster, whereas production DYNAMOS deployments span multiple nodes with network partitioning and scheduling constraints that may affect latency and throughput characteristics differently. The Go-based benchmark services share the same runtime and gRPC library version, so results may not generalize to polyglot microservice chains.
@@ -426,7 +450,7 @@ Jitter is operationalized as the standard deviation of inter-arrival times, whic
 
 \section{Planned: Cross-Technology Benchmark Comparison}
 
-The benchmark design and gRPC baseline presented in section~III address the first part of \emph{RQ1}. The planned next step completes the comparison by evaluating Apache Kafka, RabbitMQ streams, and NATS JetStream under the same workload definitions, fairness constraints, and evaluation dimensions. These results will allow a structured recommendation of which mechanism best fits which workload condition, completing the answer to RQ1.
+The benchmark design, the gRPC baseline, and the first RabbitMQ streams comparison presented in section~III address the first part of \emph{RQ1}. The planned next step extends that comparison by evaluating Apache Kafka and NATS JetStream under the same workload definitions, fairness constraints, and evaluation dimensions, then revisits the current RabbitMQ findings against that broader broker set. These results will allow a structured recommendation of which mechanism best fits which workload condition, completing the answer to RQ1.
 
 \section{Planned: Architectural Integration Design}
 
@@ -438,9 +462,9 @@ This section will address \emph{RQ3}: what impact streaming communication has on
 
 \section{Conclusion}
 
-This thesis establishes the first empirical basis for evaluating streaming communication in DYNAMOS. The literature review narrows the relevant design space to direct gRPC streaming and broker-based alternatives such as Kafka, RabbitMQ streams, and NATS JetStream. The current benchmark shows that client-streaming gRPC is markedly stronger for sustained bulk transfer, pacing stability, and restart continuity, while unary gRPC remains preferable when low per-message latency and duplicate-free delivery dominate. Rather than yielding a single winner, the present results identify a concrete trade-off space around throughput, regularity, overload handling, and recovery.
+This thesis establishes the first empirical basis for evaluating streaming communication in DYNAMOS. The literature review narrows the relevant design space to direct gRPC streaming and broker-based alternatives such as Kafka, RabbitMQ streams, and NATS JetStream. The current benchmark shows that client-streaming gRPC is markedly stronger for sustained bulk transfer, pacing stability, and restart continuity, while unary gRPC remains preferable when low per-message latency and duplicate-free delivery dominate. RabbitMQ streams now provides a first broker-based reference point: it offers decoupling and suppresses producer-visible recovery events, but in the current prototype it does so with much lower throughput, much higher end-to-end latency, and a non-trivial broker resource cost. Rather than yielding a single winner, the present results identify a concrete trade-off space around throughput, regularity, overload handling, recovery, and buffering semantics.
 
-That evidence provides a defensible baseline for the remainder of the thesis. The planned next phases extend the comparison to broker-based mechanisms, examine how the most promising options align with DYNAMOS' archetypes and policy model, and translate those findings into an integration design and system-level validation.
+That evidence provides a defensible baseline for the remainder of the thesis. The planned next phases extend the broker comparison beyond RabbitMQ, examine how the most promising options align with DYNAMOS' archetypes and policy model, and translate those findings into an integration design and system-level validation.
 
 \appendix
 
@@ -452,7 +476,7 @@ This appendix documents the complete preset definitions used in the benchmark. E
 \begin{table}[h]
     \centering
     \scriptsize
-    \caption{Benchmark presets used in the current gRPC study.}
+    \caption{Benchmark presets used in the current transport study.}
     \label{tab:appendix-presets}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -485,11 +509,11 @@ This appendix summarizes the run scopes used in the current thesis draft. The bo
         \toprule
         Scope & Transports & Variable dimensions & Repetitions & Role in thesis \\
         \midrule
-        Synthetic clean matrix & Client-streaming, unary & Payload size and concurrency sweep & 1 & Main bulk-transfer baseline in Section III \\
-        CSV replay check & Client-streaming, unary & Batch size and concurrency subset & 1 & Realism validation against copied DYNAMOS datasets \\
-        Focused continuous & Client-streaming, unary & Concurrency 4 and 8 at fixed 1 KiB and 1{,}000 msg/s & 3 & Pacing and jitter evidence \\
-        Focused backpressure & Client-streaming, unary & Fixed 1 KiB, concurrency 8, 4{,}000 msg/s, 2 ms sink delay & 3 & Overload and queueing evidence \\
-        Focused recovery & Client-streaming, unary & Fixed 4 KiB, concurrency 8, forced transformer restart & 3 & Recovery and replay evidence \\
+        Synthetic clean matrix & Client-streaming, unary, rabbitmq-streams & Payload size and concurrency sweep & 1 & Main bulk-transfer baseline in Section III \\
+        CSV replay check & Client-streaming, unary, rabbitmq-streams & Batch size and concurrency subset & 1 & Realism validation against copied DYNAMOS datasets \\
+        Focused continuous & Client-streaming, unary, rabbitmq-streams & Concurrency 4 and 8 at fixed 1 KiB and 1{,}000 msg/s & 3 & Pacing and jitter evidence \\
+        Focused backpressure & Client-streaming, unary, rabbitmq-streams & Fixed 1 KiB, concurrency 8, 4{,}000 msg/s, 2 ms sink delay & 3 & Overload and queueing evidence \\
+        Focused recovery & Client-streaming, unary, rabbitmq-streams & Fixed 4 KiB, concurrency 8, forced transformer restart & 3 & Recovery and replay evidence \\
         \bottomrule
     \end{tabular}}
 \end{table}
@@ -497,7 +521,7 @@ This appendix summarizes the run scopes used in the current thesis draft. The bo
 \section{Resource Utilisation Details}
 \label{app:resource-details}
 
-This appendix summarizes the resource metrics for the repeated Kubernetes reruns where CPU and memory data are most informative. The backpressure preset produced too few stable \texttt{kubectl top} samples to support a meaningful per-role comparison, so the appendix focuses on the continuous and recovery scenarios.
+This appendix summarizes the resource metrics for the repeated Kubernetes reruns where CPU and memory data are most informative. For RabbitMQ streams, the broker is reported as a separate role because its buffering layer is a core part of the transport cost. The backpressure preset produced too few stable \texttt{kubectl top} samples to support a meaningful per-role comparison across all transports, so the appendix focuses on the continuous and recovery scenarios.
 
 \begin{table}[h]
     \centering
@@ -506,14 +530,16 @@ This appendix summarizes the resource metrics for the repeated Kubernetes reruns
     \label{tab:appendix-continuous-cpu}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{lrrrr}
+    \begin{tabular}{lrrrrr}
         \toprule
-        Mode & Concur. & Producer & Transformer & Sink \\
+        Mode & Concur. & Producer & Transformer & Sink & Broker \\
         \midrule
-        Client-streaming & 4 & 26.10 / 26.10 & 10.54 / 25.63 & 6.11 / 14.77 \\
-        Client-streaming & 8 & -- & 9.75 / 25.53 & 5.69 / 14.80 \\
-        Unary & 4 & 34.40 / 34.40 & 14.63 / 39.27 & 8.18 / 21.93 \\
-        Unary & 8 & 37.83 / 37.83 & 16.50 / 42.10 & 9.05 / 23.10 \\
+        Client-streaming & 4 & 26.10 / 26.10 & 10.54 / 25.63 & 6.11 / 14.77 & -- \\
+        Client-streaming & 8 & -- & 9.75 / 25.53 & 5.69 / 14.80 & -- \\
+        Unary & 4 & 34.40 / 34.40 & 14.63 / 39.27 & 8.18 / 21.93 & -- \\
+        Unary & 8 & 37.83 / 37.83 & 16.50 / 42.10 & 9.05 / 23.10 & -- \\
+        RabbitMQ streams & 4 & 7.81 / 9.43 & 7.76 / 14.12 & 4.55 / 8.55 & 30.72 / 50.00 \\
+        RabbitMQ streams & 8 & 7.28 / 8.90 & 7.92 / 13.23 & 4.61 / 7.93 & 32.90 / 50.03 \\
         \bottomrule
     \end{tabular}}
 \end{table}
@@ -525,12 +551,13 @@ This appendix summarizes the resource metrics for the repeated Kubernetes reruns
     \label{tab:appendix-recovery-cpu}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{lrrr}
+    \begin{tabular}{lrrrr}
         \toprule
-        Mode & Producer & Transformer & Sink \\
+        Mode & Producer & Transformer & Sink & Broker \\
         \midrule
-        Client-streaming & 29.90 / 29.90 & 10.53 / 26.17 & 4.52 / 17.33 \\
-        Unary & 5.46 / 5.60 & 2.23 / 9.27 & 2.37 / 5.73 \\
+        Client-streaming & 29.90 / 29.90 & 10.53 / 26.17 & 4.52 / 17.33 & -- \\
+        Unary & 5.46 / 5.60 & 2.23 / 9.27 & 2.37 / 5.73 & -- \\
+        RabbitMQ streams & 7.82 / 9.68 & 10.69 / 16.68 & 4.67 / 9.78 & 33.24 / 50.00 \\
         \bottomrule
     \end{tabular}}
 \end{table}
@@ -542,12 +569,13 @@ This appendix summarizes the resource metrics for the repeated Kubernetes reruns
     \label{tab:appendix-recovery-memory}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{lrrr}
+    \begin{tabular}{lrrrr}
         \toprule
-        Mode & Producer & Transformer & Sink \\
+        Mode & Producer & Transformer & Sink & Broker \\
         \midrule
-        Client-streaming & 8.00 / 8.00 & 3.60 / 6.00 & 3.04 / 7.00 \\
-        Unary & 7.00 / 7.00 & 3.14 / 7.00 & 4.90 / 7.00 \\
+        Client-streaming & 8.00 / 8.00 & 3.60 / 6.00 & 3.04 / 7.00 & -- \\
+        Unary & 7.00 / 7.00 & 3.14 / 7.00 & 4.90 / 7.00 & -- \\
+        RabbitMQ streams & 7.31 / 7.50 & 7.45 / 8.00 & 5.97 / 8.00 & 486.71 / 511.00 \\
         \bottomrule
     \end{tabular}}
 \end{table}

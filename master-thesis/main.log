@@ -1,6 +1,7 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.8)  13 APR 2026 20:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.8)  20 APR 2026 10:30
 entering extended mode
  restricted \write18 enabled.
+ file:line:error style messages enabled.
  %&-line parsing enabled.
 **./main.tex
 (main.tex
@@ -833,98 +834,123 @@ Package pdftex.def Info: figures/phase1-evaluation-map.png  used on input line
 201.
 (pdftex.def)             Requested size: 474.71906pt x 257.5488pt.
 [6]
-Package pgfplots info on input line 288: Using 'lua backend=false' for axis: x 
-coord trafo unsupported.
-
-Underfull \hbox (badness 3078) in paragraph at lines 300--301
- \OT1/ptm/m/it/10 3) Clean baseline mat-rix: [][] \OT1/ptm/m/n/10 Sev-eral clea
-r ob-ser-va-tions
- []
-
-
-Underfull \hbox (badness 1454) in paragraph at lines 300--301
-\OT1/ptm/m/n/10 already fol-low from Table II[] and Fig. 2[]. First, client-
- []
-
-
 Underfull \vbox (badness 5431) has occurred while \output is active []
 
- [7 <./figures/phase1-evaluation-map.png>] [8]
-Underfull \hbox (badness 1997) in paragraph at lines 401--402
+Package pgfplots info on input line 290: Using 'lua backend=false' for axis: x 
+coord trafo unsupported.
+ [7 <./figures/phase1-evaluation-map.png>] [8] [9]
+Underfull \hbox (badness 1997) in paragraph at lines 446--447
 \OT1/ptm/m/n/10 three-stage pipeline with light-weight de-term-in-istic lo-gic,
 
  []
 
-[9]
-** WARNING: Ignoring useless \section in Appendix (line 426).
+[10]
+** WARNING: Ignoring useless \section in Appendix (line 471).
 
-Underfull \hbox (badness 3668) in paragraph at lines 448--448
+Underfull \hbox (badness 3668) in paragraph at lines 493--493
 []\OT1/ptm/m/n/7 Synthetic pay-loads from
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 448--448
+Underfull \hbox (badness 10000) in paragraph at lines 493--493
 []\OT1/ptm/m/n/7 Baseline bulk-transfer through-put,
  []
 
 
-Underfull \hbox (badness 5417) in paragraph at lines 448--448
+Underfull \hbox (badness 5417) in paragraph at lines 493--493
 []\OT1/ptm/m/n/7 1 KiB pay-loads, 1,000
  []
 
 
-Underfull \hbox (badness 5417) in paragraph at lines 448--448
+Underfull \hbox (badness 5417) in paragraph at lines 493--493
 []\OT1/ptm/m/n/7 1 KiB pay-loads, 4,000
  []
 
 
-Underfull \hbox (badness 5417) in paragraph at lines 448--448
+Underfull \hbox (badness 5417) in paragraph at lines 493--493
 []\OT1/ptm/m/n/7 4 KiB pay-loads, 2,000
  []
 
-** WARNING: Ignoring useless \section in Appendix (line 451).
+** WARNING: Ignoring useless \section in Appendix (line 496).
 
-Underfull \hbox (badness 10000) in paragraph at lines 473--473
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
 []\OT1/ptm/m/n/7 Client-streaming,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 473--473
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
+\OT1/ptm/m/n/7 un-ary, rabbitmq-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
 []\OT1/ptm/m/n/7 Main bulk-transfer
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 473--473
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
 []\OT1/ptm/m/n/7 Client-streaming,
  []
 
 
-Underfull \hbox (badness 1675) in paragraph at lines 473--473
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
+\OT1/ptm/m/n/7 un-ary, rabbitmq-
+ []
+
+
+Underfull \hbox (badness 1675) in paragraph at lines 518--518
 []\OT1/ptm/m/n/7 Batch size and con-cur-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 473--473
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
 []\OT1/ptm/m/n/7 Client-streaming,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 473--473
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
+\OT1/ptm/m/n/7 un-ary, rabbitmq-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
 []\OT1/ptm/m/n/7 Client-streaming,
  []
 
 
-Underfull \hbox (badness 4303) in paragraph at lines 473--473
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
+\OT1/ptm/m/n/7 un-ary, rabbitmq-
+ []
+
+
+Underfull \hbox (badness 4303) in paragraph at lines 518--518
 []\OT1/ptm/m/n/7 Overload and queueing
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 473--473
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
 []\OT1/ptm/m/n/7 Client-streaming,
  []
 
-** WARNING: Ignoring useless \section in Appendix (line 476).
-[10] (main.bbl [11])
+
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
+\OT1/ptm/m/n/7 un-ary, rabbitmq-
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+** WARNING: Ignoring useless \section in Appendix (line 521).
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+(main.bbl [11] [12])
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -936,7 +962,7 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[12
+[13
 
 ] (main.aux)
  ***********
@@ -945,13 +971,13 @@ L3 programming layer <2025-12-24>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 25130 strings out of 467871
- 655189 string characters out of 5418377
- 1200672 words of memory out of 5000000
- 53610 multiletter control sequences out of 15000+600000
+ 25132 strings out of 467871
+ 655242 string characters out of 5418377
+ 1210672 words of memory out of 5000000
+ 53612 multiletter control sequences out of 15000+600000
  669507 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,19n,118p,1239b,2334s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,19n,118p,1556b,2334s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmmi10.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmmi5.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/pu
@@ -970,9 +996,9 @@ cmsy9.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier
 /utmbi8a.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/time
 s/utmr8a.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/time
 s/utmri8a.pfb>
-Output written on main.pdf (12 pages, 293303 bytes).
+Output written on main.pdf (13 pages, 300808 bytes).
 PDF statistics:
- 128 PDF objects out of 1000 (max. 8388607)
+ 132 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  18 words of extra memory for PDF output out of 10000 (max. 10000000)
 

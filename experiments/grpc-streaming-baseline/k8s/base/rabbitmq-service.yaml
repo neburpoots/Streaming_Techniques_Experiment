@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-stream-rabbitmq
+  namespace: streaming-experiments
+spec:
+  selector:
+    app: grpc-stream-rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+    - name: stream
+      port: 5552
+      targetPort: stream
+    - name: management
+      port: 15672
+      targetPort: management

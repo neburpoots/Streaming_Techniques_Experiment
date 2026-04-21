@@ -9,7 +9,7 @@ This setup is a good starting point if the goal is to answer the first phase of 
 - it keeps the first comparison narrow: gRPC client streaming versus unary gRPC;
 - it uses a small but meaningful three-stage topology: Producer -> Transformer -> Sink;
 - it keeps application logic intentionally lightweight so the measured differences are primarily communication effects;
-- it already supports the experimental factors that matter most for the first baseline: message size, total volume, concurrency, synthetic CPU work in the middle stage, and artificial sink slowdowns.
+- it already supports the experimental factors that matter most for the first baseline: message size, total volume, concurrency, synthetic CPU work in the middle stage, artificial sink slowdowns, and a broker-based comparison through RabbitMQ Streams.
 
 ## Metrics used consistently
 
@@ -56,17 +56,18 @@ The DYNAMOS CSVs are still useful later as a replay-style workload once the base
 - `transformer`: optional lightweight CPU work, then forwards chunks to the sink via client streaming.
 - `sink`: computes canonical run-level metrics and writes a JSON summary.
 
-The same three-stage topology can now be run in two transport modes:
+The same three-stage topology can now be run in three transport modes:
 
 - `client-streaming`: one client stream per producer worker;
 - `unary`: one request per message across the same topology.
+- `rabbitmq-streams`: producer -> RabbitMQ Streams -> transformer -> RabbitMQ Streams -> sink.
 
 ## First experiment matrix to use
 
 Do not start with every possible factor crossed at once. Start with a narrow baseline matrix:
 
 1. Fix topology to the three-service chain.
-2. Run both `client-streaming` and `unary` over the exact same workload.
+2. Run `client-streaming`, `unary`, and `rabbitmq-streams` over the exact same workload.
 3. Sweep `PAYLOAD_BYTES`: for example `256`, `1024`, `4096`, `16384`.
 4. Sweep `CONCURRENCY`: for example `1`, `4`, `8`, `16`.
 5. Keep `TOTAL_MESSAGES` fixed per run, for example `50000`.
@@ -121,6 +122,18 @@ TARGET_MESSAGES_PER_SECOND=0 \
 ./scripts/run-local.sh
 ```
 
+RabbitMQ Streams comparison run:
+
+```bash
+RUN_ID=bulk-rmqs-4k-c8 \
+TRANSPORT_MODE=rabbitmq-streams \
+TOTAL_MESSAGES=50000 \
+PAYLOAD_BYTES=4096 \
+CONCURRENCY=8 \
+TARGET_MESSAGES_PER_SECOND=0 \
+./scripts/run-local.sh
+```
+
 CSV replay run using the copied datasets:
 
 ```bash
@@ -143,6 +156,10 @@ Results are written to `results/`.
 - `*-summary.csv`: exported comparison table with sink metrics and per-role CPU/memory aggregates.
 
 ## Matrix runs and CSV export
+
+The local PowerShell matrix runner now executes all three transport modes per preset: `client-streaming`, `unary`, and `rabbitmq-streams`.
+
+For the thesis-style comparable benchmark set, prefer the Kubernetes runner because it applies the same scenario presets across all three transports while also collecting pod-level resource measurements.
 
 Run the preset synthetic matrix:
 
@@ -184,6 +201,18 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
 	-Preset csv-replay-check
 ```
 
+Run the comparable three-transport Kubernetes presets:
+
+```bash
+./scripts/run-k8s-matrix.sh synthetic-clean --overlay resource-medium --repeat 3 --skip-load
+./scripts/run-k8s-matrix.sh synthetic-continuous --overlay resource-medium --repeat 3 --skip-load
+./scripts/run-k8s-matrix.sh synthetic-backpressure --overlay resource-medium --repeat 3 --skip-load
+./scripts/run-k8s-matrix.sh synthetic-recovery --overlay resource-medium --repeat 3 --skip-load
+./scripts/run-k8s-matrix.sh csv-replay-check --overlay resource-medium --repeat 3 --skip-load
+```
+
+If you are running on `kind` instead of the `docker-desktop` cluster, omit `--skip-load` so the freshly built images are loaded into the cluster.
+
 Export a comparison CSV from the JSON results:
 
 ```powershell
@@ -204,7 +233,6 @@ The recommended sequence is:
 
 ## What is intentionally not included yet
 
-- broker-based alternatives;
 - Prometheus/Grafana stack for historical dashboards.
 
 CSV replay is primarily wired for local Docker runs. For Kubernetes, the same envs are exposed in the manifests, but you still need to mount the datasets into the producer pod before enabling `WORKLOAD_SOURCE=csv-replay` there.

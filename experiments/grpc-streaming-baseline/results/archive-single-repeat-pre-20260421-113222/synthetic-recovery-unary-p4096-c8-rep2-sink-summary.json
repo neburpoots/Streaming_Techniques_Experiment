@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-recovery-unary-p4096-c8-rep2",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 81920000,
+  "duration_seconds": 33.642484263,
+  "throughput_messages_per_second": 594.4864191255934,
+  "throughput_megabytes_per_second": 2.3222125747093494,
+  "p50_latency_ms": 0.457416,
+  "p95_latency_ms": 1.829483,
+  "p99_latency_ms": 63.385005,
+  "max_latency_ms": 25304.863401,
+  "started_at_unix_nano": 1776103412706827947,
+  "finished_at_unix_nano": 1776103446118105023,
+  "transport_mode": "unary",
+  "mean_inter_arrival_ms": 1.5342086630331495,
+  "p95_inter_arrival_ms": 0.775409,
+  "inter_arrival_jitter_ms": 159.68441888884402
+}

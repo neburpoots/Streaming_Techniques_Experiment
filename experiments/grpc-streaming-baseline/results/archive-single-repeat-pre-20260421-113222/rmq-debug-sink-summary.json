@@ -1,0 +1,20 @@
+{
+  "run_id": "rmq-debug",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20,
+  "bytes_received": 5120,
+  "duration_seconds": 0.056081385,
+  "throughput_messages_per_second": 356.6245733767096,
+  "throughput_megabytes_per_second": 0.08706654623454824,
+  "p50_latency_ms": 10.608307,
+  "p95_latency_ms": 13.122081,
+  "p99_latency_ms": 14.192657,
+  "max_latency_ms": 14.192657,
+  "started_at_unix_nano": 1776255125341937137,
+  "finished_at_unix_nano": 1776255125351289978,
+  "transport_mode": "rabbitmq-streams",
+  "mean_inter_arrival_ms": 0.4922547894736843,
+  "p95_inter_arrival_ms": 1.770816,
+  "inter_arrival_jitter_ms": 0.43505707932378845
+}

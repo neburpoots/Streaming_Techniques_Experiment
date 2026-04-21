@@ -1,0 +1,20 @@
+{
+  "run_id": "csv-replay-check-rmqs-r100-c8",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 10000,
+  "bytes_received": 56298703,
+  "duration_seconds": 25.019086767,
+  "throughput_messages_per_second": 399.6948447051205,
+  "throughput_megabytes_per_second": 2.1459866860089014,
+  "p50_latency_ms": 5470.890597,
+  "p95_latency_ms": 7907.059076,
+  "p99_latency_ms": 8006.13809,
+  "max_latency_ms": 24469.979061,
+  "started_at_unix_nano": 1776608729589857168,
+  "finished_at_unix_nano": 1776608754443036331,
+  "transport_mode": "rabbitmq-streams",
+  "mean_inter_arrival_ms": 2.3839069013901386,
+  "p95_inter_arrival_ms": 5.398892,
+  "inter_arrival_jitter_ms": 8.78227880481891
+}

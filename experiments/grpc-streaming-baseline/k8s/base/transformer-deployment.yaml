@@ -18,10 +18,25 @@ spec:
           image: grpc-streaming-baseline-transformer:latest
           imagePullPolicy: IfNotPresent
           env:
+            - name: RUN_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RUN_ID
             - name: LISTEN_ADDR
               value: ":50051"
             - name: METRICS_ADDR
               value: ":9101"
+            - name: CONCURRENCY
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: CONCURRENCY
+            - name: TRANSPORT_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: TRANSPORT_MODE
             - name: SINK_ADDR
               value: grpc-stream-sink:50052
             - name: TRANSFORMER_WORK_ITERATIONS
@@ -29,6 +44,51 @@ spec:
                 configMapKeyRef:
                   name: grpc-streaming-baseline-config
                   key: TRANSFORMER_WORK_ITERATIONS
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_AMQP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_AMQP_PORT
+            - name: RABBITMQ_STREAM_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_STREAM_PORT
+            - name: RABBITMQ_MANAGEMENT_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_MANAGEMENT_PORT
+            - name: RABBITMQ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_PASSWORD
+            - name: RABBITMQ_VHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_VHOST
+            - name: RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM
+            - name: RABBITMQ_TRANSFORMER_TO_SINK_STREAM
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_TRANSFORMER_TO_SINK_STREAM
           ports:
             - containerPort: 50051
               name: grpc

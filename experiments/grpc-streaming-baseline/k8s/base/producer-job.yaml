@@ -127,6 +127,51 @@ spec:
                 configMapKeyRef:
                   name: grpc-streaming-baseline-config
                   key: FAILURE_AFTER_SECONDS
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_AMQP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_AMQP_PORT
+            - name: RABBITMQ_STREAM_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_STREAM_PORT
+            - name: RABBITMQ_MANAGEMENT_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_MANAGEMENT_PORT
+            - name: RABBITMQ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_PASSWORD
+            - name: RABBITMQ_VHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_VHOST
+            - name: RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM
+            - name: RABBITMQ_TRANSFORMER_TO_SINK_STREAM
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_TRANSFORMER_TO_SINK_STREAM
           volumeMounts:
             - name: results
               mountPath: /results

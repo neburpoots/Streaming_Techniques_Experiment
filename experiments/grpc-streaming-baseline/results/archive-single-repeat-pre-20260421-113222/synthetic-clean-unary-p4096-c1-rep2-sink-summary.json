@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-unary-p4096-c1-rep2",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 81920000,
+  "duration_seconds": 23.208209512,
+  "throughput_messages_per_second": 861.7640231857969,
+  "throughput_megabytes_per_second": 3.366265715569519,
+  "p50_latency_ms": 0.256117,
+  "p95_latency_ms": 0.47465,
+  "p99_latency_ms": 1.908225,
+  "max_latency_ms": 47.771714,
+  "started_at_unix_nano": 1776720039001467091,
+  "finished_at_unix_nano": 1776720062165177205,
+  "transport_mode": "unary",
+  "mean_inter_arrival_ms": 1.0219573741187056,
+  "p95_inter_arrival_ms": 0.936559,
+  "inter_arrival_jitter_ms": 3.909599702238715
+}
