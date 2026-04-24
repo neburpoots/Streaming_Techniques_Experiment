@@ -326,7 +326,7 @@ copy_results_from_pvc() {
     kubectl wait --for=condition=Ready pod/"${helper_pod}" -n "${NAMESPACE}" --timeout=60s
 
     # Copy result files matching this run
-    for suffix in producer-result.json sink-summary.json; do
+    for suffix in producer-result.json sink-summary.json sink-analysis.json; do
         local remote_path="/results/${run_id}-${suffix}"
         local local_path="${RESULTS_DIR}/${run_id}-${suffix}"
         local copied=false

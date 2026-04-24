@@ -56,7 +56,7 @@ func bridgeRabbitMQWorker(ctx context.Context, server *transformerServer, cfg *t
 	server.metrics.streams.Inc()
 
 	for {
-		chunk, delivery, err := consumer.ReceiveChunk(ctx)
+		chunk, _, err := consumer.ReceiveChunk(ctx)
 		if err != nil {
 			return err
 		}
@@ -64,9 +64,6 @@ func bridgeRabbitMQWorker(ctx context.Context, server *transformerServer, cfg *t
 		server.applyWork(chunk.GetPayload())
 		if err := publisher.PublishChunk(ctx, chunk); err != nil {
 			return fmt.Errorf("publish worker %d sequence %d to %s: %w", worker, chunk.GetSequence(), outputStream, err)
-		}
-		if err := delivery.Commit(); err != nil {
-			return fmt.Errorf("commit worker %d sequence %d from %s: %w", worker, chunk.GetSequence(), inputStream, err)
 		}
 
 		server.metrics.messages.Inc()

@@ -21,6 +21,7 @@ type RabbitMQStreamPublisher struct {
 	confirmMu   sync.Mutex
 	confirmErr  error
 	pendingAcks map[int64]chan error
+	pendingZero chan struct{}
 	confirmDone chan struct{}
 }
 
@@ -43,6 +44,13 @@ type RabbitMQStreamDelivery struct {
 	commitErr  error
 }
 
+const (
+	rabbitMQAutoCommitCount      = 500
+	rabbitMQAutoCommitFlushAfter = 5 * time.Second
+	rabbitMQInitialCredits       = 500
+	rabbitMQConfirmationTimeout  = 10 * time.Second
+)
+
 func NewRabbitMQStreamPublisher(cfg RabbitMQConfig, streamName string) (*RabbitMQStreamPublisher, error) {
 	env, err := openRabbitMQEnvironment(cfg)
 	if err != nil {
@@ -56,7 +64,7 @@ func NewRabbitMQStreamPublisher(cfg RabbitMQConfig, streamName string) (*RabbitM
 
 	producer, err := env.NewProducer(streamName, stream.NewProducerOptions().
 		SetBatchSize(100).
-		SetConfirmationTimeOut(10 * time.Second))
+		SetConfirmationTimeOut(rabbitMQConfirmationTimeout))
 	if err != nil {
 		_ = env.Close()
 		return nil, fmt.Errorf("create stream producer for %q: %w", streamName, err)
@@ -67,6 +75,7 @@ func NewRabbitMQStreamPublisher(cfg RabbitMQConfig, streamName string) (*RabbitM
 		env:         env,
 		producer:    producer,
 		pendingAcks: make(map[int64]chan error),
+		pendingZero: closedSignal(),
 		confirmDone: make(chan struct{}),
 	}
 
@@ -112,9 +121,11 @@ func NewRabbitMQStreamConsumer(cfg RabbitMQConfig, streamName string, consumerNa
 		consumer.handleMessage,
 		stream.NewConsumerOptions().
 			SetConsumerName(consumerName).
-			SetManualCommit().
 			SetCRCCheck(false).
-			SetInitialCredits(50).
+			SetInitialCredits(rabbitMQInitialCredits).
+			SetAutoCommit(stream.NewAutoCommitStrategy().
+				SetCountBeforeStorage(rabbitMQAutoCommitCount).
+				SetFlushInterval(rabbitMQAutoCommitFlushAfter)).
 			SetOffset(offsetSpec),
 	)
 	if err != nil {
@@ -155,7 +166,7 @@ func (p *RabbitMQStreamPublisher) PublishChunk(ctx context.Context, chunk *pb.Da
 		"created_at_unix_nano": chunk.GetCreatedAtUnixNano(),
 	}
 
-	ackCh, err := p.registerPendingConfirmation(publishID)
+	_, err = p.registerPendingConfirmation(publishID)
 	if err != nil {
 		return err
 	}
@@ -169,16 +180,7 @@ func (p *RabbitMQStreamPublisher) PublishChunk(ctx context.Context, chunk *pb.Da
 		return fmt.Errorf("publish to %q: %w", p.streamName, err)
 	}
 
-	select {
-	case err := <-ackCh:
-		if err != nil {
-			return err
-		}
-		return nil
-	case <-ctx.Done():
-		p.cancelPendingConfirmation(publishID)
-		return ctx.Err()
-	}
+	return nil
 }
 
 func (p *RabbitMQStreamPublisher) Close() error {
@@ -187,8 +189,11 @@ func (p *RabbitMQStreamPublisher) Close() error {
 	}
 
 	var closeErr error
+	if err := p.waitForPendingConfirmations(rabbitMQConfirmationTimeout); err != nil {
+		closeErr = err
+	}
 	if p.producer != nil {
-		if err := p.producer.Close(); err != nil {
+		if err := p.producer.Close(); err != nil && closeErr == nil {
 			closeErr = err
 		}
 	}
@@ -308,7 +313,6 @@ func (p *RabbitMQStreamPublisher) trackConfirmations(confirms stream.ChannelPubl
 			p.resolveConfirmation(status)
 		}
 	}
-	p.failPendingConfirmations(errors.New("publish confirmation channel closed before all messages were acknowledged"))
 }
 
 func (p *RabbitMQStreamPublisher) setConfirmationError(err error) {
@@ -338,6 +342,9 @@ func (p *RabbitMQStreamPublisher) registerPendingConfirmation(publishID int64) (
 	if _, exists := p.pendingAcks[publishID]; exists {
 		return nil, fmt.Errorf("duplicate pending publish confirmation for %q publishing id %d", p.streamName, publishID)
 	}
+	if len(p.pendingAcks) == 0 {
+		p.pendingZero = make(chan struct{})
+	}
 
 	ackCh := make(chan error, 1)
 	p.pendingAcks[publishID] = ackCh
@@ -355,6 +362,7 @@ func (p *RabbitMQStreamPublisher) cancelPendingConfirmation(publishID int64) {
 	if exists {
 		close(ackCh)
 	}
+	p.notifyPendingZero()
 }
 
 func (p *RabbitMQStreamPublisher) resolveConfirmation(status *stream.ConfirmationStatus) {
@@ -388,14 +396,12 @@ func (p *RabbitMQStreamPublisher) finishPendingConfirmation(publishID int64, err
 		ackCh <- err
 		close(ackCh)
 	}
+	p.notifyPendingZero()
 }
 
 func (p *RabbitMQStreamPublisher) failPendingConfirmations(err error) {
 	p.confirmMu.Lock()
 	if len(p.pendingAcks) == 0 {
-		if err != nil && p.confirmErr == nil {
-			p.confirmErr = err
-		}
 		p.confirmMu.Unlock()
 		return
 	}
@@ -410,6 +416,52 @@ func (p *RabbitMQStreamPublisher) failPendingConfirmations(err error) {
 		ackCh <- err
 		close(ackCh)
 	}
+	p.notifyPendingZero()
+}
+
+func (p *RabbitMQStreamPublisher) waitForPendingConfirmations(timeout time.Duration) error {
+	deadline := time.NewTimer(timeout)
+	defer deadline.Stop()
+
+	for {
+		p.confirmMu.Lock()
+		if p.confirmErr != nil {
+			err := p.confirmErr
+			p.confirmMu.Unlock()
+			return err
+		}
+		if len(p.pendingAcks) == 0 {
+			p.confirmMu.Unlock()
+			return nil
+		}
+		pendingZero := p.pendingZero
+		pendingCount := len(p.pendingAcks)
+		p.confirmMu.Unlock()
+
+		select {
+		case <-pendingZero:
+		case <-deadline.C:
+			return fmt.Errorf("timed out waiting for %d pending publish confirmations on %q", pendingCount, p.streamName)
+		}
+	}
+}
+
+func (p *RabbitMQStreamPublisher) notifyPendingZero() {
+	p.confirmMu.Lock()
+	defer p.confirmMu.Unlock()
+	if len(p.pendingAcks) == 0 && p.pendingZero != nil {
+		select {
+		case <-p.pendingZero:
+		default:
+			close(p.pendingZero)
+		}
+	}
+}
+
+func closedSignal() chan struct{} {
+	ch := make(chan struct{})
+	close(ch)
+	return ch
 }
 
 func (p *RabbitMQStreamPublisher) trackClose(events stream.ChannelClose) {

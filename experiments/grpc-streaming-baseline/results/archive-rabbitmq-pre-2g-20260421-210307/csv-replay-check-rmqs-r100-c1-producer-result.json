@@ -1,0 +1,52 @@
+{
+  "run_id": "csv-replay-check-rmqs-r100-c1",
+  "transport_mode": "rabbitmq-streams",
+  "workload_source": "csv-replay",
+  "workload_descriptor": "csv-replay[Personen_test.csv+Aanstellingen_test.csv]:rows-per-message=100:repeat=10",
+  "profile": "bulk",
+  "expected_messages": 10000,
+  "payload_bytes": 5630,
+  "concurrency": 1,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-21T11:17:39.270918255Z",
+  "producer_finished_at": "2026-04-21T11:18:07.759304641Z",
+  "stream_acks": [
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c1",
+      "stage": "producer",
+      "stream_messages": 10000,
+      "stream_bytes": 56298703,
+      "finished_at_unix_nano": 1776770287480044549
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "csv-replay-check-rmqs-r100-c1",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 10000,
+    "bytes_received": 56298703,
+    "duration_seconds": 28.481427578,
+    "throughput_messages_per_second": 351.1059960956568,
+    "throughput_megabytes_per_second": 1.8851101108273067,
+    "p50_latency_ms": 115.083188,
+    "p95_latency_ms": 292.780692,
+    "p99_latency_ms": 349.67514,
+    "max_latency_ms": 21021.598709,
+    "started_at_unix_nano": 1776770259324919453,
+    "finished_at_unix_nano": 1776770287632893444,
+    "transport_mode": "rabbitmq-streams",
+    "mean_inter_arrival_ms": 2.5587404523452375,
+    "p95_inter_arrival_ms": 7.9211,
+    "inter_arrival_jitter_ms": 7.930133082578778
+  }
+}

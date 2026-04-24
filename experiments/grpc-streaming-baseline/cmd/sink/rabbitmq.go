@@ -48,15 +48,12 @@ func (s *sinkServer) consumeRabbitMQRunWorker(ctx context.Context, runID string,
 	s.metrics.streams.Inc()
 
 	for {
-		chunk, delivery, err := consumer.ReceiveChunk(ctx)
+		chunk, _, err := consumer.ReceiveChunk(ctx)
 		if err != nil {
 			return err
 		}
 		if err := s.ingest(chunk); err != nil {
 			return fmt.Errorf("ingest worker %d sequence %d from %s: %w", worker, chunk.GetSequence(), streamName, err)
-		}
-		if err := delivery.Commit(); err != nil {
-			return fmt.Errorf("commit worker %d sequence %d from %s: %w", worker, chunk.GetSequence(), streamName, err)
 		}
 	}
 }

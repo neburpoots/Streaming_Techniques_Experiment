@@ -62,6 +62,7 @@ type runState struct {
 	seenSequences      map[uint64]struct{}
 	lastByWorker       map[uint64]uint64
 	summary            *pb.RunSummary
+	analysis           *sinkAnalysisFile
 }
 
 type sinkServer struct {
@@ -219,6 +220,7 @@ func (s *sinkServer) RegisterRun(_ context.Context, in *pb.RunConfig) (*pb.Regis
 		seenSequences:      make(map[uint64]struct{}),
 		lastByWorker:       make(map[uint64]uint64),
 	}
+	state.analysis = newSinkAnalysis(in.GetRunId(), in, registeredAt.UnixNano())
 	if in.GetTransportMode() == transport.ModeRabbitMQStreams {
 		runCtx, state.consumerCancel = context.WithCancel(s.ctx)
 		startConsumers = true
@@ -324,6 +326,9 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 	}
 	if state.startedAt.IsZero() {
 		state.startedAt = now
+		if state.analysis != nil {
+			state.analysis.StartedAtUnixNano = now.UnixNano()
+		}
 	}
 	if !state.lastArrivalAt.IsZero() {
 		state.interArrivalMillis = append(state.interArrivalMillis, float64(now.Sub(state.lastArrivalAt))/float64(time.Millisecond))
@@ -331,6 +336,9 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 	state.lastArrivalAt = now
 	if _, duplicate := state.seenSequences[chunk.GetSequence()]; duplicate {
 		state.duplicates++
+		if state.analysis != nil {
+			state.analysis.DuplicateArrivalUnixNano = append(state.analysis.DuplicateArrivalUnixNano, now.UnixNano())
+		}
 		s.metrics.duplicates.Inc()
 		s.mu.Unlock()
 
@@ -347,6 +355,12 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 	state.lastByWorker[chunk.GetProducerWorker()] = chunk.GetSequence()
 	latencyMillis := float64(now.UnixNano()-chunk.GetCreatedAtUnixNano()) / float64(time.Millisecond)
 	state.latenciesMillis = append(state.latenciesMillis, latencyMillis)
+	if state.analysis != nil {
+		state.analysis.UniqueEvents = append(state.analysis.UniqueEvents, sinkArrivalEvent{
+			ArrivalAtUnixNano: now.UnixNano(),
+			LatencyMs:         latencyMillis,
+		})
+	}
 	state.messagesReceived++
 	state.bytesReceived += uint64(len(chunk.GetPayload()))
 	s.metrics.messages.Inc()
@@ -359,10 +373,18 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 		state.completed = true
 		state.finishedAt = now
 		state.summary = buildSummary(chunk.GetRunId(), state)
+		if state.analysis != nil {
+			state.analysis.FinishedAtUnixNano = now.UnixNano()
+		}
 		cancelConsumers = state.consumerCancel
 		state.consumerCancel = nil
 		if err := app.WriteJSON(s.resultDir, fmt.Sprintf("%s-sink-summary.json", chunk.GetRunId()), state.summary); err != nil {
 			log.Printf("write sink summary: %v", err)
+		}
+		if state.analysis != nil {
+			if err := app.WriteJSON(s.resultDir, fmt.Sprintf("%s-sink-analysis.json", chunk.GetRunId()), state.analysis); err != nil {
+				log.Printf("write sink analysis: %v", err)
+			}
 		}
 	}
 	s.mu.Unlock()

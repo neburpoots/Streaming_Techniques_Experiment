@@ -376,9 +376,6 @@ func sendBulkRabbitMQStreams(ctx context.Context, cfg *producerConfig, limiter *
 				errChan <- fmt.Errorf("worker %d open rabbitmq publisher: %w", worker, err)
 				return
 			}
-			defer func() {
-				_ = publisher.Close()
-			}()
 
 			streamName := cfg.rabbitMQ.ProducerToTransformerRunWorkerStream(cfg.runID, worker)
 			var streamBytes uint64
@@ -427,6 +424,11 @@ func sendBulkRabbitMQStreams(ctx context.Context, cfg *producerConfig, limiter *
 
 				streamBytes += uint64(len(chunk.GetPayload()))
 				nextIndex++
+			}
+
+			if err := publisher.Close(); err != nil {
+				errChan <- fmt.Errorf("worker %d close rabbitmq publisher for %s: %w", worker, streamName, err)
+				return
 			}
 
 			ackChan <- &pb.StreamAck{

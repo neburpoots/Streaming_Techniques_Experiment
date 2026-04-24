@@ -1,0 +1,101 @@
+{
+  "run_id": "csv-replay-check-rmqs-r100-c8",
+  "transport_mode": "rabbitmq-streams",
+  "workload_source": "csv-replay",
+  "workload_descriptor": "csv-replay[Personen_test.csv+Aanstellingen_test.csv]:rows-per-message=100:repeat=10",
+  "profile": "bulk",
+  "expected_messages": 10000,
+  "payload_bytes": 5630,
+  "concurrency": 8,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-21T11:18:41.843011933Z",
+  "producer_finished_at": "2026-04-21T11:19:05.08894172Z",
+  "stream_acks": [
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c8",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 7164242,
+      "finished_at_unix_nano": 1776770344636387120
+    },
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c8",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 7164229,
+      "finished_at_unix_nano": 1776770344718547316
+    },
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c8",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 6912149,
+      "finished_at_unix_nano": 1776770344719241966
+    },
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c8",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 7162689,
+      "finished_at_unix_nano": 1776770344721426200
+    },
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c8",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 6910280,
+      "finished_at_unix_nano": 1776770344728162325
+    },
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c8",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 6912171,
+      "finished_at_unix_nano": 1776770344747164001
+    },
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c8",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 6910257,
+      "finished_at_unix_nano": 1776770344817822780
+    },
+    {
+      "run_id": "csv-replay-check-rmqs-r100-c8",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 7162686,
+      "finished_at_unix_nano": 1776770344826113939
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "csv-replay-check-rmqs-r100-c8",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 10000,
+    "bytes_received": 56298703,
+    "duration_seconds": 23.157145441,
+    "throughput_messages_per_second": 431.83215416071454,
+    "throughput_megabytes_per_second": 2.318533915800503,
+    "p50_latency_ms": 186.158668,
+    "p95_latency_ms": 421.850364,
+    "p99_latency_ms": 1158.782598,
+    "max_latency_ms": 21340.873797,
+    "started_at_unix_nano": 1776770322056576615,
+    "finished_at_unix_nano": 1776770344940273779,
+    "transport_mode": "rabbitmq-streams",
+    "mean_inter_arrival_ms": 2.2018227363736305,
+    "p95_inter_arrival_ms": 3.6317,
+    "inter_arrival_jitter_ms": 9.314565079735528
+  }
+}

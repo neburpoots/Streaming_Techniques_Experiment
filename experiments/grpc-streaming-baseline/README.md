@@ -20,7 +20,8 @@ The metrics are chosen to line up with the papers already discussed in the thesi
 - inter-arrival regularity for continuous runs, reported as mean, p95, and jitter proxy at the sink;
 - total stream completion time for the run;
 - duplicate detection and per-flow ordering violations;
-- retry attempts, stream reconnects, and recovery timing during restart-oriented runs;
+- producer retry attempts, reconnects, and producer-side recovery timing during restart-oriented runs;
+- recovery-specific sink metrics: completion ratio, loss count, duplicate ratio, time to first post-failure message, end-to-end recovery time, backlog drain time, recovery-window p95 latency, and throughput debt;
 - per-service message and byte counters through Prometheus-style `/metrics` endpoints;
 - container CPU and memory snapshots through `docker stats` sampling.
 
@@ -55,6 +56,8 @@ The DYNAMOS CSVs are still useful later as a replay-style workload once the base
 - `producer`: generates deterministic payloads and opens one or more client streams to the transformer.
 - `transformer`: optional lightweight CPU work, then forwards chunks to the sink via client streaming.
 - `sink`: computes canonical run-level metrics and writes a JSON summary.
+
+For restart-and-recovery scenarios, the sink also records per-message arrival timing in a companion analysis file so the export step can derive end-to-end recovery metrics from the same observation point for every transport.
 
 The same three-stage topology can now be run in three transport modes:
 
@@ -151,9 +154,20 @@ CONCURRENCY=8 \
 Results are written to `results/`.
 
 - `*-sink-summary.json`: canonical end-to-end run summary.
+- `*-sink-analysis.json`: sink-side arrival timeline used to derive fair recovery metrics for restart scenarios.
 - `*-producer-result.json`: producer view plus workload metadata, retry counts, reconnect counts, and recovery timing.
 - `*-docker-stats.ndjson`: container CPU and memory snapshots taken during the run.
 - `*-summary.csv`: exported comparison table with sink metrics and per-role CPU/memory aggregates.
+
+The recovery-oriented CSV columns intentionally separate producer-side and end-to-end behavior:
+
+- `producer_*`: retries, reconnects, and producer-observed recovery timing.
+- `completion_ratio`, `lost_messages`, `duplicate_ratio`: correctness under failure.
+- `time_to_first_post_failure_message_ms`, `e2e_recovery_ms`, `backlog_drain_ms`: service disruption as seen at the sink.
+- `sustained_target_recovered`: whether the sink ever regained at least 90% of the configured target rate for three consecutive one-second windows.
+- `recovery_window_p95_latency_ms`, `throughput_debt_messages`, `post_failure_duplicates`: the quality and cost of recovery.
+
+When a run never regains the sustained-rate threshold before completion, `e2e_recovery_ms` is capped at `backlog_drain_ms` instead of being left blank. Use `sustained_target_recovered` to distinguish a true steady-state recovery from that bounded fallback.
 
 ## Matrix runs and CSV export
 
