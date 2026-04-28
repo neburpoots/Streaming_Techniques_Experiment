@@ -29,6 +29,8 @@ resolve_role() {
         grpc-stream-transformer*) echo "transformer" ;;
         grpc-stream-sink*) echo "sink" ;;
         grpc-stream-rabbitmq*) echo "rabbitmq" ;;
+        grpc-stream-nats*) echo "nats" ;;
+        grpc-stream-kafka*) echo "kafka" ;;
         *) echo "" ;;
     esac
 }

@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-kafka-p16384-c1",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 327680000,
+  "duration_seconds": 268.391903033,
+  "throughput_messages_per_second": 74.51789630755331,
+  "throughput_megabytes_per_second": 1.1643421298055205,
+  "p50_latency_ms": 887.285299,
+  "p95_latency_ms": 1929.692767,
+  "p99_latency_ms": 4204.694384,
+  "max_latency_ms": 28379.908823,
+  "started_at_unix_nano": 1777116080220087989,
+  "finished_at_unix_nano": 1777116348337793154,
+  "transport_mode": "kafka",
+  "mean_inter_arrival_ms": 12.426869802590087,
+  "p95_inter_arrival_ms": 17.164948,
+  "inter_arrival_jitter_ms": 3.060910882541971
+}

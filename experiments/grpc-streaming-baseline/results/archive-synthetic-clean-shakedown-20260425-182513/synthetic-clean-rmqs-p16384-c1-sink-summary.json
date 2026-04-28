@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-rmqs-p16384-c1",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 327680000,
+  "duration_seconds": 8.955855888,
+  "throughput_messages_per_second": 2233.1757288321387,
+  "throughput_megabytes_per_second": 34.89337076300217,
+  "p50_latency_ms": 710.979394,
+  "p95_latency_ms": 1001.101088,
+  "p99_latency_ms": 1041.383454,
+  "max_latency_ms": 1068.784545,
+  "started_at_unix_nano": 1776803136488293390,
+  "finished_at_unix_nano": 1776803145164275000,
+  "transport_mode": "rabbitmq-streams",
+  "mean_inter_arrival_ms": 0.43382077153862453,
+  "p95_inter_arrival_ms": 0.17435,
+  "inter_arrival_jitter_ms": 4.2038901517733995
+}

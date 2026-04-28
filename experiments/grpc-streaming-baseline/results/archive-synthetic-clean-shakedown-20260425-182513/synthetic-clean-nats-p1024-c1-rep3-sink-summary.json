@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-nats-p1024-c1-rep3",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 20480000,
+  "duration_seconds": 19.046741586,
+  "throughput_messages_per_second": 1050.048372300104,
+  "throughput_megabytes_per_second": 1.0254378635743202,
+  "p50_latency_ms": 4338.884315,
+  "p95_latency_ms": 9286.531902,
+  "p99_latency_ms": 9490.947392,
+  "max_latency_ms": 9552.234355,
+  "started_at_unix_nano": 1777120592451470724,
+  "finished_at_unix_nano": 1777120611455533315,
+  "transport_mode": "nats-jetstream",
+  "mean_inter_arrival_ms": 0.8139984411220512,
+  "p95_inter_arrival_ms": 1.025475,
+  "inter_arrival_jitter_ms": 2.7033592690377004
+}

@@ -1,0 +1,52 @@
+{
+  "run_id": "synthetic-clean-kafka-p16384-c1",
+  "transport_mode": "kafka",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 16384,
+  "concurrency": 1,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-25T11:21:20.020382474Z",
+  "producer_finished_at": "2026-04-25T11:25:48.484134206Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-clean-kafka-p16384-c1",
+      "stage": "producer",
+      "stream_messages": 20000,
+      "stream_bytes": 327680000,
+      "finished_at_unix_nano": 1777116346460575424
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-clean-kafka-p16384-c1",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 327680000,
+    "duration_seconds": 268.391903033,
+    "throughput_messages_per_second": 74.51789630755331,
+    "throughput_megabytes_per_second": 1.1643421298055205,
+    "p50_latency_ms": 887.285299,
+    "p95_latency_ms": 1929.692767,
+    "p99_latency_ms": 4204.694384,
+    "max_latency_ms": 28379.908823,
+    "started_at_unix_nano": 1777116080220087989,
+    "finished_at_unix_nano": 1777116348337793154,
+    "transport_mode": "kafka",
+    "mean_inter_arrival_ms": 12.426869802590087,
+    "p95_inter_arrival_ms": 17.164948,
+    "inter_arrival_jitter_ms": 3.060910882541971
+  }
+}

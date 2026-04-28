@@ -1,0 +1,9 @@
+{"Name":"grpc-streaming-baseline-rabbitmq-1","CPUPerc":"8.20%","MemUsage":"1987MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"0.10%","MemUsage":"5MiB / 0B"}
+{"Name":"grpc-streaming-baseline-rabbitmq-1","CPUPerc":"8.20%","MemUsage":"1987MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"0.10%","MemUsage":"5MiB / 0B"}
+{"Name":"grpc-streaming-baseline-rabbitmq-1","CPUPerc":"8.20%","MemUsage":"1987MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"0.10%","MemUsage":"5MiB / 0B"}

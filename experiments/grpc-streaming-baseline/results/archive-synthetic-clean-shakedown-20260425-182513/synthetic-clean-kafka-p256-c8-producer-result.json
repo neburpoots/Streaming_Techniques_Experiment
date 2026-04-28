@@ -1,0 +1,101 @@
+{
+  "run_id": "synthetic-clean-kafka-p256-c8",
+  "transport_mode": "kafka",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 256,
+  "concurrency": 8,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-25T10:58:10.260964753Z",
+  "producer_finished_at": "2026-04-25T10:58:53.874409707Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-clean-kafka-p256-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 640000,
+      "finished_at_unix_nano": 1777114733093553248
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p256-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 640000,
+      "finished_at_unix_nano": 1777114733293052917
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p256-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 640000,
+      "finished_at_unix_nano": 1777114733430371968
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p256-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 640000,
+      "finished_at_unix_nano": 1777114733433095202
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p256-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 640000,
+      "finished_at_unix_nano": 1777114733454865669
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p256-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 640000,
+      "finished_at_unix_nano": 1777114733465403394
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p256-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 640000,
+      "finished_at_unix_nano": 1777114733591562029
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p256-c8",
+      "stage": "producer",
+      "stream_messages": 2500,
+      "stream_bytes": 640000,
+      "finished_at_unix_nano": 1777114733622300796
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-clean-kafka-p256-c8",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 5120000,
+    "duration_seconds": 43.47489986,
+    "throughput_messages_per_second": 460.0355622302749,
+    "throughput_megabytes_per_second": 0.1123133696851257,
+    "p50_latency_ms": 88.606701,
+    "p95_latency_ms": 351.385504,
+    "p99_latency_ms": 442.721589,
+    "max_latency_ms": 2984.036906,
+    "started_at_unix_nano": 1777114690765100901,
+    "finished_at_unix_nano": 1777114733646594296,
+    "transport_mode": "kafka",
+    "mean_inter_arrival_ms": 2.007667076303837,
+    "p95_inter_arrival_ms": 9.6333,
+    "inter_arrival_jitter_ms": 5.534927329103721
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-nats-p256-c16-rep2",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 5120000,
+  "duration_seconds": 16.883280326,
+  "throughput_messages_per_second": 1184.6039166452917,
+  "throughput_megabytes_per_second": 0.28920994058722943,
+  "p50_latency_ms": 4083.988029,
+  "p95_latency_ms": 8056.651457,
+  "p99_latency_ms": 8222.707672,
+  "max_latency_ms": 8400.048057,
+  "started_at_unix_nano": 1777118866194708905,
+  "finished_at_unix_nano": 1777118882912469174,
+  "transport_mode": "nats-jetstream",
+  "mean_inter_arrival_ms": 0.6996288476423843,
+  "p95_inter_arrival_ms": 2.093118,
+  "inter_arrival_jitter_ms": 4.258830726435127
+}

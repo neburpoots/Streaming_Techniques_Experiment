@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-stream-kafka
+  namespace: streaming-experiments
+spec:
+  selector:
+    app: grpc-stream-kafka
+  ports:
+    - name: client
+      port: 9092
+      targetPort: 9092

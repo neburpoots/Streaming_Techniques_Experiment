@@ -1,0 +1,52 @@
+{
+  "run_id": "synthetic-clean-nats-p1024-c1-rep1",
+  "transport_mode": "nats-jetstream",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 1024,
+  "concurrency": 1,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-25T11:38:17.98033603Z",
+  "producer_finished_at": "2026-04-25T11:38:42.64643478Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-clean-nats-p1024-c1-rep1",
+      "stage": "producer",
+      "stream_messages": 20000,
+      "stream_bytes": 20480000,
+      "finished_at_unix_nano": 1777117109829954526
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-clean-nats-p1024-c1-rep1",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 20480000,
+    "duration_seconds": 24.477745577,
+    "throughput_messages_per_second": 817.0687099057268,
+    "throughput_megabytes_per_second": 0.7979186620173113,
+    "p50_latency_ms": 5338.843545,
+    "p95_latency_ms": 12202.46579,
+    "p99_latency_ms": 12517.652713,
+    "max_latency_ms": 12596.635367,
+    "started_at_unix_nano": 1777117097990020246,
+    "finished_at_unix_nano": 1777117122426478701,
+    "transport_mode": "nats-jetstream",
+    "mean_inter_arrival_ms": 1.0855884823241093,
+    "p95_inter_arrival_ms": 3.396341,
+    "inter_arrival_jitter_ms": 3.320845687214429
+  }
+}

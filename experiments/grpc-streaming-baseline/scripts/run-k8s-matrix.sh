@@ -17,7 +17,9 @@ set -euo pipefail
 # Options:
 #   --overlay <name>    Kustomize overlay to use (default: resource-medium)
 #   --repeat <n>        Number of repetitions per case (default: 1)
-#   --transport <mode>  Transport filter: all, client-streaming, unary, rabbitmq-streams
+#   --transport <mode>  Transport filter: all, client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka
+#   --payload <bytes>   Payload-size filter for synthetic-clean
+#   --concurrency <n>   Concurrency filter for synthetic-clean
 #   --skip-build        Skip container image build
 #   --skip-load         Skip image load into cluster (kind)
 #   --namespace <ns>    Kubernetes namespace (default: streaming-experiments)
@@ -34,6 +36,8 @@ PRESET=""
 OVERLAY="resource-medium"
 REPEAT=1
 TRANSPORT_FILTER="all"
+PAYLOAD_FILTER=""
+CONCURRENCY_FILTER=""
 SKIP_BUILD=false
 SKIP_LOAD=false
 NAMESPACE="streaming-experiments"
@@ -45,6 +49,8 @@ while [[ $# -gt 0 ]]; do
         --overlay)    OVERLAY="$2"; shift 2 ;;
         --repeat)     REPEAT="$2"; shift 2 ;;
         --transport)  TRANSPORT_FILTER="$2"; shift 2 ;;
+        --payload)    PAYLOAD_FILTER="$2"; shift 2 ;;
+        --concurrency) CONCURRENCY_FILTER="$2"; shift 2 ;;
         --skip-build) SKIP_BUILD=true; shift ;;
         --skip-load)  SKIP_LOAD=true; shift ;;
         --namespace)  NAMESPACE="$2"; shift 2 ;;
@@ -78,10 +84,10 @@ mkdir -p "${RESULTS_DIR}"
 
 validate_transport_filter() {
     case "${TRANSPORT_FILTER}" in
-        all|client-streaming|unary|rabbitmq-streams) ;;
+        all|client-streaming|unary|rabbitmq-streams|nats-jetstream|kafka) ;;
         *)
             echo "Invalid --transport value: ${TRANSPORT_FILTER}" >&2
-            echo "Expected one of: all, client-streaming, unary, rabbitmq-streams" >&2
+            echo "Expected one of: all, client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka" >&2
             exit 1
             ;;
     esac
@@ -89,9 +95,15 @@ validate_transport_filter() {
 
 selected_transport_modes() {
     case "${TRANSPORT_FILTER}" in
-        all) echo "client-streaming unary rabbitmq-streams" ;;
+        all) echo "client-streaming unary rabbitmq-streams nats-jetstream kafka" ;;
         *) echo "${TRANSPORT_FILTER}" ;;
     esac
+}
+
+matches_filter() {
+    local value="$1"
+    local filter="$2"
+    [[ -z "${filter}" || "${value}" == "${filter}" ]]
 }
 
 validate_transport_filter
@@ -228,6 +240,13 @@ patch_configmap() {
         --from-literal=RABBITMQ_VHOST="${RABBITMQ_VHOST:-/}" \
         --from-literal=RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM="${RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM:-producer-to-transformer}" \
         --from-literal=RABBITMQ_TRANSFORMER_TO_SINK_STREAM="${RABBITMQ_TRANSFORMER_TO_SINK_STREAM:-transformer-to-sink}" \
+        --from-literal=NATS_URL="${NATS_URL:-nats://grpc-stream-nats:4222}" \
+        --from-literal=NATS_PRODUCER_TO_TRANSFORMER_SUBJECT="${NATS_PRODUCER_TO_TRANSFORMER_SUBJECT:-producer.to.transformer}" \
+        --from-literal=NATS_TRANSFORMER_TO_SINK_SUBJECT="${NATS_TRANSFORMER_TO_SINK_SUBJECT:-transformer.to.sink}" \
+        --from-literal=KAFKA_BROKERS="${KAFKA_BROKERS:-grpc-stream-kafka:9092}" \
+        --from-literal=KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC="${KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC:-producer-to-transformer}" \
+        --from-literal=KAFKA_TRANSFORMER_TO_SINK_TOPIC="${KAFKA_TRANSFORMER_TO_SINK_TOPIC:-transformer-to-sink}" \
+        --from-literal=KAFKA_TOPIC_PARTITIONS="${KAFKA_TOPIC_PARTITIONS:-16}" \
         --dry-run=client -o yaml | kubectl apply -f -
 }
 
@@ -248,6 +267,25 @@ wait_for_rabbitmq_ready() {
     echo "  Warning: RabbitMQ did not report ready state before the producer job started" >&2
 }
 
+wait_for_nats_ready() {
+    echo "  Waiting for NATS to be ready..."
+    kubectl rollout status deployment/grpc-stream-nats -n "${NAMESPACE}" --timeout=120s
+}
+
+wait_for_kafka_ready() {
+    echo "  Waiting for Kafka to be ready..."
+    kubectl rollout status deployment/grpc-stream-kafka -n "${NAMESPACE}" --timeout=180s
+    local kafka_pod=""
+    for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+        kafka_pod="$(kubectl get pods -n "${NAMESPACE}" -l app=grpc-stream-kafka -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
+        if [[ -n "${kafka_pod}" ]] && kubectl exec -n "${NAMESPACE}" "${kafka_pod}" -- bash -ec 'unset JMX_PORT; /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null' >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep 3
+    done
+    echo "  Warning: Kafka did not report ready state before the producer job started" >&2
+}
+
 wait_for_ready() {
     local transport_mode="${1:-client-streaming}"
     echo "  Waiting for sink and transformer to be ready..."
@@ -255,6 +293,10 @@ wait_for_ready() {
     kubectl rollout status deployment/grpc-stream-transformer -n "${NAMESPACE}" --timeout=120s
     if [[ "${transport_mode}" == "rabbitmq-streams" ]]; then
         wait_for_rabbitmq_ready
+    elif [[ "${transport_mode}" == "nats-jetstream" ]]; then
+        wait_for_nats_ready
+    elif [[ "${transport_mode}" == "kafka" ]]; then
+        wait_for_kafka_ready
     fi
     sleep 2
 }
@@ -262,6 +304,17 @@ wait_for_ready() {
 # ── Restart deployments to pick up new ConfigMap values ──
 restart_deployments() {
     local transport_mode="${1:-client-streaming}"
+    case "${transport_mode}" in
+        rabbitmq-streams)
+            kubectl rollout restart deployment/grpc-stream-rabbitmq -n "${NAMESPACE}"
+            ;;
+        nats-jetstream)
+            kubectl rollout restart deployment/grpc-stream-nats -n "${NAMESPACE}"
+            ;;
+        kafka)
+            kubectl rollout restart deployment/grpc-stream-kafka -n "${NAMESPACE}"
+            ;;
+    esac
     kubectl rollout restart deployment/grpc-stream-sink -n "${NAMESPACE}"
     kubectl rollout restart deployment/grpc-stream-transformer -n "${NAMESPACE}"
     wait_for_ready "${transport_mode}"
@@ -459,7 +512,9 @@ run_synthetic_clean() {
     for transport_mode in $(selected_transport_modes); do
         local ts; ts=$(transport_short "${transport_mode}")
         for payload in 256 1024 4096 16384; do
+            matches_filter "${payload}" "${PAYLOAD_FILTER}" || continue
             for conc in 1 4 8 16; do
+                matches_filter "${conc}" "${CONCURRENCY_FILTER}" || continue
                 run_case "synthetic-clean-${ts}-p${payload}-c${conc}" \
                     "${transport_mode}" "synthetic" "bulk" "20000" "${payload}" "${conc}" "0"
             done
@@ -520,6 +575,8 @@ transport_short() {
         client-streaming) echo "stream" ;;
         unary) echo "unary" ;;
         rabbitmq-streams) echo "rmqs" ;;
+        nats-jetstream) echo "nats" ;;
+        kafka) echo "kafka" ;;
         *) echo "$1" ;;
     esac
 }

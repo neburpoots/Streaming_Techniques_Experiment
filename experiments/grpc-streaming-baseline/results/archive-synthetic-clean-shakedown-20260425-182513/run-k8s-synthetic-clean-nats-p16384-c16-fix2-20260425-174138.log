@@ -1,0 +1,47 @@
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config configured
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka unchanged
+deployment.apps/grpc-stream-nats unchanged
+deployment.apps/grpc-stream-rabbitmq unchanged
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium, repeat: 1, transport: nats-jetstream)
+━━━ Running: synthetic-clean-nats-p16384-c16 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p16384-c16 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c16
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\synthetic-clean-summary.csv
+Finished preset: synthetic-clean

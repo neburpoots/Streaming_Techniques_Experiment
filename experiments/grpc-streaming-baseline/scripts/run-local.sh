@@ -12,7 +12,7 @@ cleanup() {
   if [[ -n "${STATS_PID:-}" ]]; then
     kill "${STATS_PID}" >/dev/null 2>&1 || true
   fi
-  docker compose -f "${ROOT}/docker-compose.yml" down >/dev/null 2>&1 || true
+  docker compose -f "${ROOT}/docker-compose.yml" down -v >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
@@ -28,6 +28,16 @@ if [[ "${TRANSPORT_MODE:-client-streaming}" == "rabbitmq-streams" ]]; then
   until docker compose exec -T rabbitmq rabbitmq-diagnostics -q ping >/dev/null 2>&1; do
     printf 'waiting for rabbitmq to become ready\n'
     sleep 1
+  done
+elif [[ "${TRANSPORT_MODE:-client-streaming}" == "nats-jetstream" ]]; then
+  until docker compose exec -T nats sh -c 'nc -z 127.0.0.1 4222' >/dev/null 2>&1; do
+    printf 'waiting for nats to become ready\n'
+    sleep 1
+  done
+elif [[ "${TRANSPORT_MODE:-client-streaming}" == "kafka" ]]; then
+  until docker compose exec -T kafka bash -ec 'unset JMX_PORT; /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null' >/dev/null 2>&1; do
+    printf 'waiting for kafka to become ready\n'
+    sleep 2
   done
 fi
 

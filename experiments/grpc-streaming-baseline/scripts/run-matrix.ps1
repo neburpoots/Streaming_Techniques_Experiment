@@ -67,13 +67,15 @@ function Get-MatrixCases {
     switch ($PresetName) {
         'synthetic-clean' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 foreach ($payloadBytes in @(256, 1024, 4096, 16384)) {
                     foreach ($concurrency in @(1, 4, 8, 16)) {
                         $transportShort = switch ($transportMode) {
                             'client-streaming' { 'stream' }
                             'unary' { 'unary' }
                             'rabbitmq-streams' { 'rmqs' }
+                            'nats-jetstream' { 'nats' }
+                            'kafka' { 'kafka' }
                         }
                         $cases += New-RunCase `
                             -RunId "synthetic-clean-$transportShort-p$payloadBytes-c$concurrency" `
@@ -91,13 +93,15 @@ function Get-MatrixCases {
         }
         'csv-replay-check' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 foreach ($rowsPerMessage in @(25, 100)) {
                     foreach ($concurrency in @(1, 8)) {
                         $transportShort = switch ($transportMode) {
                             'client-streaming' { 'stream' }
                             'unary' { 'unary' }
                             'rabbitmq-streams' { 'rmqs' }
+                            'nats-jetstream' { 'nats' }
+                            'kafka' { 'kafka' }
                         }
                         $cases += New-RunCase `
                             -RunId "csv-replay-check-$transportShort-r$rowsPerMessage-c$concurrency" `
@@ -118,12 +122,14 @@ function Get-MatrixCases {
         }
         'synthetic-continuous' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 foreach ($concurrency in @(4, 8)) {
                     $transportShort = switch ($transportMode) {
                         'client-streaming' { 'stream' }
                         'unary' { 'unary' }
                         'rabbitmq-streams' { 'rmqs' }
+                        'nats-jetstream' { 'nats' }
+                        'kafka' { 'kafka' }
                     }
                     $cases += New-RunCase `
                         -RunId "synthetic-continuous-$transportShort-p1024-c$concurrency" `
@@ -140,11 +146,13 @@ function Get-MatrixCases {
         }
         'synthetic-backpressure' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 $transportShort = switch ($transportMode) {
                     'client-streaming' { 'stream' }
                     'unary' { 'unary' }
                     'rabbitmq-streams' { 'rmqs' }
+                    'nats-jetstream' { 'nats' }
+                    'kafka' { 'kafka' }
                 }
                 $cases += New-RunCase `
                     -RunId "synthetic-backpressure-$transportShort-p1024-c8" `
@@ -161,11 +169,13 @@ function Get-MatrixCases {
         }
         'synthetic-recovery' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 $transportShort = switch ($transportMode) {
                     'client-streaming' { 'stream' }
                     'unary' { 'unary' }
                     'rabbitmq-streams' { 'rmqs' }
+                    'nats-jetstream' { 'nats' }
+                    'kafka' { 'kafka' }
                 }
                 $cases += New-RunCase `
                     -RunId "synthetic-recovery-$transportShort-p4096-c8" `
@@ -195,6 +205,16 @@ function Wait-ForHealth {
             Invoke-WebRequest -UseBasicParsing http://localhost:9101/healthz | Out-Null
             Invoke-WebRequest -UseBasicParsing http://localhost:9102/healthz | Out-Null
             if ($TransportMode -ne 'rabbitmq-streams') {
+                if ($TransportMode -eq 'nats-jetstream') {
+                    if (-not (Test-NetConnection -ComputerName localhost -Port 4222 -InformationLevel Quiet)) {
+                        throw 'NATS is not accepting connections yet.'
+                    }
+                }
+                elseif ($TransportMode -eq 'kafka') {
+                    if (-not (Test-NetConnection -ComputerName localhost -Port 9092 -InformationLevel Quiet)) {
+                        throw 'Kafka is not accepting connections yet.'
+                    }
+                }
                 return
             }
             docker compose exec -T rabbitmq rabbitmq-diagnostics -q ping | Out-Null
@@ -302,7 +322,7 @@ function Invoke-RunCase {
             Wait-Job $failureJob | Out-Null
             Remove-Job $failureJob -Force | Out-Null
         }
-        docker compose down | Out-Null
+        docker compose down -v | Out-Null
     }
 }
 

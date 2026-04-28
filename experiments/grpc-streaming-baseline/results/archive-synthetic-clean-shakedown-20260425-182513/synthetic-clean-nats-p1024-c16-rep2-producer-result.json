@@ -1,0 +1,157 @@
+{
+  "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+  "transport_mode": "nats-jetstream",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 1024,
+  "concurrency": 16,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-25T12:12:22.819372663Z",
+  "producer_finished_at": "2026-04-25T12:12:39.580169151Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153461481943
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153465023211
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153501185809
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153561700488
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153589166576
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153625207167
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153625398842
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153673587926
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153690659563
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153690901746
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153694992555
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153695021247
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153695026014
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153697300997
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153754469109
+    },
+    {
+      "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+      "stage": "producer",
+      "stream_messages": 1250,
+      "stream_bytes": 1280000,
+      "finished_at_unix_nano": 1777119153789324540
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-clean-nats-p1024-c16-rep2",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 20480000,
+    "duration_seconds": 16.727753399,
+    "throughput_messages_per_second": 1195.6178168668853,
+    "throughput_megabytes_per_second": 1.1675955242840677,
+    "p50_latency_ms": 5055.853801,
+    "p95_latency_ms": 5827.16836,
+    "p99_latency_ms": 5988.577899,
+    "max_latency_ms": 6079.375767,
+    "started_at_unix_nano": 1777119142950709663,
+    "finished_at_unix_nano": 1777119159492856909,
+    "transport_mode": "nats-jetstream",
+    "mean_inter_arrival_ms": 0.8271487197359837,
+    "p95_inter_arrival_ms": 2.725984,
+    "inter_arrival_jitter_ms": 3.9228034024855423
+  }
+}

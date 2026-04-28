@@ -1,0 +1,73 @@
+{
+  "run_id": "synthetic-clean-kafka-p16384-c4",
+  "transport_mode": "kafka",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 16384,
+  "concurrency": 4,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-25T11:26:40.442530004Z",
+  "producer_finished_at": "2026-04-25T11:27:55.99521307Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-clean-kafka-p16384-c4",
+      "stage": "producer",
+      "stream_messages": 5000,
+      "stream_bytes": 81920000,
+      "finished_at_unix_nano": 1777116475439599528
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p16384-c4",
+      "stage": "producer",
+      "stream_messages": 5000,
+      "stream_bytes": 81920000,
+      "finished_at_unix_nano": 1777116475475073426
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p16384-c4",
+      "stage": "producer",
+      "stream_messages": 5000,
+      "stream_bytes": 81920000,
+      "finished_at_unix_nano": 1777116475485522692
+    },
+    {
+      "run_id": "synthetic-clean-kafka-p16384-c4",
+      "stage": "producer",
+      "stream_messages": 5000,
+      "stream_bytes": 81920000,
+      "finished_at_unix_nano": 1777116475491914150
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-clean-kafka-p16384-c4",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 327680000,
+    "duration_seconds": 75.444461928,
+    "throughput_messages_per_second": 265.095667579774,
+    "throughput_megabytes_per_second": 4.142119805933969,
+    "p50_latency_ms": 154.263441,
+    "p95_latency_ms": 281.738492,
+    "p99_latency_ms": 344.844297,
+    "max_latency_ms": 26776.586722,
+    "started_at_unix_nano": 1777116400781645069,
+    "finished_at_unix_nano": 1777116475817123539,
+    "transport_mode": "kafka",
+    "mean_inter_arrival_ms": 3.5921774406720286,
+    "p95_inter_arrival_ms": 11.478775,
+    "inter_arrival_jitter_ms": 6.133245442238042
+  }
+}

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-stream-nats
+  namespace: streaming-experiments
+spec:
+  selector:
+    app: grpc-stream-nats
+  ports:
+    - name: client
+      port: 4222
+      targetPort: 4222

@@ -1,0 +1,1067 @@
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka unchanged
+deployment.apps/grpc-stream-nats unchanged
+deployment.apps/grpc-stream-rabbitmq unchanged
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium, repeat: 3, transport: nats-jetstream)
+═══ Repetition 1/3 ═══
+━━━ Running: synthetic-clean-nats-p256-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c1-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c1-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c1-rep1
+━━━ Running: synthetic-clean-nats-p256-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c4-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c4-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c4-rep1
+━━━ Running: synthetic-clean-nats-p256-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c8-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c8-rep1
+━━━ Running: synthetic-clean-nats-p256-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c16-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c16-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c16-rep1
+━━━ Running: synthetic-clean-nats-p1024-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c1-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c1-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c1-rep1
+━━━ Running: synthetic-clean-nats-p1024-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c4-rep1 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c4-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c4-rep1
+━━━ Running: synthetic-clean-nats-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c8-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c8-rep1
+━━━ Running: synthetic-clean-nats-p1024-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c16-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c16-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c16-rep1
+━━━ Running: synthetic-clean-nats-p4096-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c1-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c1-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c1-rep1
+━━━ Running: synthetic-clean-nats-p4096-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c4-rep1 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c4-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c4-rep1
+━━━ Running: synthetic-clean-nats-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c8-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c8-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c8-rep1
+━━━ Running: synthetic-clean-nats-p4096-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c16-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c16-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c16-rep1
+━━━ Running: synthetic-clean-nats-p16384-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p16384-c1-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c1-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c1-rep1
+━━━ Running: synthetic-clean-nats-p16384-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p16384-c4-rep1 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c4-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c4-rep1
+━━━ Running: synthetic-clean-nats-p16384-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/04/25 11:51:58 run nats-jetstream workload: worker 2 publish sequence 15587 via nats-jetstream: publish to nats subject "producer.to.transformer.synthetic-clean-nats-p16384-c8-rep1.worker.02": context deadline exceeded
+pod/results-helper-synthetic-clean-nats-p16384-c8-rep1 condition met
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep1-producer-result.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep1-sink-summary.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c8-rep1
+━━━ Running: synthetic-clean-nats-p16384-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/04/25 11:58:24 run nats-jetstream workload: worker 12 publish sequence 12477 via nats-jetstream: publish to nats subject "producer.to.transformer.synthetic-clean-nats-p16384-c16-rep1.worker.12": context deadline exceeded
+pod/results-helper-synthetic-clean-nats-p16384-c16-rep1 condition met
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep1-producer-result.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep1-sink-summary.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep1-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c16-rep1
+═══ Repetition 2/3 ═══
+━━━ Running: synthetic-clean-nats-p256-c1-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c1-rep2 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c1-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c1-rep2
+━━━ Running: synthetic-clean-nats-p256-c4-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c4-rep2 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c4-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c4-rep2
+━━━ Running: synthetic-clean-nats-p256-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c8-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c8-rep2
+━━━ Running: synthetic-clean-nats-p256-c16-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c16-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c16-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c16-rep2
+━━━ Running: synthetic-clean-nats-p1024-c1-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c1-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c1-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c1-rep2
+━━━ Running: synthetic-clean-nats-p1024-c4-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c4-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c4-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c4-rep2
+━━━ Running: synthetic-clean-nats-p1024-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c8-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c8-rep2
+━━━ Running: synthetic-clean-nats-p1024-c16-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c16-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c16-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c16-rep2
+━━━ Running: synthetic-clean-nats-p4096-c1-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c1-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c1-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c1-rep2
+━━━ Running: synthetic-clean-nats-p4096-c4-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c4-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c4-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c4-rep2
+━━━ Running: synthetic-clean-nats-p4096-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c8-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c8-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c8-rep2
+━━━ Running: synthetic-clean-nats-p4096-c16-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c16-rep2 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c16-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c16-rep2
+━━━ Running: synthetic-clean-nats-p16384-c1-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p16384-c1-rep2 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c1-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c1-rep2
+━━━ Running: synthetic-clean-nats-p16384-c4-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p16384-c4-rep2 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c4-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c4-rep2
+━━━ Running: synthetic-clean-nats-p16384-c8-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/04/25 12:20:57 run nats-jetstream workload: worker 4 publish sequence 18581 via nats-jetstream: publish to nats subject "producer.to.transformer.synthetic-clean-nats-p16384-c8-rep2.worker.04": context deadline exceeded
+pod/results-helper-synthetic-clean-nats-p16384-c8-rep2 condition met
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep2-producer-result.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep2-sink-summary.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c8-rep2
+━━━ Running: synthetic-clean-nats-p16384-c16-rep2 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/04/25 12:27:11 run nats-jetstream workload: worker 1 publish sequence 12770 via nats-jetstream: publish to nats subject "producer.to.transformer.synthetic-clean-nats-p16384-c16-rep2.worker.01": context deadline exceeded
+pod/results-helper-synthetic-clean-nats-p16384-c16-rep2 condition met
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep2-producer-result.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep2-sink-summary.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep2-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c16-rep2
+═══ Repetition 3/3 ═══
+━━━ Running: synthetic-clean-nats-p256-c1-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c1-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c1-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c1-rep3
+━━━ Running: synthetic-clean-nats-p256-c4-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c4-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c4-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c4-rep3
+━━━ Running: synthetic-clean-nats-p256-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c8-rep3 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c8-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c8-rep3
+━━━ Running: synthetic-clean-nats-p256-c16-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p256-c16-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p256-c16-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p256-c16-rep3
+━━━ Running: synthetic-clean-nats-p1024-c1-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c1-rep3 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c1-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c1-rep3
+━━━ Running: synthetic-clean-nats-p1024-c4-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c4-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c4-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c4-rep3
+━━━ Running: synthetic-clean-nats-p1024-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c8-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c8-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c8-rep3
+━━━ Running: synthetic-clean-nats-p1024-c16-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p1024-c16-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p1024-c16-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p1024-c16-rep3
+━━━ Running: synthetic-clean-nats-p4096-c1-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c1-rep3 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c1-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c1-rep3
+━━━ Running: synthetic-clean-nats-p4096-c4-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c4-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c4-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c4-rep3
+━━━ Running: synthetic-clean-nats-p4096-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c8-rep3 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c8-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c8-rep3
+━━━ Running: synthetic-clean-nats-p4096-c16-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p4096-c16-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p4096-c16-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p4096-c16-rep3
+━━━ Running: synthetic-clean-nats-p16384-c1-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p16384-c1-rep3 condition met
+tar: removing leading '/' from member names
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c1-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c1-rep3
+━━━ Running: synthetic-clean-nats-p16384-c4-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+pod/results-helper-synthetic-clean-nats-p16384-c4-rep3 condition met
+tar: removing leading '/' from member names
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c4-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c4-rep3
+━━━ Running: synthetic-clean-nats-p16384-c8-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/04/25 12:47:02 run nats-jetstream workload: worker 2 publish sequence 17691 via nats-jetstream: publish to nats subject "producer.to.transformer.synthetic-clean-nats-p16384-c8-rep3.worker.02": context deadline exceeded
+pod/results-helper-synthetic-clean-nats-p16384-c8-rep3 condition met
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep3-producer-result.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep3-sink-summary.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c8-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c8-rep3
+━━━ Running: synthetic-clean-nats-p16384-c16-rep3 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/04/25 12:53:18 run nats-jetstream workload: worker 10 publish sequence 12875 via nats-jetstream: publish to nats subject "producer.to.transformer.synthetic-clean-nats-p16384-c16-rep3.worker.10": context deadline exceeded
+pod/results-helper-synthetic-clean-nats-p16384-c16-rep3 condition met
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep3-producer-result.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep3-sink-summary.json
+  Warning: missing result artifact /results/synthetic-clean-nats-p16384-c16-rep3-sink-analysis.json
+job.batch "grpc-stream-producer" deleted from streaming-experiments namespace
+  Done: synthetic-clean-nats-p16384-c16-rep3
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\synthetic-clean-summary.csv
+Wrote aggregated summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\synthetic-clean-summary-aggregated.csv
+Finished preset: synthetic-clean

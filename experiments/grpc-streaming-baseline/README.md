@@ -9,7 +9,7 @@ This setup is a good starting point if the goal is to answer the first phase of 
 - it keeps the first comparison narrow: gRPC client streaming versus unary gRPC;
 - it uses a small but meaningful three-stage topology: Producer -> Transformer -> Sink;
 - it keeps application logic intentionally lightweight so the measured differences are primarily communication effects;
-- it already supports the experimental factors that matter most for the first baseline: message size, total volume, concurrency, synthetic CPU work in the middle stage, artificial sink slowdowns, and a broker-based comparison through RabbitMQ Streams.
+- it already supports the experimental factors that matter most for the first baseline: message size, total volume, concurrency, synthetic CPU work in the middle stage, artificial sink slowdowns, and broker-based comparisons through RabbitMQ Streams, NATS JetStream, and Kafka.
 
 ## Metrics used consistently
 
@@ -59,18 +59,20 @@ The DYNAMOS CSVs are still useful later as a replay-style workload once the base
 
 For restart-and-recovery scenarios, the sink also records per-message arrival timing in a companion analysis file so the export step can derive end-to-end recovery metrics from the same observation point for every transport.
 
-The same three-stage topology can now be run in three transport modes:
+The same three-stage topology can now be run in five transport modes:
 
 - `client-streaming`: one client stream per producer worker;
 - `unary`: one request per message across the same topology.
 - `rabbitmq-streams`: producer -> RabbitMQ Streams -> transformer -> RabbitMQ Streams -> sink.
+- `nats-jetstream`: producer -> JetStream stream -> transformer -> JetStream stream -> sink, using pull consumers with explicit acknowledgements.
+- `kafka`: producer -> Kafka topic -> transformer -> Kafka topic -> sink, using run-scoped topics and consumer groups.
 
 ## First experiment matrix to use
 
 Do not start with every possible factor crossed at once. Start with a narrow baseline matrix:
 
 1. Fix topology to the three-service chain.
-2. Run `client-streaming`, `unary`, and `rabbitmq-streams` over the exact same workload.
+2. Run `client-streaming`, `unary`, `rabbitmq-streams`, `nats-jetstream`, and `kafka` over the exact same workload.
 3. Sweep `PAYLOAD_BYTES`: for example `256`, `1024`, `4096`, `16384`.
 4. Sweep `CONCURRENCY`: for example `1`, `4`, `8`, `16`.
 5. Keep `TOTAL_MESSAGES` fixed per run, for example `50000`.
@@ -137,6 +139,30 @@ TARGET_MESSAGES_PER_SECOND=0 \
 ./scripts/run-local.sh
 ```
 
+NATS JetStream comparison run:
+
+```bash
+RUN_ID=bulk-nats-4k-c8 \
+TRANSPORT_MODE=nats-jetstream \
+TOTAL_MESSAGES=50000 \
+PAYLOAD_BYTES=4096 \
+CONCURRENCY=8 \
+TARGET_MESSAGES_PER_SECOND=0 \
+./scripts/run-local.sh
+```
+
+Kafka comparison run:
+
+```bash
+RUN_ID=bulk-kafka-4k-c8 \
+TRANSPORT_MODE=kafka \
+TOTAL_MESSAGES=50000 \
+PAYLOAD_BYTES=4096 \
+CONCURRENCY=8 \
+TARGET_MESSAGES_PER_SECOND=0 \
+./scripts/run-local.sh
+```
+
 CSV replay run using the copied datasets:
 
 ```bash
@@ -171,7 +197,7 @@ When a run never regains the sustained-rate threshold before completion, `e2e_re
 
 ## Matrix runs and CSV export
 
-The local PowerShell matrix runner now executes all three transport modes per preset: `client-streaming`, `unary`, and `rabbitmq-streams`.
+The local PowerShell matrix runner now executes all five transport modes per preset: `client-streaming`, `unary`, `rabbitmq-streams`, `nats-jetstream`, and `kafka`.
 
 For the thesis-style comparable benchmark set, prefer the Kubernetes runner because it applies the same scenario presets across all three transports while also collecting pod-level resource measurements.
 
@@ -215,7 +241,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
 	-Preset csv-replay-check
 ```
 
-Run the comparable three-transport Kubernetes presets:
+Run the comparable five-transport Kubernetes presets:
 
 ```bash
 ./scripts/run-k8s-matrix.sh synthetic-clean --overlay resource-medium --repeat 3 --skip-load

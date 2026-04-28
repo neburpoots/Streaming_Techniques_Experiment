@@ -30,6 +30,8 @@ type transformerConfig struct {
 	workIters     int
 	concurrency   int
 	rabbitMQ      transport.RabbitMQConfig
+	nats          transport.NATSConfig
+	kafka         transport.KafkaConfig
 }
 
 type transformerServer struct {
@@ -110,6 +112,12 @@ func main() {
 	if cfg.transportMode == transport.ModeRabbitMQStreams {
 		startRabbitMQBridge(ctx, server, cfg)
 	}
+	if cfg.transportMode == transport.ModeNATSJetStream {
+		startNATSBridge(ctx, server, cfg)
+	}
+	if cfg.transportMode == transport.ModeKafka {
+		startKafkaBridge(ctx, server, cfg)
+	}
 
 	go func() {
 		<-ctx.Done()
@@ -142,6 +150,8 @@ func loadConfig() (*transformerConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	natsConfig := transport.LoadNATSConfig()
+	kafkaConfig := transport.LoadKafkaConfig()
 
 	return &transformerConfig{
 		listenAddr:    config.String("LISTEN_ADDR", ":50051"),
@@ -152,6 +162,8 @@ func loadConfig() (*transformerConfig, error) {
 		workIters:     workIters,
 		concurrency:   concurrency,
 		rabbitMQ:      rabbitMQConfig,
+		nats:          natsConfig,
+		kafka:         kafkaConfig,
 	}, nil
 }
 

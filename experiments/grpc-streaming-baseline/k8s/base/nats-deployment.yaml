@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-nats
+  namespace: streaming-experiments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grpc-stream-nats
+  template:
+    metadata:
+      labels:
+        app: grpc-stream-nats
+    spec:
+      containers:
+        - name: nats
+          image: nats:2.10-alpine
+          args:
+            - "-c"
+            - /etc/nats/nats.conf
+          ports:
+            - containerPort: 4222
+              name: client
+          volumeMounts:
+            - name: nats-config
+              mountPath: /etc/nats/nats.conf
+              subPath: nats.conf
+            - name: nats-data
+              mountPath: /data/jetstream
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      volumes:
+        - name: nats-config
+          configMap:
+            name: grpc-stream-nats-config
+        - name: nats-data
+          emptyDir: {}

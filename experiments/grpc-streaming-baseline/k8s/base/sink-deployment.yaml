@@ -79,6 +79,36 @@ spec:
                 configMapKeyRef:
                   name: grpc-streaming-baseline-config
                   key: RABBITMQ_TRANSFORMER_TO_SINK_STREAM
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_URL
+            - name: NATS_PRODUCER_TO_TRANSFORMER_SUBJECT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_PRODUCER_TO_TRANSFORMER_SUBJECT
+            - name: NATS_TRANSFORMER_TO_SINK_SUBJECT
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_TRANSFORMER_TO_SINK_SUBJECT
+            - name: KAFKA_BROKERS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_BROKERS
+            - name: KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC
+            - name: KAFKA_TRANSFORMER_TO_SINK_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_TRANSFORMER_TO_SINK_TOPIC
           ports:
             - containerPort: 50052
               name: grpc

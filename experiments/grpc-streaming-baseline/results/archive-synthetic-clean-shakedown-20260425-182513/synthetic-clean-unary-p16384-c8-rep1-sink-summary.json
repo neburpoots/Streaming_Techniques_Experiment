@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-unary-p16384-c8-rep1",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 327680000,
+  "duration_seconds": 6.944024563,
+  "throughput_messages_per_second": 2880.1741437618816,
+  "throughput_megabytes_per_second": 45.0027209962794,
+  "p50_latency_ms": 0.536067,
+  "p95_latency_ms": 1.6852,
+  "p99_latency_ms": 51.178691,
+  "max_latency_ms": 57.660624,
+  "started_at_unix_nano": 1777111280902474709,
+  "finished_at_unix_nano": 1777111287804491189,
+  "transport_mode": "unary",
+  "mean_inter_arrival_ms": 0.34511807990399557,
+  "p95_inter_arrival_ms": 0.747359,
+  "inter_arrival_jitter_ms": 3.0921170607493136
+}

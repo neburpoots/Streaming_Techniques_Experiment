@@ -7,6 +7,11 @@ resources:
   - rabbitmq-stream-configmap.yaml
   - rabbitmq-deployment.yaml
   - rabbitmq-service.yaml
+  - nats-configmap.yaml
+  - nats-deployment.yaml
+  - nats-service.yaml
+  - kafka-deployment.yaml
+  - kafka-service.yaml
   - results-pvc.yaml
   - sink-deployment.yaml
   - sink-service.yaml

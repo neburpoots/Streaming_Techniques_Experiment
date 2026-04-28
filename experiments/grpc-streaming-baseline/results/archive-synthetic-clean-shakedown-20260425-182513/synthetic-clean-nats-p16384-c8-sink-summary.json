@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-nats-p16384-c8",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 327680000,
+  "duration_seconds": 16.814712503,
+  "throughput_messages_per_second": 1189.4345500365646,
+  "throughput_megabytes_per_second": 18.58491484432132,
+  "p50_latency_ms": 4606.934725,
+  "p95_latency_ms": 6080.96255,
+  "p99_latency_ms": 6305.35,
+  "max_latency_ms": 6445.102896,
+  "started_at_unix_nano": 1777131156411352483,
+  "finished_at_unix_nano": 1777131173146669092,
+  "transport_mode": "nats-jetstream",
+  "mean_inter_arrival_ms": 0.8368076754337684,
+  "p95_inter_arrival_ms": 4.053042,
+  "inter_arrival_jitter_ms": 2.730065159348217
+}

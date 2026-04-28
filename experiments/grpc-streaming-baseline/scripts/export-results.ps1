@@ -296,6 +296,12 @@ function Get-ContainerRole {
     if ($ContainerName -like 'grpc-streaming-baseline-rabbitmq-*') {
         return 'rabbitmq'
     }
+    if ($ContainerName -like 'grpc-streaming-baseline-nats-*') {
+        return 'nats'
+    }
+    if ($ContainerName -like 'grpc-streaming-baseline-kafka-*') {
+        return 'kafka'
+    }
 
     return $null
 }
@@ -347,6 +353,8 @@ function Get-RunResourceSummary {
             transformer = $emptyRoleSummary
             sink = $emptyRoleSummary
             rabbitmq = $emptyRoleSummary
+            nats = $emptyRoleSummary
+            kafka = $emptyRoleSummary
         }
     }
 
@@ -355,6 +363,8 @@ function Get-RunResourceSummary {
         transformer = (New-ResourceStatSummary)
         sink = (New-ResourceStatSummary)
         rabbitmq = (New-ResourceStatSummary)
+        nats = (New-ResourceStatSummary)
+        kafka = (New-ResourceStatSummary)
     }
 
     Get-Content $statsPath | ForEach-Object {
@@ -381,7 +391,7 @@ function Get-RunResourceSummary {
     }
 
     $summary = @{}
-    foreach ($role in @('producer', 'transformer', 'sink', 'rabbitmq')) {
+    foreach ($role in @('producer', 'transformer', 'sink', 'rabbitmq', 'nats', 'kafka')) {
         $cpuStats = Get-StatsAggregate -Values $byRole[$role].cpu_values
         $memoryStats = Get-StatsAggregate -Values $byRole[$role].memory_values_mib
         $summary[$role] = [PSCustomObject]@{
@@ -398,6 +408,8 @@ function Get-RunResourceSummary {
         transformer = $summary.transformer
         sink = $summary.sink
         rabbitmq = $summary.rabbitmq
+        nats = $summary.nats
+        kafka = $summary.kafka
     }
 }
 
@@ -491,6 +503,16 @@ $rows = Get-ChildItem -Path $resolvedResultsDir -Filter '*-producer-result.json'
             rabbitmq_memory_avg_mib = $resourceSummary.rabbitmq.memory_avg_mib
             rabbitmq_memory_peak_mib = $resourceSummary.rabbitmq.memory_peak_mib
             rabbitmq_samples = $resourceSummary.rabbitmq.samples
+            nats_cpu_avg_pct = $resourceSummary.nats.cpu_avg_pct
+            nats_cpu_peak_pct = $resourceSummary.nats.cpu_peak_pct
+            nats_memory_avg_mib = $resourceSummary.nats.memory_avg_mib
+            nats_memory_peak_mib = $resourceSummary.nats.memory_peak_mib
+            nats_samples = $resourceSummary.nats.samples
+            kafka_cpu_avg_pct = $resourceSummary.kafka.cpu_avg_pct
+            kafka_cpu_peak_pct = $resourceSummary.kafka.cpu_peak_pct
+            kafka_memory_avg_mib = $resourceSummary.kafka.memory_avg_mib
+            kafka_memory_peak_mib = $resourceSummary.kafka.memory_peak_mib
+            kafka_samples = $resourceSummary.kafka.samples
         }
     } |
     Where-Object { $_ -ne $null } |

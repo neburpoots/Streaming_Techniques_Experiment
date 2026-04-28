@@ -51,6 +51,8 @@ type producerConfig struct {
 	pollInterval              time.Duration
 	maxSummaryWait            time.Duration
 	rabbitMQ                  transport.RabbitMQConfig
+	nats                      transport.NATSConfig
+	kafka                     transport.KafkaConfig
 }
 
 type producerDiagnostics struct {
@@ -286,6 +288,8 @@ func loadConfig() (*producerConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	natsConfig := transport.LoadNATSConfig()
+	kafkaConfig := transport.LoadKafkaConfig()
 
 	return &producerConfig{
 		runID:                     config.String("RUN_ID", fmt.Sprintf("grpc-stream-%d", time.Now().Unix())),
@@ -313,6 +317,8 @@ func loadConfig() (*producerConfig, error) {
 		pollInterval:              time.Duration(pollMillis) * time.Millisecond,
 		maxSummaryWait:            time.Duration(maxWaitSeconds) * time.Second,
 		rabbitMQ:                  rabbitMQConfig,
+		nats:                      natsConfig,
+		kafka:                     kafkaConfig,
 	}, nil
 }
 
@@ -348,14 +354,27 @@ func runTransport(ctx context.Context, client pb.TransformerClient, cfg *produce
 		count, err := sendBulkUnary(ctx, client, cfg, limiter, payloadSource, diagnostics)
 		return nil, count, err
 	case transport.ModeRabbitMQStreams:
-		acks, err := sendBulkRabbitMQStreams(ctx, cfg, limiter, payloadSource, diagnostics)
+		acks, err := sendBulkPublished(ctx, cfg, limiter, payloadSource, diagnostics, openRabbitMQPublisher)
+		return acks, 0, err
+	case transport.ModeNATSJetStream:
+		acks, err := sendBulkPublished(ctx, cfg, limiter, payloadSource, diagnostics, openNATSPublisher)
+		return acks, 0, err
+	case transport.ModeKafka:
+		acks, err := sendBulkPublished(ctx, cfg, limiter, payloadSource, diagnostics, openKafkaPublisher)
 		return acks, 0, err
 	default:
 		return nil, 0, fmt.Errorf("unsupported TRANSPORT_MODE %q", cfg.transportMode)
 	}
 }
 
-func sendBulkRabbitMQStreams(ctx context.Context, cfg *producerConfig, limiter *rate.Limiter, payloadSource workload.Source, diagnostics *producerDiagnostics) ([]*pb.StreamAck, error) {
+type chunkPublisher interface {
+	PublishChunk(context.Context, *pb.DataChunk) error
+	Close() error
+}
+
+type openPublisherFunc func(context.Context, *producerConfig, int, *producerDiagnostics, bool, time.Time) (chunkPublisher, error)
+
+func sendBulkPublished(ctx context.Context, cfg *producerConfig, limiter *rate.Limiter, payloadSource workload.Source, diagnostics *producerDiagnostics, openPublisher openPublisherFunc) ([]*pb.StreamAck, error) {
 	ackChan := make(chan *pb.StreamAck, cfg.concurrency)
 	errChan := make(chan error, cfg.concurrency)
 	var wg sync.WaitGroup
@@ -371,13 +390,12 @@ func sendBulkRabbitMQStreams(ctx context.Context, cfg *producerConfig, limiter *
 		go func() {
 			defer wg.Done()
 
-			publisher, err := openRabbitMQPublisher(ctx, cfg, worker, diagnostics, false, time.Time{})
+			publisher, err := openPublisher(ctx, cfg, worker, diagnostics, false, time.Time{})
 			if err != nil {
-				errChan <- fmt.Errorf("worker %d open rabbitmq publisher: %w", worker, err)
+				errChan <- fmt.Errorf("worker %d open %s publisher: %w", worker, cfg.transportMode, err)
 				return
 			}
 
-			streamName := cfg.rabbitMQ.ProducerToTransformerRunWorkerStream(cfg.runID, worker)
 			var streamBytes uint64
 			nextIndex := 0
 
@@ -406,7 +424,7 @@ func sendBulkRabbitMQStreams(ctx context.Context, cfg *producerConfig, limiter *
 					} else {
 						_ = publisher.Close()
 						if !canRetry(err, attempt, cfg.maxRetryAttempts) {
-							errChan <- fmt.Errorf("worker %d publish sequence %d to %s: %w", worker, sequence, streamName, err)
+							errChan <- fmt.Errorf("worker %d publish sequence %d via %s: %w", worker, sequence, cfg.transportMode, err)
 							return
 						}
 						if recoveryStartedAt.IsZero() {
@@ -414,9 +432,9 @@ func sendBulkRabbitMQStreams(ctx context.Context, cfg *producerConfig, limiter *
 						}
 						diagnostics.recordRetry()
 						attempt++
-						publisher, err = openRabbitMQPublisher(ctx, cfg, worker, diagnostics, true, recoveryStartedAt)
+						publisher, err = openPublisher(ctx, cfg, worker, diagnostics, true, recoveryStartedAt)
 						if err != nil {
-							errChan <- fmt.Errorf("worker %d reopen rabbitmq publisher after sequence %d failure: %w", worker, sequence, err)
+							errChan <- fmt.Errorf("worker %d reopen %s publisher after sequence %d failure: %w", worker, cfg.transportMode, sequence, err)
 							return
 						}
 					}
@@ -427,7 +445,7 @@ func sendBulkRabbitMQStreams(ctx context.Context, cfg *producerConfig, limiter *
 			}
 
 			if err := publisher.Close(); err != nil {
-				errChan <- fmt.Errorf("worker %d close rabbitmq publisher for %s: %w", worker, streamName, err)
+				errChan <- fmt.Errorf("worker %d close %s publisher: %w", worker, cfg.transportMode, err)
 				return
 			}
 
@@ -677,7 +695,7 @@ func openStream(ctx context.Context, client pb.TransformerClient, cfg *producerC
 	}
 }
 
-func openRabbitMQPublisher(ctx context.Context, cfg *producerConfig, worker int, diagnostics *producerDiagnostics, reconnect bool, recoveryStartedAt time.Time) (*transport.RabbitMQStreamPublisher, error) {
+func openRabbitMQPublisher(ctx context.Context, cfg *producerConfig, worker int, diagnostics *producerDiagnostics, reconnect bool, recoveryStartedAt time.Time) (chunkPublisher, error) {
 	attempt := 0
 	maxRetryAttempts := cfg.maxRetryAttempts
 	if !reconnect && maxRetryAttempts < 30 {
@@ -685,6 +703,65 @@ func openRabbitMQPublisher(ctx context.Context, cfg *producerConfig, worker int,
 	}
 	for {
 		publisher, err := transport.NewRabbitMQStreamPublisher(cfg.rabbitMQ, cfg.rabbitMQ.ProducerToTransformerRunWorkerStream(cfg.runID, worker))
+		if err == nil {
+			if reconnect {
+				diagnostics.recordStreamReconnect()
+				if !recoveryStartedAt.IsZero() {
+					diagnostics.recordRecovery(time.Since(recoveryStartedAt))
+				}
+			}
+			return publisher, nil
+		}
+		if !canRetry(err, attempt, maxRetryAttempts) {
+			return nil, err
+		}
+		diagnostics.recordRetry()
+		attempt++
+		if err := sleepWithContext(ctx, cfg.retryBackoff); err != nil {
+			return nil, err
+		}
+	}
+}
+
+func openNATSPublisher(ctx context.Context, cfg *producerConfig, worker int, diagnostics *producerDiagnostics, reconnect bool, recoveryStartedAt time.Time) (chunkPublisher, error) {
+	attempt := 0
+	maxRetryAttempts := cfg.maxRetryAttempts
+	if !reconnect && maxRetryAttempts < 30 {
+		maxRetryAttempts = 30
+	}
+	streamName := cfg.nats.ProducerToTransformerRunWorkerStream(cfg.runID, worker)
+	subject := cfg.nats.ProducerToTransformerRunWorkerSubject(cfg.runID, worker)
+	for {
+		publisher, err := transport.NewNATSJetStreamPublisher(cfg.nats, streamName, subject)
+		if err == nil {
+			if reconnect {
+				diagnostics.recordStreamReconnect()
+				if !recoveryStartedAt.IsZero() {
+					diagnostics.recordRecovery(time.Since(recoveryStartedAt))
+				}
+			}
+			return publisher, nil
+		}
+		if !canRetry(err, attempt, maxRetryAttempts) {
+			return nil, err
+		}
+		diagnostics.recordRetry()
+		attempt++
+		if err := sleepWithContext(ctx, cfg.retryBackoff); err != nil {
+			return nil, err
+		}
+	}
+}
+
+func openKafkaPublisher(ctx context.Context, cfg *producerConfig, worker int, diagnostics *producerDiagnostics, reconnect bool, recoveryStartedAt time.Time) (chunkPublisher, error) {
+	attempt := 0
+	maxRetryAttempts := cfg.maxRetryAttempts
+	if !reconnect && maxRetryAttempts < 30 {
+		maxRetryAttempts = 30
+	}
+	topic := cfg.kafka.ProducerToTransformerRunTopic(cfg.runID)
+	for {
+		publisher, err := transport.NewKafkaPublisher(cfg.kafka, topic)
 		if err == nil {
 			if reconnect {
 				diagnostics.recordStreamReconnect()

@@ -1,0 +1,73 @@
+{
+  "run_id": "synthetic-clean-rmqs-p4096-c4",
+  "transport_mode": "rabbitmq-streams",
+  "workload_source": "synthetic",
+  "workload_descriptor": "synthetic",
+  "profile": "bulk",
+  "expected_messages": 20000,
+  "payload_bytes": 4096,
+  "concurrency": 4,
+  "target_messages_per_second": 0,
+  "transformer_work_iterations": 0,
+  "sink_process_delay_ms": 0,
+  "max_retry_attempts": 0,
+  "retry_backoff_ms": 500,
+  "producer_started_at": "2026-04-21T20:23:40.081555742Z",
+  "producer_finished_at": "2026-04-21T20:23:42.330417514Z",
+  "stream_acks": [
+    {
+      "run_id": "synthetic-clean-rmqs-p4096-c4",
+      "stage": "producer",
+      "stream_messages": 5000,
+      "stream_bytes": 20480000,
+      "finished_at_unix_nano": 1776803021995897804
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p4096-c4",
+      "stage": "producer",
+      "stream_messages": 5000,
+      "stream_bytes": 20480000,
+      "finished_at_unix_nano": 1776803021999578404
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p4096-c4",
+      "stage": "producer",
+      "stream_messages": 5000,
+      "stream_bytes": 20480000,
+      "finished_at_unix_nano": 1776803022004195195
+    },
+    {
+      "run_id": "synthetic-clean-rmqs-p4096-c4",
+      "stage": "producer",
+      "stream_messages": 5000,
+      "stream_bytes": 20480000,
+      "finished_at_unix_nano": 1776803022078981535
+    }
+  ],
+  "unary_acknowledged_requests": 0,
+  "retry_attempts": 0,
+  "stream_reconnects": 0,
+  "recovery_events": 0,
+  "avg_recovery_ms": 0,
+  "max_recovery_ms": 0,
+  "sink_summary": {
+    "run_id": "synthetic-clean-rmqs-p4096-c4",
+    "stage": "sink",
+    "completed": true,
+    "messages_received": 20000,
+    "bytes_received": 81920000,
+    "duration_seconds": 2.240069655,
+    "throughput_messages_per_second": 8928.293794507028,
+    "throughput_megabytes_per_second": 34.87614763479308,
+    "p50_latency_ms": 587.409888,
+    "p95_latency_ms": 998.299755,
+    "p99_latency_ms": 1191.075943,
+    "max_latency_ms": 1225.670759,
+    "started_at_unix_nano": 1776803020189148573,
+    "finished_at_unix_nano": 1776803022296780431,
+    "transport_mode": "rabbitmq-streams",
+    "mean_inter_arrival_ms": 0.10538686224314525,
+    "p95_inter_arrival_ms": 0.001009,
+    "inter_arrival_jitter_ms": 2.480826049235351
+  }
+}

@@ -15,9 +15,9 @@ import (
 )
 
 type RabbitMQStreamPublisher struct {
-	streamName string
-	env        *stream.Environment
-	producer   *stream.Producer
+	streamName  string
+	env         *stream.Environment
+	producer    *stream.Producer
 	confirmMu   sync.Mutex
 	confirmErr  error
 	pendingAcks map[int64]chan error

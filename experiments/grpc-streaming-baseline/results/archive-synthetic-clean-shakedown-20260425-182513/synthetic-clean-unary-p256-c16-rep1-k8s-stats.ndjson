@@ -1,0 +1,16 @@
+{"Name":"grpc-streaming-baseline-nats-1","CPUPerc":"0.10%","MemUsage":"18MiB / 0B"}
+{"Name":"grpc-streaming-baseline-rabbitmq-1","CPUPerc":"0.30%","MemUsage":"200MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-nats-1","CPUPerc":"0.10%","MemUsage":"18MiB / 0B"}
+{"Name":"grpc-streaming-baseline-rabbitmq-1","CPUPerc":"0.30%","MemUsage":"200MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-nats-1","CPUPerc":"0.10%","MemUsage":"18MiB / 0B"}
+{"Name":"grpc-streaming-baseline-rabbitmq-1","CPUPerc":"0.30%","MemUsage":"200MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-nats-1","CPUPerc":"0.10%","MemUsage":"18MiB / 0B"}
+{"Name":"grpc-streaming-baseline-rabbitmq-1","CPUPerc":"0.30%","MemUsage":"200MiB / 0B"}
+{"Name":"grpc-streaming-baseline-sink-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}
+{"Name":"grpc-streaming-baseline-transformer-1","CPUPerc":"0.00%","MemUsage":"2MiB / 0B"}

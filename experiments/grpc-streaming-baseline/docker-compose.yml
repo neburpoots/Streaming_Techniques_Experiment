@@ -16,6 +16,35 @@ services:
       - "15672:15672"
       - "5552:5552"
 
+  nats:
+    image: nats:2.10-alpine
+    command:
+      - "-js"
+      - "-sd"
+      - /data/jetstream
+    ports:
+      - "4222:4222"
+
+  kafka:
+    image: apache/kafka:3.9.1
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_NUM_PARTITIONS: "1"
+    ports:
+      - "9092:9092"
+
   sink:
     build:
       context: .
@@ -37,6 +66,12 @@ services:
       RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
       RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM: ${RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM:-producer-to-transformer}
       RABBITMQ_TRANSFORMER_TO_SINK_STREAM: ${RABBITMQ_TRANSFORMER_TO_SINK_STREAM:-transformer-to-sink}
+      NATS_URL: ${NATS_URL:-nats://nats:4222}
+      NATS_PRODUCER_TO_TRANSFORMER_SUBJECT: ${NATS_PRODUCER_TO_TRANSFORMER_SUBJECT:-producer.to.transformer}
+      NATS_TRANSFORMER_TO_SINK_SUBJECT: ${NATS_TRANSFORMER_TO_SINK_SUBJECT:-transformer.to.sink}
+      KAFKA_BROKERS: ${KAFKA_BROKERS:-kafka:9092}
+      KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC: ${KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC:-producer-to-transformer}
+      KAFKA_TRANSFORMER_TO_SINK_TOPIC: ${KAFKA_TRANSFORMER_TO_SINK_TOPIC:-transformer-to-sink}
     ports:
       - "50052:50052"
       - "9102:9102"
@@ -52,6 +87,8 @@ services:
     depends_on:
       - sink
       - rabbitmq
+      - nats
+      - kafka
     environment:
       RUN_ID: ${RUN_ID:-grpc-stream-local}
       LISTEN_ADDR: ":50051"
@@ -69,6 +106,12 @@ services:
       RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
       RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM: ${RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM:-producer-to-transformer}
       RABBITMQ_TRANSFORMER_TO_SINK_STREAM: ${RABBITMQ_TRANSFORMER_TO_SINK_STREAM:-transformer-to-sink}
+      NATS_URL: ${NATS_URL:-nats://nats:4222}
+      NATS_PRODUCER_TO_TRANSFORMER_SUBJECT: ${NATS_PRODUCER_TO_TRANSFORMER_SUBJECT:-producer.to.transformer}
+      NATS_TRANSFORMER_TO_SINK_SUBJECT: ${NATS_TRANSFORMER_TO_SINK_SUBJECT:-transformer.to.sink}
+      KAFKA_BROKERS: ${KAFKA_BROKERS:-kafka:9092}
+      KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC: ${KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC:-producer-to-transformer}
+      KAFKA_TRANSFORMER_TO_SINK_TOPIC: ${KAFKA_TRANSFORMER_TO_SINK_TOPIC:-transformer-to-sink}
     ports:
       - "50051:50051"
       - "9101:9101"
@@ -83,6 +126,8 @@ services:
       - sink
       - transformer
       - rabbitmq
+      - nats
+      - kafka
     environment:
       RUN_ID: ${RUN_ID:-grpc-stream-local}
       TRANSPORT_MODE: ${TRANSPORT_MODE:-client-streaming}
@@ -117,6 +162,12 @@ services:
       RABBITMQ_VHOST: ${RABBITMQ_VHOST:-/}
       RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM: ${RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM:-producer-to-transformer}
       RABBITMQ_TRANSFORMER_TO_SINK_STREAM: ${RABBITMQ_TRANSFORMER_TO_SINK_STREAM:-transformer-to-sink}
+      NATS_URL: ${NATS_URL:-nats://nats:4222}
+      NATS_PRODUCER_TO_TRANSFORMER_SUBJECT: ${NATS_PRODUCER_TO_TRANSFORMER_SUBJECT:-producer.to.transformer}
+      NATS_TRANSFORMER_TO_SINK_SUBJECT: ${NATS_TRANSFORMER_TO_SINK_SUBJECT:-transformer.to.sink}
+      KAFKA_BROKERS: ${KAFKA_BROKERS:-kafka:9092}
+      KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC: ${KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC:-producer-to-transformer}
+      KAFKA_TRANSFORMER_TO_SINK_TOPIC: ${KAFKA_TRANSFORMER_TO_SINK_TOPIC:-transformer-to-sink}
     volumes:
       - ./results:/results
       - ../../datasets:/datasets:ro

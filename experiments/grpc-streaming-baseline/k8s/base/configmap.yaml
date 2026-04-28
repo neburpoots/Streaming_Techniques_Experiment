@@ -34,3 +34,10 @@ data:
   RABBITMQ_VHOST: "/"
   RABBITMQ_PRODUCER_TO_TRANSFORMER_STREAM: producer-to-transformer
   RABBITMQ_TRANSFORMER_TO_SINK_STREAM: transformer-to-sink
+  NATS_URL: nats://grpc-stream-nats:4222
+  NATS_PRODUCER_TO_TRANSFORMER_SUBJECT: producer.to.transformer
+  NATS_TRANSFORMER_TO_SINK_SUBJECT: transformer.to.sink
+  KAFKA_BROKERS: grpc-stream-kafka:9092
+  KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC: producer-to-transformer
+  KAFKA_TRANSFORMER_TO_SINK_TOPIC: transformer-to-sink
+  KAFKA_TOPIC_PARTITIONS: "16"

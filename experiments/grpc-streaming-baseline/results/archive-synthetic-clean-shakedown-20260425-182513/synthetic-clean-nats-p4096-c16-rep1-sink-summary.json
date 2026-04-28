@@ -1,0 +1,20 @@
+{
+  "run_id": "synthetic-clean-nats-p4096-c16-rep1",
+  "stage": "sink",
+  "completed": true,
+  "messages_received": 20000,
+  "bytes_received": 81920000,
+  "duration_seconds": 19.854948233000002,
+  "throughput_messages_per_second": 1007.3055726611724,
+  "throughput_megabytes_per_second": 3.9347873932077047,
+  "p50_latency_ms": 4988.757657,
+  "p95_latency_ms": 6535.546308,
+  "p99_latency_ms": 7197.201678,
+  "max_latency_ms": 7588.017721,
+  "started_at_unix_nano": 1777117607574143265,
+  "finished_at_unix_nano": 1777117627290884023,
+  "transport_mode": "nats-jetstream",
+  "mean_inter_arrival_ms": 0.9858863322166077,
+  "p95_inter_arrival_ms": 3.062125,
+  "inter_arrival_jitter_ms": 5.324213937547507
+}

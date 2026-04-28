@@ -32,6 +32,8 @@ type sinkConfig struct {
 	processDelay  time.Duration
 	transportMode string
 	rabbitMQ      transport.RabbitMQConfig
+	nats          transport.NATSConfig
+	kafka         transport.KafkaConfig
 }
 
 type sinkMetrics struct {
@@ -75,6 +77,8 @@ type sinkServer struct {
 	metrics      sinkMetrics
 	resultDir    string
 	rabbitMQ     transport.RabbitMQConfig
+	nats         transport.NATSConfig
+	kafka        transport.KafkaConfig
 	processDelay time.Duration
 }
 
@@ -152,6 +156,8 @@ func main() {
 		metrics:      serverMetrics,
 		resultDir:    cfg.resultDir,
 		rabbitMQ:     cfg.rabbitMQ,
+		nats:         cfg.nats,
+		kafka:        cfg.kafka,
 		processDelay: cfg.processDelay,
 	}
 	pb.RegisterSinkServer(grpcServer, server)
@@ -181,6 +187,8 @@ func loadConfig() (*sinkConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	natsConfig := transport.LoadNATSConfig()
+	kafkaConfig := transport.LoadKafkaConfig()
 
 	return &sinkConfig{
 		listenAddr:    config.String("LISTEN_ADDR", ":50052"),
@@ -189,6 +197,8 @@ func loadConfig() (*sinkConfig, error) {
 		processDelay:  processDelay,
 		transportMode: transportMode,
 		rabbitMQ:      rabbitMQConfig,
+		nats:          natsConfig,
+		kafka:         kafkaConfig,
 	}, nil
 }
 
@@ -221,7 +231,7 @@ func (s *sinkServer) RegisterRun(_ context.Context, in *pb.RunConfig) (*pb.Regis
 		lastByWorker:       make(map[uint64]uint64),
 	}
 	state.analysis = newSinkAnalysis(in.GetRunId(), in, registeredAt.UnixNano())
-	if in.GetTransportMode() == transport.ModeRabbitMQStreams {
+	if in.GetTransportMode() == transport.ModeRabbitMQStreams || in.GetTransportMode() == transport.ModeNATSJetStream || in.GetTransportMode() == transport.ModeKafka {
 		runCtx, state.consumerCancel = context.WithCancel(s.ctx)
 		startConsumers = true
 	}
@@ -230,7 +240,14 @@ func (s *sinkServer) RegisterRun(_ context.Context, in *pb.RunConfig) (*pb.Regis
 	s.mu.Unlock()
 
 	if startConsumers {
-		s.startRabbitMQRunConsumers(runCtx, in)
+		switch in.GetTransportMode() {
+		case transport.ModeRabbitMQStreams:
+			s.startRabbitMQRunConsumers(runCtx, in)
+		case transport.ModeNATSJetStream:
+			s.startNATSRunConsumers(runCtx, in)
+		case transport.ModeKafka:
+			s.startKafkaRunConsumers(runCtx, in)
+		}
 	}
 	return &pb.RegisterRunResponse{Accepted: true}, nil
 }
