@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-rabbitmq
+  namespace: streaming-experiments
+spec:
+  replicas: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-kafka
+  namespace: streaming-experiments
+spec:
+  replicas: 0

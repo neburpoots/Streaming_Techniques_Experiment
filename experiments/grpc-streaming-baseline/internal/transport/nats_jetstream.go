@@ -36,19 +36,19 @@ type natsAsyncPublishState struct {
 }
 
 const (
-	natsConnectTimeout           = 10 * time.Second
-	natsPublishTimeout           = 30 * time.Second
-	natsPublishCompleteTimeout   = 30 * time.Second
-	natsPublishAsyncMaxPending   = 2048
-	natsFetchBatchSize           = 64
-	natsFetchMaxWait             = 25 * time.Millisecond
-	natsPullMaxWaiting           = 8
-	natsMaxAckPending            = 4096
-	natsConsumerPendingMsgLimit  = 8192
+	natsConnectTimeout            = 10 * time.Second
+	natsPublishTimeout            = 30 * time.Second
+	natsPublishCompleteTimeout    = 30 * time.Second
+	natsPublishAsyncMaxPending    = 2048
+	natsFetchBatchSize            = 64
+	natsFetchMaxWait              = 25 * time.Millisecond
+	natsPullMaxWaiting            = 8
+	natsMaxAckPending             = 4096
+	natsConsumerPendingMsgLimit   = 8192
 	natsConsumerPendingBytesLimit = 128 * 1024 * 1024
-	natsAckWait                  = 30 * time.Second
-	natsMaxDeliver               = 20
-	natsStreamMaxBytes           = 512 * 1024 * 1024
+	natsAckWait                   = 30 * time.Second
+	natsMaxDeliver                = 20
+	natsStreamMaxBytes            = 512 * 1024 * 1024
 )
 
 func NewNATSJetStreamPublisher(cfg NATSConfig, streamName string, subject string) (*NATSJetStreamPublisher, error) {
@@ -67,7 +67,7 @@ func NewNATSJetStreamPublisher(cfg NATSConfig, streamName string, subject string
 	if err != nil {
 		return nil, err
 	}
-	if err := ensureNATSStream(js, streamName, subject); err != nil {
+	if err := ensureNATSStream(js, streamName, subject, cfg.StreamReplicas); err != nil {
 		conn.Close()
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func NewNATSJetStreamConsumer(cfg NATSConfig, streamName string, subject string,
 	if err != nil {
 		return nil, err
 	}
-	if err := ensureNATSStream(js, streamName, subject); err != nil {
+	if err := ensureNATSStream(js, streamName, subject, cfg.StreamReplicas); err != nil {
 		conn.Close()
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func (p *NATSJetStreamPublisher) Close() error {
 		p.conn.Close()
 	}
 	return closeErr
-	}
+}
 
 func (c *NATSJetStreamConsumer) ReceiveChunk(ctx context.Context) (*pb.DataChunk, *NATSJetStreamDelivery, error) {
 	if c == nil || c.sub == nil {
@@ -173,16 +173,16 @@ func (c *NATSJetStreamConsumer) ReceiveChunk(ctx context.Context) (*pb.DataChunk
 			return nil, nil, err
 		}
 		if len(c.pending) == 0 {
-		msgs, err := c.sub.Fetch(natsFetchBatchSize, nats.MaxWait(natsFetchMaxWait))
-		if err != nil {
-			if errors.Is(err, nats.ErrTimeout) {
+			msgs, err := c.sub.Fetch(natsFetchBatchSize, nats.MaxWait(natsFetchMaxWait))
+			if err != nil {
+				if errors.Is(err, nats.ErrTimeout) {
+					continue
+				}
+				return nil, nil, err
+			}
+			if len(msgs) == 0 {
 				continue
 			}
-			return nil, nil, err
-		}
-		if len(msgs) == 0 {
-			continue
-		}
 			c.pending = msgs
 		}
 		msg := c.pending[0]
@@ -257,11 +257,14 @@ func (s *natsAsyncPublishState) get() error {
 	return s.err
 }
 
-func ensureNATSStream(js nats.JetStreamContext, streamName string, subject string) error {
+func ensureNATSStream(js nats.JetStreamContext, streamName string, subject string, replicas int) error {
 	if _, err := js.StreamInfo(streamName); err == nil {
 		return nil
 	} else if !errors.Is(err, nats.ErrStreamNotFound) {
 		return fmt.Errorf("lookup nats stream %q: %w", streamName, err)
+	}
+	if replicas <= 0 {
+		replicas = 1
 	}
 
 	_, err := js.AddStream(&nats.StreamConfig{
@@ -270,7 +273,7 @@ func ensureNATSStream(js nats.JetStreamContext, streamName string, subject strin
 		Storage:   nats.FileStorage,
 		Retention: nats.LimitsPolicy,
 		MaxBytes:  natsStreamMaxBytes,
-		Replicas:  1,
+		Replicas:  replicas,
 	})
 	if err != nil {
 		if errors.Is(err, nats.ErrStreamNameAlreadyInUse) || errors.Is(err, io.EOF) {

@@ -16,16 +16,16 @@ import (
 )
 
 type KafkaPublisher struct {
-	writer         *kafka.Writer
-	topic          string
-	flushInterval  time.Duration
-	maxBatchBytes  int
-	closeCh        chan struct{}
-	flushDone      chan struct{}
-	mu             sync.Mutex
-	pending        []kafka.Message
-	pendingBytes   int
-	lastFlushAt    time.Time
+	writer        *kafka.Writer
+	topic         string
+	flushInterval time.Duration
+	maxBatchBytes int
+	closeCh       chan struct{}
+	flushDone     chan struct{}
+	mu            sync.Mutex
+	pending       []kafka.Message
+	pendingBytes  int
+	lastFlushAt   time.Time
 }
 
 type KafkaConsumer struct {
@@ -78,7 +78,6 @@ func NewKafkaPublisher(cfg KafkaConfig, topic string) (*KafkaPublisher, error) {
 	publisher.startPeriodicFlush()
 	return publisher, nil
 }
-
 
 func (p *KafkaPublisher) startPeriodicFlush() {
 	go func() {
@@ -248,7 +247,7 @@ func ensureKafkaTopic(cfg KafkaConfig, topic string) error {
 	err = controllerConn.CreateTopics(kafka.TopicConfig{
 		Topic:             topic,
 		NumPartitions:     cfg.TopicPartitions,
-		ReplicationFactor: 1,
+		ReplicationFactor: cfg.TopicReplicationFactor,
 	})
 	if err == nil || strings.Contains(strings.ToLower(err.Error()), "already exists") {
 		return nil

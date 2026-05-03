@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-sink
+  namespace: streaming-experiments
+spec:
+  template:
+    metadata:
+      labels:
+        benchmark.dynamos/component: sink
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: benchmark.dynamos/placement
+                    operator: In
+                    values:
+                      - sink
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-transformer
+  namespace: streaming-experiments
+spec:
+  template:
+    metadata:
+      labels:
+        benchmark.dynamos/component: transformer
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: benchmark.dynamos/placement
+                    operator: In
+                    values:
+                      - transformer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-rabbitmq
+  namespace: streaming-experiments
+spec:
+  template:
+    metadata:
+      labels:
+        benchmark.dynamos/component: broker
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: benchmark.dynamos/placement
+                    operator: In
+                    values:
+                      - broker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-nats
+  namespace: streaming-experiments
+spec:
+  template:
+    metadata:
+      labels:
+        benchmark.dynamos/component: broker
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: benchmark.dynamos/placement
+                    operator: In
+                    values:
+                      - broker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-kafka
+  namespace: streaming-experiments
+spec:
+  template:
+    metadata:
+      labels:
+        benchmark.dynamos/component: broker
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: benchmark.dynamos/placement
+                    operator: In
+                    values:
+                      - broker
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: grpc-stream-producer
+  namespace: streaming-experiments
+spec:
+  template:
+    metadata:
+      labels:
+        benchmark.dynamos/component: producer
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: benchmark.dynamos/placement
+                    operator: NotIn
+                    values:
+                      - broker

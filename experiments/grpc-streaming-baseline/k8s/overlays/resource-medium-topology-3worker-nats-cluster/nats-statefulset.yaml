@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grpc-stream-nats
+  namespace: streaming-experiments
+spec:
+  serviceName: grpc-stream-nats-headless
+  replicas: 3
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: grpc-stream-nats
+  template:
+    metadata:
+      labels:
+        app: grpc-stream-nats
+        benchmark.dynamos/component: broker
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: benchmark.dynamos/topology-sensitivity
+                    operator: In
+                    values:
+                      - "true"
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: grpc-stream-nats
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: nats
+          image: nats:2.10-alpine
+          command:
+            - /bin/sh
+            - -ec
+          args:
+            - exec nats-server -c /etc/nats/nats.conf --server_name "${POD_NAME}"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 4222
+              name: client
+            - containerPort: 6222
+              name: cluster
+          volumeMounts:
+            - name: nats-config
+              mountPath: /etc/nats/nats.conf
+              subPath: nats.conf
+            - name: nats-data
+              mountPath: /data/jetstream
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      volumes:
+        - name: nats-config
+          configMap:
+            name: grpc-stream-nats-config
+        - name: nats-data
+          emptyDir: {}

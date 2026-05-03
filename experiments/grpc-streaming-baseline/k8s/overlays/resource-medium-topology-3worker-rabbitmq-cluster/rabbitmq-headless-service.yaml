@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-stream-rabbitmq-headless
+  namespace: streaming-experiments
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: grpc-stream-rabbitmq
+  ports:
+    - name: epmd
+      port: 4369
+      targetPort: epmd
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+    - name: stream
+      port: 5552
+      targetPort: stream
+    - name: management
+      port: 15672
+      targetPort: management
+    - name: distribution
+      port: 25672
+      targetPort: distribution

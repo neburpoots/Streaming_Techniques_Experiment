@@ -32,6 +32,7 @@ type NATSConfig struct {
 	URL                          string
 	ProducerToTransformerSubject string
 	TransformerToSinkSubject     string
+	StreamReplicas               int
 }
 
 type KafkaConfig struct {
@@ -39,6 +40,7 @@ type KafkaConfig struct {
 	ProducerToTransformerTopic string
 	TransformerToSinkTopic     string
 	TopicPartitions            int
+	TopicReplicationFactor     int
 }
 
 func SupportedModes() []string {
@@ -99,10 +101,15 @@ func LoadRabbitMQConfig() (RabbitMQConfig, error) {
 }
 
 func LoadNATSConfig() NATSConfig {
+	streamReplicas, err := config.Int("NATS_STREAM_REPLICAS", 1)
+	if err != nil || streamReplicas <= 0 {
+		streamReplicas = 1
+	}
 	return NATSConfig{
 		URL:                          config.String("NATS_URL", "nats://nats:4222"),
 		ProducerToTransformerSubject: config.String("NATS_PRODUCER_TO_TRANSFORMER_SUBJECT", "producer.to.transformer"),
 		TransformerToSinkSubject:     config.String("NATS_TRANSFORMER_TO_SINK_SUBJECT", "transformer.to.sink"),
+		StreamReplicas:               streamReplicas,
 	}
 }
 
@@ -115,11 +122,16 @@ func LoadKafkaConfig() KafkaConfig {
 	if err != nil || topicPartitions <= 0 {
 		topicPartitions = 16
 	}
+	topicReplicationFactor, err := config.Int("KAFKA_TOPIC_REPLICATION_FACTOR", 1)
+	if err != nil || topicReplicationFactor <= 0 {
+		topicReplicationFactor = 1
+	}
 	return KafkaConfig{
 		Brokers:                    brokers,
 		ProducerToTransformerTopic: config.String("KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC", "producer-to-transformer"),
 		TransformerToSinkTopic:     config.String("KAFKA_TRANSFORMER_TO_SINK_TOPIC", "transformer-to-sink"),
 		TopicPartitions:            topicPartitions,
+		TopicReplicationFactor:     topicReplicationFactor,
 	}
 }
 

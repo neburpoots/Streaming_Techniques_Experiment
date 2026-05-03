@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../resource-medium-topology-3worker
+  - nats-headless-service.yaml
+  - nats-statefulset.yaml
+patches:
+  - path: delete-nats-deployment.yaml
+  - path: scale-unused-brokers.yaml
+  - path: clustered-config-patch.yaml
+  - path: nats-config-patch.yaml

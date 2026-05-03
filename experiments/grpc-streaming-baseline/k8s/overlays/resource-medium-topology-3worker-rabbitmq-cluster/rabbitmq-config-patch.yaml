@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grpc-stream-rabbitmq-config
+  namespace: streaming-experiments
+data:
+  rabbitmq.conf: |
+    stream.listeners.tcp.default = 5552
+    stream.advertised_host = $(POD_NAME).grpc-stream-rabbitmq-headless.streaming-experiments.svc.cluster.local
+    stream.advertised_port = 5552
+
+    cluster_formation.peer_discovery_backend = classic_config
+    cluster_formation.classic_config.nodes.1 = rabbit@grpc-stream-rabbitmq-0.grpc-stream-rabbitmq-headless.streaming-experiments.svc.cluster.local
+    cluster_formation.classic_config.nodes.2 = rabbit@grpc-stream-rabbitmq-1.grpc-stream-rabbitmq-headless.streaming-experiments.svc.cluster.local
+    cluster_formation.classic_config.nodes.3 = rabbit@grpc-stream-rabbitmq-2.grpc-stream-rabbitmq-headless.streaming-experiments.svc.cluster.local
+    cluster_partition_handling = pause_minority
+    queue_leader_locator = least_leaders

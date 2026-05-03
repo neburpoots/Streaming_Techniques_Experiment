@@ -19,10 +19,13 @@ set -euo pipefail
 #   --repeat <n>        Number of repetitions per case (default: 1)
 #   --transport <mode>  Transport filter: all, client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka
 #   --payload <bytes>   Payload-size filter for synthetic-clean
-#   --concurrency <n>   Concurrency filter for synthetic-clean
+#   --concurrency <n>   Concurrency filter for presets with concurrency sweeps
+#   --kind-cluster-name <name>
+#                       Explicit kind cluster name for image loading
 #   --skip-build        Skip container image build
 #   --skip-load         Skip image load into cluster (kind)
 #   --namespace <ns>    Kubernetes namespace (default: streaming-experiments)
+#   --run-id-prefix <p> Prefix added to every run id and summary file
 #   --help              Show usage
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -30,6 +33,16 @@ RESULTS_DIR="${ROOT}/results"
 STATS_SCRIPT="${ROOT}/scripts/collect-k8s-stats.sh"
 EXPORT_SCRIPT="${ROOT}/scripts/export-results.ps1"
 AGGREGATE_SCRIPT="${ROOT}/scripts/aggregate-repeat-results.ps1"
+
+export PATH="/tmp/agent-bin:/usr/local/bin:/usr/bin:/bin:${PATH}"
+
+if ! command -v kubectl >/dev/null 2>&1 || ! kubectl version --client >/dev/null 2>&1; then
+    if [[ -x "/mnt/c/Program Files/Docker/Docker/resources/bin/kubectl.exe" ]]; then
+        kubectl() {
+            "/mnt/c/Program Files/Docker/Docker/resources/bin/kubectl.exe" "$@"
+        }
+    fi
+fi
 
 # ── Defaults ──
 PRESET=""
@@ -42,6 +55,8 @@ SKIP_BUILD=false
 SKIP_LOAD=false
 NAMESPACE="streaming-experiments"
 REPEAT_SUFFIX=""
+RUN_ID_PREFIX=""
+KIND_CLUSTER_NAME=""
 
 # ── Parse arguments ──
 while [[ $# -gt 0 ]]; do
@@ -51,9 +66,11 @@ while [[ $# -gt 0 ]]; do
         --transport)  TRANSPORT_FILTER="$2"; shift 2 ;;
         --payload)    PAYLOAD_FILTER="$2"; shift 2 ;;
         --concurrency) CONCURRENCY_FILTER="$2"; shift 2 ;;
+        --kind-cluster-name) KIND_CLUSTER_NAME="$2"; shift 2 ;;
         --skip-build) SKIP_BUILD=true; shift ;;
         --skip-load)  SKIP_LOAD=true; shift ;;
         --namespace)  NAMESPACE="$2"; shift 2 ;;
+        --run-id-prefix) RUN_ID_PREFIX="$2"; shift 2 ;;
         --help)
             head -20 "$0" | tail -15
             exit 0
@@ -155,9 +172,24 @@ build_images() {
 }
 
 load_images_kind() {
-    echo "Loading images into kind cluster..."
+    local kind_cluster_name="${KIND_CLUSTER_NAME}"
+
+    if [[ -z "${kind_cluster_name}" ]]; then
+        local current_context=""
+        current_context="$(kubectl config current-context 2>/dev/null || true)"
+        if [[ "${current_context}" == kind-* ]]; then
+            kind_cluster_name="${current_context#kind-}"
+        fi
+    fi
+
+    if [[ -z "${kind_cluster_name}" ]]; then
+        echo "Skipping kind image load because the current context is not a kind cluster."
+        return
+    fi
+
+    echo "Loading images into kind cluster ${kind_cluster_name}..."
     for svc in producer transformer sink; do
-        kind load docker-image "grpc-streaming-baseline-${svc}:latest" 2>/dev/null || true
+        kind load docker-image --name "${kind_cluster_name}" "grpc-streaming-baseline-${svc}:latest"
     done
 }
 
@@ -178,11 +210,43 @@ if [[ ! -d "${OVERLAY_DIR}" ]]; then
     exit 1
 fi
 
+configure_overlay_runtime_defaults() {
+    case "${OVERLAY}" in
+        *kafka-cluster)
+            export KAFKA_BROKERS="${KAFKA_BROKERS:-grpc-stream-kafka-0.grpc-stream-kafka-headless:9092,grpc-stream-kafka-1.grpc-stream-kafka-headless:9092,grpc-stream-kafka-2.grpc-stream-kafka-headless:9092}"
+            export KAFKA_TOPIC_REPLICATION_FACTOR="${KAFKA_TOPIC_REPLICATION_FACTOR:-3}"
+            ;;
+        *nats-cluster)
+            export NATS_URL="${NATS_URL:-nats://grpc-stream-nats-0.grpc-stream-nats-headless:4222,nats://grpc-stream-nats-1.grpc-stream-nats-headless:4222,nats://grpc-stream-nats-2.grpc-stream-nats-headless:4222}"
+            export NATS_STREAM_REPLICAS="${NATS_STREAM_REPLICAS:-3}"
+            ;;
+    esac
+}
+
+configure_overlay_runtime_defaults
+
 # ── Ensure namespace and base resources exist ──
 ensure_base_resources() {
     # Apply namespace and PVC (idempotent)
     kubectl apply -f "${ROOT}/k8s/base/namespace.yaml"
     kubectl apply -f "${ROOT}/k8s/base/results-pvc.yaml"
+}
+
+cleanup_broker_overlay_conflicts() {
+    local stale_resources=(
+        deployment/grpc-stream-rabbitmq
+        statefulset/grpc-stream-rabbitmq
+        service/grpc-stream-rabbitmq-headless
+        deployment/grpc-stream-nats
+        statefulset/grpc-stream-nats
+        service/grpc-stream-nats-headless
+        deployment/grpc-stream-kafka
+        statefulset/grpc-stream-kafka
+        service/grpc-stream-kafka-headless
+    )
+
+    echo "Cleaning up broker workloads before applying overlay..."
+    kubectl delete "${stale_resources[@]}" -n "${NAMESPACE}" --ignore-not-found=true >/dev/null 2>&1 || true
 }
 
 # ── ConfigMap patching ──
@@ -243,17 +307,48 @@ patch_configmap() {
         --from-literal=NATS_URL="${NATS_URL:-nats://grpc-stream-nats:4222}" \
         --from-literal=NATS_PRODUCER_TO_TRANSFORMER_SUBJECT="${NATS_PRODUCER_TO_TRANSFORMER_SUBJECT:-producer.to.transformer}" \
         --from-literal=NATS_TRANSFORMER_TO_SINK_SUBJECT="${NATS_TRANSFORMER_TO_SINK_SUBJECT:-transformer.to.sink}" \
+        --from-literal=NATS_STREAM_REPLICAS="${NATS_STREAM_REPLICAS:-1}" \
         --from-literal=KAFKA_BROKERS="${KAFKA_BROKERS:-grpc-stream-kafka:9092}" \
         --from-literal=KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC="${KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC:-producer-to-transformer}" \
         --from-literal=KAFKA_TRANSFORMER_TO_SINK_TOPIC="${KAFKA_TRANSFORMER_TO_SINK_TOPIC:-transformer-to-sink}" \
         --from-literal=KAFKA_TOPIC_PARTITIONS="${KAFKA_TOPIC_PARTITIONS:-16}" \
+        --from-literal=KAFKA_TOPIC_REPLICATION_FACTOR="${KAFKA_TOPIC_REPLICATION_FACTOR:-1}" \
         --dry-run=client -o yaml | kubectl apply -f -
 }
 
 # ── Wait for deployments to be ready ──
+workload_ref() {
+    local name="$1"
+    if kubectl get deployment "${name}" -n "${NAMESPACE}" >/dev/null 2>&1; then
+        echo "deployment/${name}"
+        return 0
+    fi
+    if kubectl get statefulset "${name}" -n "${NAMESPACE}" >/dev/null 2>&1; then
+        echo "statefulset/${name}"
+        return 0
+    fi
+    echo "Could not find deployment or statefulset ${name} in namespace ${NAMESPACE}." >&2
+    return 1
+}
+
+rollout_status() {
+    local name="$1"
+    local timeout="$2"
+    local ref
+    ref="$(workload_ref "${name}")"
+    kubectl rollout status "${ref}" -n "${NAMESPACE}" --timeout="${timeout}"
+}
+
+rollout_restart() {
+    local name="$1"
+    local ref
+    ref="$(workload_ref "${name}")"
+    kubectl rollout restart "${ref}" -n "${NAMESPACE}"
+}
+
 wait_for_rabbitmq_ready() {
     echo "  Waiting for RabbitMQ to be ready..."
-    kubectl rollout status deployment/grpc-stream-rabbitmq -n "${NAMESPACE}" --timeout=120s
+    rollout_status grpc-stream-rabbitmq 600s
 
     local rabbitmq_pod=""
     for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
@@ -269,12 +364,12 @@ wait_for_rabbitmq_ready() {
 
 wait_for_nats_ready() {
     echo "  Waiting for NATS to be ready..."
-    kubectl rollout status deployment/grpc-stream-nats -n "${NAMESPACE}" --timeout=120s
+    rollout_status grpc-stream-nats 300s
 }
 
 wait_for_kafka_ready() {
     echo "  Waiting for Kafka to be ready..."
-    kubectl rollout status deployment/grpc-stream-kafka -n "${NAMESPACE}" --timeout=180s
+    rollout_status grpc-stream-kafka 600s
     local kafka_pod=""
     for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
         kafka_pod="$(kubectl get pods -n "${NAMESPACE}" -l app=grpc-stream-kafka -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
@@ -289,8 +384,8 @@ wait_for_kafka_ready() {
 wait_for_ready() {
     local transport_mode="${1:-client-streaming}"
     echo "  Waiting for sink and transformer to be ready..."
-    kubectl rollout status deployment/grpc-stream-sink -n "${NAMESPACE}" --timeout=120s
-    kubectl rollout status deployment/grpc-stream-transformer -n "${NAMESPACE}" --timeout=120s
+    rollout_status grpc-stream-sink 120s
+    rollout_status grpc-stream-transformer 120s
     if [[ "${transport_mode}" == "rabbitmq-streams" ]]; then
         wait_for_rabbitmq_ready
     elif [[ "${transport_mode}" == "nats-jetstream" ]]; then
@@ -306,17 +401,17 @@ restart_deployments() {
     local transport_mode="${1:-client-streaming}"
     case "${transport_mode}" in
         rabbitmq-streams)
-            kubectl rollout restart deployment/grpc-stream-rabbitmq -n "${NAMESPACE}"
+            rollout_restart grpc-stream-rabbitmq
             ;;
         nats-jetstream)
-            kubectl rollout restart deployment/grpc-stream-nats -n "${NAMESPACE}"
+            rollout_restart grpc-stream-nats
             ;;
         kafka)
-            kubectl rollout restart deployment/grpc-stream-kafka -n "${NAMESPACE}"
+            rollout_restart grpc-stream-kafka
             ;;
     esac
-    kubectl rollout restart deployment/grpc-stream-sink -n "${NAMESPACE}"
-    kubectl rollout restart deployment/grpc-stream-transformer -n "${NAMESPACE}"
+    rollout_restart grpc-stream-sink
+    rollout_restart grpc-stream-transformer
     wait_for_ready "${transport_mode}"
 }
 
@@ -333,6 +428,25 @@ wait_for_metrics_ready() {
     echo "  Warning: metrics-server did not report sink/transformer pod metrics before the run started" >&2
 }
 
+delete_producer_job() {
+    kubectl delete job grpc-stream-producer \
+        -n "${NAMESPACE}" \
+        --ignore-not-found=true \
+        --wait=true \
+        --timeout=120s \
+        >/dev/null 2>&1 || true
+
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+        if ! kubectl get job grpc-stream-producer -n "${NAMESPACE}" >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep 1
+    done
+
+    echo "Producer job still exists after delete wait in namespace ${NAMESPACE}." >&2
+    return 1
+}
+
 apply_producer_job() {
     kubectl kustomize "${OVERLAY_DIR}" |
         awk 'BEGIN { RS="---"; ORS="---\n" } /kind:[[:space:]]*Job/ { print $0 }' |
@@ -343,40 +457,19 @@ apply_producer_job() {
 copy_results_from_pvc() {
     local run_id="$1"
 
-    # Create a temporary pod to access the PVC
-    local helper_pod="results-helper-${run_id//[^a-zA-Z0-9-]/-}"
-    kubectl delete pod "${helper_pod}" -n "${NAMESPACE}" --ignore-not-found=true --grace-period=0 --force >/dev/null 2>&1 || true
+    local sink_pod=""
     for _ in 1 2 3 4 5 6 7 8 9 10; do
-        if ! kubectl get pod "${helper_pod}" -n "${NAMESPACE}" >/dev/null 2>&1; then
+        sink_pod="$(kubectl get pods -n "${NAMESPACE}" -l app=grpc-stream-sink -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
+        if [[ -n "${sink_pod}" ]]; then
             break
         fi
         sleep 1
     done
-    kubectl run "${helper_pod}" -n "${NAMESPACE}" \
-        --image=busybox:latest \
-        --restart=Never \
-        --overrides='{
-            "spec": {
-                "containers": [{
-                    "name": "helper",
-                    "image": "busybox:latest",
-                    "command": ["sleep", "3600"],
-                    "volumeMounts": [{
-                        "name": "results",
-                        "mountPath": "/results"
-                    }]
-                }],
-                "volumes": [{
-                    "name": "results",
-                    "persistentVolumeClaim": {
-                        "claimName": "experiment-results"
-                    }
-                }]
-            }
-        }' \
-        >/dev/null 2>&1
 
-    kubectl wait --for=condition=Ready pod/"${helper_pod}" -n "${NAMESPACE}" --timeout=60s
+    if [[ -z "${sink_pod}" ]]; then
+        echo "Could not find sink pod to collect results for ${run_id}." >&2
+        return 1
+    fi
 
     # Copy result files matching this run
     for suffix in producer-result.json sink-summary.json sink-analysis.json; do
@@ -384,8 +477,8 @@ copy_results_from_pvc() {
         local local_path="${RESULTS_DIR}/${run_id}-${suffix}"
         local copied=false
         for attempt in 1 2 3 4 5; do
-            if kubectl exec -n "${NAMESPACE}" "${helper_pod}" -- test -f "${remote_path}" 2>/dev/null; then
-                kubectl cp "${NAMESPACE}/${helper_pod}:${remote_path}" "${local_path}" 2>/dev/null || true
+            if kubectl exec -n "${NAMESPACE}" "${sink_pod}" -c sink -- test -f "${remote_path}" 2>/dev/null; then
+                kubectl cp -c sink "${NAMESPACE}/${sink_pod}:${remote_path}" "${local_path}" 2>/dev/null || true
                 if [[ -f "${local_path}" ]]; then
                     copied=true
                     break
@@ -397,9 +490,6 @@ copy_results_from_pvc() {
             echo "  Warning: missing result artifact ${remote_path}" >&2
         fi
     done
-
-    # Clean up helper pod
-    kubectl delete pod "${helper_pod}" -n "${NAMESPACE}" --ignore-not-found=true --grace-period=0 --force >/dev/null 2>&1 || true
 }
 
 # ── Failure injection ──
@@ -447,7 +537,7 @@ run_case() {
     local dataset_files="${16:-}"
     local dataset_rows_per_msg="${17:-1}"
     local dataset_repeat="${18:-1}"
-    local effective_run_id="${run_id}${REPEAT_SUFFIX}"
+    local effective_run_id="${RUN_ID_PREFIX}${run_id}${REPEAT_SUFFIX}"
 
     echo "━━━ Running: ${effective_run_id} ━━━"
 
@@ -463,7 +553,7 @@ run_case() {
     wait_for_metrics_ready
 
     # 3. Delete any previous producer job
-    kubectl delete job grpc-stream-producer -n "${NAMESPACE}" --ignore-not-found=true 2>/dev/null
+    delete_producer_job
 
     # 4. Start resource stats collection
     local stats_file="${RESULTS_DIR}/${effective_run_id}-k8s-stats.ndjson"
@@ -501,7 +591,7 @@ run_case() {
     copy_results_from_pvc "${effective_run_id}"
 
     # 9. Clean up producer job (keep deployments for next run)
-    kubectl delete job grpc-stream-producer -n "${NAMESPACE}" --ignore-not-found=true 2>/dev/null
+    delete_producer_job
 
     echo "  Done: ${effective_run_id}"
 }
@@ -540,6 +630,7 @@ run_synthetic_continuous() {
     for transport_mode in $(selected_transport_modes); do
         local ts; ts=$(transport_short "${transport_mode}")
         for conc in 4 8; do
+            matches_filter "${conc}" "${CONCURRENCY_FILTER}" || continue
             run_case "synthetic-continuous-${ts}-p1024-c${conc}" \
                 "${transport_mode}" "synthetic" "continuous" "20000" "1024" "${conc}" "1000"
         done
@@ -619,10 +710,11 @@ if [[ "${PRESET}" == "csv-replay-check" ]]; then
 fi
 
 # Apply the overlay to create/update deployments and services
+cleanup_broker_overlay_conflicts
 kubectl apply -k "${OVERLAY_DIR}"
 
 # Delete producer job so it does not block the first run
-kubectl delete job grpc-stream-producer -n "${NAMESPACE}" --ignore-not-found=true 2>/dev/null
+delete_producer_job
 
 wait_for_ready
 
@@ -651,15 +743,17 @@ for ((r = 1; r <= REPEAT; r++)); do
 done
 
 # Export summary CSV
+summary_prefix="${RUN_ID_PREFIX}${PRESET}"
+
 echo "Exporting summary CSV..."
 if run_export_powershell "${EXPORT_SCRIPT}" \
     -ResultsDir "${RESULTS_DIR}" \
-    -RunIdPrefix "${PRESET}" \
-    -OutputPath "${RESULTS_DIR}/${PRESET}-summary.csv"; then
+    -RunIdPrefix "${summary_prefix}" \
+    -OutputPath "${RESULTS_DIR}/${summary_prefix}-summary.csv"; then
     if [[ "${REPEAT}" -gt 1 && -f "${AGGREGATE_SCRIPT}" ]]; then
         run_export_powershell "${AGGREGATE_SCRIPT}" \
-            -SummaryPath "${RESULTS_DIR}/${PRESET}-summary.csv" \
-            -OutputPath "${RESULTS_DIR}/${PRESET}-summary-aggregated.csv"
+            -SummaryPath "${RESULTS_DIR}/${summary_prefix}-summary.csv" \
+            -OutputPath "${RESULTS_DIR}/${summary_prefix}-summary-aggregated.csv"
     fi
 else
     echo "PowerShell not found; skipping CSV export."

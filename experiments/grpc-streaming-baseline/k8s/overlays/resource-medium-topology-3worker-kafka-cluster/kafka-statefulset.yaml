@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grpc-stream-kafka
+  namespace: streaming-experiments
+spec:
+  serviceName: grpc-stream-kafka-headless
+  replicas: 3
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: grpc-stream-kafka
+  template:
+    metadata:
+      labels:
+        app: grpc-stream-kafka
+        benchmark.dynamos/component: broker
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: benchmark.dynamos/topology-sensitivity
+                    operator: In
+                    values:
+                      - "true"
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: grpc-stream-kafka
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: kafka
+          image: apache/kafka:3.9.1
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              ordinal="${HOSTNAME##*-}"
+              export KAFKA_NODE_ID="$((ordinal + 1))"
+              export KAFKA_ADVERTISED_LISTENERS="PLAINTEXT://${HOSTNAME}.grpc-stream-kafka-headless.streaming-experiments.svc.cluster.local:9092"
+              export KAFKA_CONTROLLER_QUORUM_VOTERS="1@grpc-stream-kafka-0.grpc-stream-kafka-headless.streaming-experiments.svc.cluster.local:9093,2@grpc-stream-kafka-1.grpc-stream-kafka-headless.streaming-experiments.svc.cluster.local:9093,3@grpc-stream-kafka-2.grpc-stream-kafka-headless.streaming-experiments.svc.cluster.local:9093"
+              exec /etc/kafka/docker/run
+          env:
+            - name: CLUSTER_ID
+              value: MkU3OEVBNTcwNTJENDM2Qk
+            - name: KAFKA_PROCESS_ROLES
+              value: broker,controller
+            - name: KAFKA_CONTROLLER_LISTENER_NAMES
+              value: CONTROLLER
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: PLAINTEXT
+            - name: KAFKA_LISTENERS
+              value: PLAINTEXT://:9092,CONTROLLER://:9093
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
+            - name: KAFKA_NUM_PARTITIONS
+              value: "16"
+            - name: KAFKA_DEFAULT_REPLICATION_FACTOR
+              value: "3"
+            - name: KAFKA_MIN_INSYNC_REPLICAS
+              value: "2"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "3"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "3"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "2"
+            - name: KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS
+              value: "0"
+            - name: KAFKA_HEAP_OPTS
+              value: -Xms1g -Xmx1536m
+          ports:
+            - containerPort: 9092
+              name: client
+            - containerPort: 9093
+              name: controller
+          startupProbe:
+            tcpSocket:
+              port: client
+            periodSeconds: 2
+            failureThreshold: 90
+          readinessProbe:
+            tcpSocket:
+              port: client
+            periodSeconds: 2
+            failureThreshold: 15
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /tmp/kraft-combined-logs
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      volumes:
+        - name: kafka-data
+          emptyDir: {}

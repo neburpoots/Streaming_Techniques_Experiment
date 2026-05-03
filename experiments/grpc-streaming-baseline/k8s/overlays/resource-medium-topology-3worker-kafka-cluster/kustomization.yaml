@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../resource-medium-topology-3worker
+  - kafka-headless-service.yaml
+  - kafka-statefulset.yaml
+patches:
+  - path: delete-kafka-deployment.yaml
+  - path: scale-unused-brokers.yaml
+  - path: clustered-config-patch.yaml

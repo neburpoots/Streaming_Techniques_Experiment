@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grpc-streaming-baseline-config
+  namespace: streaming-experiments
+data:
+  KAFKA_BROKERS: grpc-stream-kafka-0.grpc-stream-kafka-headless:9092,grpc-stream-kafka-1.grpc-stream-kafka-headless:9092,grpc-stream-kafka-2.grpc-stream-kafka-headless:9092
+  KAFKA_TOPIC_REPLICATION_FACTOR: "3"

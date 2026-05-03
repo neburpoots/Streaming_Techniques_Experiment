@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grpc-stream-rabbitmq
+  namespace: streaming-experiments
+spec:
+  serviceName: grpc-stream-rabbitmq-headless
+  replicas: 3
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: grpc-stream-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: grpc-stream-rabbitmq
+        benchmark.dynamos/component: broker
+        benchmark.dynamos/topology-sensitivity: "true"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: benchmark.dynamos/topology-sensitivity
+                    operator: In
+                    values:
+                      - "true"
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: grpc-stream-rabbitmq
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - rabbitmq-plugins enable --offline rabbitmq_stream rabbitmq_stream_management && rabbitmq-server
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: RABBITMQ_NODENAME
+              value: rabbit@$(POD_NAME).grpc-stream-rabbitmq-headless.streaming-experiments.svc.cluster.local
+            - name: RABBITMQ_USE_LONGNAME
+              value: "true"
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_PASSWORD
+            - name: RABBITMQ_DEFAULT_VHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: RABBITMQ_VHOST
+            - name: RABBITMQ_ERLANG_COOKIE
+              value: benchmark-cookie
+            - name: RABBITMQ_LOGS
+              value: "-"
+          ports:
+            - containerPort: 4369
+              name: epmd
+            - containerPort: 5672
+              name: amqp
+            - containerPort: 5552
+              name: stream
+            - containerPort: 15672
+              name: management
+            - containerPort: 25672
+              name: distribution
+          startupProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - ping
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 36
+          readinessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - ping
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 12
+          volumeMounts:
+            - name: rabbitmq-config
+              mountPath: /etc/rabbitmq/rabbitmq.conf
+              subPath: rabbitmq.conf
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      volumes:
+        - name: rabbitmq-config
+          configMap:
+            name: grpc-stream-rabbitmq-config
+        - name: rabbitmq-data
+          emptyDir: {}

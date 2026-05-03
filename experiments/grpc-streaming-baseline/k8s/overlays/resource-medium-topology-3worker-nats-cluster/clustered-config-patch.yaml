@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grpc-streaming-baseline-config
+  namespace: streaming-experiments
+data:
+  NATS_URL: nats://grpc-stream-nats-0.grpc-stream-nats-headless:4222,nats://grpc-stream-nats-1.grpc-stream-nats-headless:4222,nats://grpc-stream-nats-2.grpc-stream-nats-headless:4222
+  NATS_STREAM_REPLICAS: "3"

@@ -253,6 +253,29 @@ Run the comparable five-transport Kubernetes presets:
 
 If you are running on `kind` instead of the `docker-desktop` cluster, omit `--skip-load` so the freshly built images are loaded into the cluster.
 
+For a narrow broker-only topology-sensitivity check on a local multi-node cluster, create a 3-worker `kind` cluster and run the dedicated wrapper:
+
+```bash
+./scripts/setup-kind-topology-cluster.sh
+./scripts/run-k8s-topology-sensitivity.sh
+```
+
+That wrapper uses the `resource-medium-topology-3worker` overlay, pins the broker, transformer, and sink to distinct worker nodes, runs two targeted `synthetic-clean` rows plus `synthetic-continuous`, `synthetic-backpressure`, and `synthetic-recovery`, and prefixes all outputs with `topology-3worker-` so the results stay separate from the main single-node corpus.
+
+For a separate clustered-broker check, use the dedicated wrapper. It runs one broker family at a time with a 3-pod StatefulSet, 2Gi broker memory limits, and clustered broker settings while scaling the unused broker deployments to zero:
+
+```bash
+./scripts/run-k8s-clustered-brokers.sh
+```
+
+The wrapper uses these overlays:
+
+- `resource-medium-topology-3worker-kafka-cluster`: 3 Kafka KRaft broker/controller pods and run-scoped topics with replication factor 3.
+- `resource-medium-topology-3worker-nats-cluster`: 3 NATS pods with JetStream streams using `Replicas: 3`.
+- `resource-medium-topology-3worker-rabbitmq-cluster`: 3 RabbitMQ pods with stream plugin clustering; streams declared after the cluster is ready are replicated across the RabbitMQ cluster.
+
+Treat these outputs as a separate clustered-local experiment. They model broker clustering inside a local `kind` cluster, not independent physical machines.
+
 Export a comparison CSV from the JSON results:
 
 ```powershell
