@@ -1,0 +1,486 @@
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer unchanged
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-continuous (overlay: resource-medium-single-2g, repeat: 1, transport: rabbitmq-streams)
+━━━ Running: single3-final-20260504-synthetic-continuous-rmqs-p1024-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-rabbitmq restarted
+  Waiting for RabbitMQ to be ready...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for RabbitMQ to be ready...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-continuous-rmqs-p1024-c8
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\single3-final-20260504-synthetic-continuous-summary.csv
+Warning: 1 row(s) in single3-final-20260504-synthetic-continuous-summary.csv have incomplete resource samples.
+Finished preset: synthetic-continuous
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-continuous (overlay: resource-medium-single-2g, repeat: 1, transport: nats-jetstream)
+━━━ Running: single3-final-20260504-synthetic-continuous-nats-p1024-c4 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-continuous-nats-p1024-c4
+━━━ Running: single3-final-20260504-synthetic-continuous-nats-p1024-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-continuous-nats-p1024-c8
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\single3-final-20260504-synthetic-continuous-summary.csv
+Warning: 1 row(s) in single3-final-20260504-synthetic-continuous-summary.csv have incomplete resource samples.
+Finished preset: synthetic-continuous
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-continuous (overlay: resource-medium-single-2g, repeat: 1, transport: kafka)
+━━━ Running: single3-final-20260504-synthetic-continuous-kafka-p1024-c4 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-kafka restarted
+  Waiting for Kafka to be ready...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-kafka" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for Kafka to be ready...
+deployment "grpc-stream-kafka" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-continuous-kafka-p1024-c4
+━━━ Running: single3-final-20260504-synthetic-continuous-kafka-p1024-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-kafka restarted
+  Waiting for Kafka to be ready...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-kafka" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for Kafka to be ready...
+deployment "grpc-stream-kafka" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-continuous-kafka-p1024-c8
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\single3-final-20260504-synthetic-continuous-summary.csv
+Warning: 1 row(s) in single3-final-20260504-synthetic-continuous-summary.csv have incomplete resource samples.
+Finished preset: synthetic-continuous
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-backpressure (overlay: resource-medium-single-2g, repeat: 1, transport: all)
+━━━ Running: single3-final-20260504-synthetic-backpressure-stream-p1024-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for single3-final-20260504-synthetic-backpressure-stream-p1024-c8 (missing: producer )
+  Done: single3-final-20260504-synthetic-backpressure-stream-p1024-c8
+━━━ Running: single3-final-20260504-synthetic-backpressure-unary-p1024-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for single3-final-20260504-synthetic-backpressure-unary-p1024-c8 (missing: producer )
+  Done: single3-final-20260504-synthetic-backpressure-unary-p1024-c8
+━━━ Running: single3-final-20260504-synthetic-backpressure-rmqs-p1024-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-rabbitmq restarted
+  Waiting for RabbitMQ to be ready...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for RabbitMQ to be ready...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+job.batch/grpc-stream-producer created
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for single3-final-20260504-synthetic-backpressure-rmqs-p1024-c8 (missing: producer )
+  Done: single3-final-20260504-synthetic-backpressure-rmqs-p1024-c8
+━━━ Running: single3-final-20260504-synthetic-backpressure-nats-p1024-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for single3-final-20260504-synthetic-backpressure-nats-p1024-c8 (missing: producer )
+  Done: single3-final-20260504-synthetic-backpressure-nats-p1024-c8
+━━━ Running: single3-final-20260504-synthetic-backpressure-kafka-p1024-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-kafka restarted
+  Waiting for Kafka to be ready...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-kafka" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for Kafka to be ready...
+deployment "grpc-stream-kafka" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-backpressure-kafka-p1024-c8
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\single3-final-20260504-synthetic-backpressure-summary.csv
+Warning: 4 row(s) in single3-final-20260504-synthetic-backpressure-summary.csv have incomplete resource samples.
+Finished preset: synthetic-backpressure
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-recovery (overlay: resource-medium-single-2g, repeat: 1, transport: all)
+━━━ Running: single3-final-20260504-synthetic-recovery-stream-p4096-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-7ddc4447f8-pr9z6" deleted from streaming-experiments namespace
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-recovery-stream-p4096-c8
+━━━ Running: single3-final-20260504-synthetic-recovery-unary-p4096-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-bbbb79c7b-gsxg7" deleted from streaming-experiments namespace
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-recovery-unary-p4096-c8
+━━━ Running: single3-final-20260504-synthetic-recovery-rmqs-p4096-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-rabbitmq restarted
+  Waiting for RabbitMQ to be ready...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for RabbitMQ to be ready...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+job.batch/grpc-stream-producer created
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-779b58dbc9-59tvc" deleted from streaming-experiments namespace
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for single3-final-20260504-synthetic-recovery-rmqs-p4096-c8 (missing: producer )
+  Done: single3-final-20260504-synthetic-recovery-rmqs-p4096-c8
+━━━ Running: single3-final-20260504-synthetic-recovery-nats-p4096-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-5c55f57b4b-8lq5x" deleted from streaming-experiments namespace
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-recovery-nats-p4096-c8
+━━━ Running: single3-final-20260504-synthetic-recovery-kafka-p4096-c8 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-kafka restarted
+  Waiting for Kafka to be ready...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-kafka" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-kafka" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for Kafka to be ready...
+deployment "grpc-stream-kafka" successfully rolled out
+job.batch/grpc-stream-producer created
+  Injecting failure: restarting transformer...
+pod "grpc-stream-transformer-7c6d44c694-d5xsb" deleted from streaming-experiments namespace
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Done: single3-final-20260504-synthetic-recovery-kafka-p4096-c8
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\single3-final-20260504-synthetic-recovery-summary.csv
+Warning: 2 row(s) in single3-final-20260504-synthetic-recovery-summary.csv have incomplete resource samples.
+Finished preset: synthetic-recovery

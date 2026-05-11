@@ -40,6 +40,8 @@ const (
 	natsPublishTimeout            = 30 * time.Second
 	natsPublishCompleteTimeout    = 30 * time.Second
 	natsPublishAsyncMaxPending    = 2048
+	natsPublishAsyncDrainTarget   = 512
+	natsPublishAsyncPollInterval  = 5 * time.Millisecond
 	natsFetchBatchSize            = 64
 	natsFetchMaxWait              = 25 * time.Millisecond
 	natsPullMaxWaiting            = 8
@@ -117,6 +119,9 @@ func (p *NATSJetStreamPublisher) PublishChunk(ctx context.Context, chunk *pb.Dat
 	if err := p.asyncPublishError(); err != nil {
 		return err
 	}
+	if err := p.waitForPublishCapacity(ctx); err != nil {
+		return err
+	}
 	body, err := proto.Marshal(chunk)
 	if err != nil {
 		return fmt.Errorf("marshal data chunk: %w", err)
@@ -137,6 +142,28 @@ func (p *NATSJetStreamPublisher) PublishChunk(ctx context.Context, chunk *pb.Dat
 	if err != nil {
 		return fmt.Errorf("publish to nats subject %q: %w", p.subject, err)
 	}
+	return nil
+}
+
+func (p *NATSJetStreamPublisher) waitForPublishCapacity(ctx context.Context) error {
+	if p == nil || p.js == nil {
+		return nil
+	}
+
+	for p.js.PublishAsyncPending() >= natsPublishAsyncDrainTarget {
+		if err := p.asyncPublishError(); err != nil {
+			return err
+		}
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(natsPublishAsyncPollInterval):
+		}
+	}
+
 	return nil
 }
 

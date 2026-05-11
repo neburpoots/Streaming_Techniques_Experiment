@@ -1,0 +1,53 @@
+Command: env STRICT_RESOURCE_VALIDATION=true PRODUCER_TIMEOUT_SECONDS=420s EXPORT_TIMEOUT_SECONDS=900s /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/scripts/run-k8s-matrix.sh synthetic-clean --overlay resource-medium-single-2g --kind-cluster-name grpc-stream-single --namespace streaming-experiments --repeat 1 --run-id-prefix probe-final-20260504- --transport nats-jetstream --payload 16384 --concurrency 16 --skip-build --skip-load
+
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 1, transport: nats-jetstream)
+━━━ Running: probe-final-20260504-synthetic-clean-nats-p16384-c16 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+  Warning: metrics-server did not report sink/transformer pod metrics before the run started
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/probe-final-20260504-synthetic-clean-nats-p16384-c16-sink-analysis.json
+  Done: probe-final-20260504-synthetic-clean-nats-p16384-c16
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\probe-final-20260504-synthetic-clean-summary.csv
+Finished preset: synthetic-clean

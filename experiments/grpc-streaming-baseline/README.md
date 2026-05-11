@@ -189,11 +189,13 @@ The recovery-oriented CSV columns intentionally separate producer-side and end-t
 
 - `producer_*`: retries, reconnects, and producer-observed recovery timing.
 - `completion_ratio`, `lost_messages`, `duplicate_ratio`: correctness under failure.
-- `time_to_first_post_failure_message_ms`, `e2e_recovery_ms`, `backlog_drain_ms`: service disruption as seen at the sink.
-- `sustained_target_recovered`: whether the sink ever regained at least 90% of the configured target rate for three consecutive one-second windows.
-- `recovery_window_p95_latency_ms`, `throughput_debt_messages`, `post_failure_duplicates`: the quality and cost of recovery.
+- `pre_failure_throughput_msg_s`, `recovery_window_throughput_msg_s`, `post_recovery_throughput_msg_s`: phase-segmented delivery rate around the injected failure.
+- `time_to_first_post_failure_message_ms`, `time_to_sustained_target_ms`, `backlog_drain_ms`: restart visibility, sustained-rate recovery, and total backlog drain as separate timings.
+- `sustained_target_within_run`: whether the sink observed five complete one-second buckets inside the configured target band after the failure.
+- `throughput_debt_recovery_window_msg`, `recovery_window_p95_latency_ms`, `post_failure_duplicates`, `post_failure_ordering_violations`: the cost and correctness impact of the fixed 10-second recovery window.
+- `run_completed_within_deadline`: whether the sink received the expected unique message count.
 
-When a run never regains the sustained-rate threshold before completion, `e2e_recovery_ms` is capped at `backlog_drain_ms` instead of being left blank. Use `sustained_target_recovered` to distinguish a true steady-state recovery from that bounded fallback.
+`time_to_sustained_target_ms` is intentionally left blank when the sustained-rate condition is not observed within the run. It is not capped to `backlog_drain_ms`, because backlog drain and steady-rate recovery are different questions.
 
 ## Matrix runs and CSV export
 

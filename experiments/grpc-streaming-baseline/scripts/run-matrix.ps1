@@ -182,7 +182,7 @@ function Get-MatrixCases {
                     -TransportMode $transportMode `
                     -WorkloadSource 'synthetic' `
                     -Profile 'continuous' `
-                    -TotalMessages '20000' `
+                    -TotalMessages '50000' `
                     -PayloadBytes '4096' `
                     -Concurrency '8' `
                     -TargetMessagesPerSecond '2000' `

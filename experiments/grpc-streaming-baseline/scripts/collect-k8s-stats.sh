@@ -17,6 +17,7 @@ OUTPUT_FILE="${1:-${ROOT}/results/k8s-stats.ndjson}"
 NAMESPACE="${NAMESPACE:-streaming-experiments}"
 INTERVAL_SECONDS="${INTERVAL_SECONDS:-2}"
 STOP_FILE="${STOP_FILE:-}"
+ACTIVE_TRANSPORT_MODE="${ACTIVE_TRANSPORT_MODE:-all}"
 
 mkdir -p "$(dirname "${OUTPUT_FILE}")"
 : > "${OUTPUT_FILE}"
@@ -32,6 +33,40 @@ resolve_role() {
         grpc-stream-nats*) echo "nats" ;;
         grpc-stream-kafka*) echo "kafka" ;;
         *) echo "" ;;
+    esac
+}
+
+should_include_role() {
+    local role="$1"
+
+    case "${role}" in
+        producer|transformer|sink)
+            return 0
+            ;;
+    esac
+
+    case "${ACTIVE_TRANSPORT_MODE}" in
+        all)
+            return 0
+            ;;
+        client-streaming|unary)
+            return 1
+            ;;
+        rabbitmq-streams)
+            [[ "${role}" == "rabbitmq" ]]
+            return
+            ;;
+        nats-jetstream)
+            [[ "${role}" == "nats" ]]
+            return
+            ;;
+        kafka)
+            [[ "${role}" == "kafka" ]]
+            return
+            ;;
+        *)
+            return 0
+            ;;
     esac
 }
 
@@ -73,6 +108,7 @@ while true; do
     fi
 
     top_output="$(kubectl top pods -n "${NAMESPACE}" --no-headers 2>/dev/null || true)"
+    sample_unix_nano="$(date +%s%N)"
 
     # kubectl top pods outputs lines like:
     #   grpc-stream-sink-abc12   3m   45Mi
@@ -87,15 +123,15 @@ while true; do
 
         role=$(resolve_role "${pod_name}")
         [[ -z "${role}" ]] && continue
+        should_include_role "${role}" || continue
 
         cpu_pct=$(normalize_cpu "${cpu_raw}")
         mem_display=$(normalize_memory "${mem_raw}")
 
-        # Emit JSON matching the docker stats format that export-results.ps1 expects:
-        # { "Name": "<role-matching-name>", "CPUPerc": "X.XX%", "MemUsage": "XXMiB / ..." }
-        container_name="grpc-streaming-baseline-${role}-1"
-        printf '{"Name":"%s","CPUPerc":"%s","MemUsage":"%s / 0B"}\n' \
-            "${container_name}" "${cpu_pct}" "${mem_display}" >> "${OUTPUT_FILE}"
+        # Emit pod identity and the normalized logical role. The exporter can
+        # aggregate by role while still retaining the original pod name.
+        printf '{"Name":"%s","PodName":"%s","Role":"%s","SampleUnixNano":"%s","CPUPerc":"%s","MemUsage":"%s / 0B"}\n' \
+            "${pod_name}" "${pod_name}" "${role}" "${sample_unix_nano}" "${cpu_pct}" "${mem_display}" >> "${OUTPUT_FILE}"
     done <<< "${top_output}"
 
     sleep "${INTERVAL_SECONDS}"

@@ -1,0 +1,13 @@
+Usage: run-k8s-single-node-final.sh [options]
+
+Options:
+  --cluster-name <name>    Kind cluster name (default: grpc-stream-single)
+  --overlay <name>         Kustomize overlay (default: resource-medium-single-2g)
+  --run-tag <tag>          Prefix for final run ids (default: single3-final-20260504)
+  --probe-tag <tag>        Prefix for probe run ids (default: probe-final-20260504)
+  --repeat <n>             Repetitions per final case (default: 3)
+  --namespace <ns>         Kubernetes namespace (default: streaming-experiments)
+  --skip-cluster-setup     Do not recreate/setup the kind cluster
+  --skip-build             Pass through to run-k8s-matrix.sh
+  --skip-load              Pass through to run-k8s-matrix.sh
+  --help                   Show help

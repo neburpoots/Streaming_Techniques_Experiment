@@ -1,0 +1,342 @@
+Cleaning prior artifacts for single3-final-20260504-* and probe-final-20260504-*
+Running strict probe set...
+Logging to /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/probe-final-20260504-stream-p256-c1.log
+Building container images...
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:f9c6a2fd2ddbc23e336b6257a5245e31f996953ef06cd13a59fa0a1df2d5c252
+#5 resolve docker.io/library/debian:bookworm-slim@sha256:f9c6a2fd2ddbc23e336b6257a5245e31f996953ef06cd13a59fa0a1df2d5c252 0.0s done
+#5 DONE 0.0s
+
+#6 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#6 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 294.85kB 0.1s done
+#7 DONE 0.1s
+
+#8 [builder 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [builder 3/7] COPY go.mod go.sum ./
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 0.6s
+
+#12 [builder 6/7] RUN test -n "producer"
+#12 DONE 0.3s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/producer
+#13 DONE 16.1s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 DONE 0.1s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 1.0s done
+#17 exporting manifest sha256:1bd0518e74221a1a9c56519bdb9d377c857efb825399f98d073c893755e7381b 0.0s done
+#17 exporting config sha256:052758d66471e9826ba0317dc9e4fa1a22b6d85bd810f6aa243abf5d03dbfd4a 0.0s done
+#17 exporting attestation manifest sha256:fcb6eda8749cda5a88288a77f5d2871459372f3c9fd65288787058492b5ed023 0.1s done
+#17 exporting manifest list sha256:2dc405e0813c89840c31975891b214b4e307cca1f49300d6a4c3fd93148b52dd
+#17 exporting manifest list sha256:2dc405e0813c89840c31975891b214b4e307cca1f49300d6a4c3fd93148b52dd 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-producer:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-producer:latest 0.1s done
+#17 DONE 1.2s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:f9c6a2fd2ddbc23e336b6257a5245e31f996953ef06cd13a59fa0a1df2d5c252
+#5 resolve docker.io/library/debian:bookworm-slim@sha256:f9c6a2fd2ddbc23e336b6257a5245e31f996953ef06cd13a59fa0a1df2d5c252 0.0s done
+#5 DONE 0.0s
+
+#6 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#6 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 298.02kB 0.1s done
+#7 DONE 0.1s
+
+#8 [builder 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [builder 3/7] COPY go.mod go.sum ./
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 0.6s
+
+#12 [builder 6/7] RUN test -n "transformer"
+#12 DONE 0.3s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/transformer
+#13 DONE 18.0s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 DONE 0.1s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 1.1s done
+#17 exporting manifest sha256:fb08137f44a614b62b6d433cf511959f76536c05f991bb8bf4d135eb6e3be115 0.0s done
+#17 exporting config sha256:7d20f695551e8198ba496762a3c07998fec4c294aac2594e7500161f6c675f37 0.0s done
+#17 exporting attestation manifest sha256:ce2ce91cbdd30bdef4c9f1e4b2653a995e488e1addb8b06ab31e35263cf488f0 0.0s done
+#17 exporting manifest list sha256:b40e8ce2a1d2f1d7513fa5fafaf37f8b227546f397c129c1cdc020868891526a 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-transformer:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-transformer:latest
+#17 unpacking to docker.io/library/grpc-streaming-baseline-transformer:latest 0.2s done
+#17 DONE 1.3s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:f9c6a2fd2ddbc23e336b6257a5245e31f996953ef06cd13a59fa0a1df2d5c252
+#5 resolve docker.io/library/debian:bookworm-slim@sha256:f9c6a2fd2ddbc23e336b6257a5245e31f996953ef06cd13a59fa0a1df2d5c252 0.0s done
+#5 DONE 0.0s
+
+#6 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#6 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 302.89kB 0.1s done
+#7 DONE 0.1s
+
+#8 [builder 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [builder 3/7] COPY go.mod go.sum ./
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 0.6s
+
+#12 [builder 6/7] RUN test -n "sink"
+#12 DONE 0.3s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/sink
+#13 DONE 17.8s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 DONE 0.1s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 1.0s done
+#17 exporting manifest sha256:ca731d4dcfe4bc22512c5494e8dfbc28817a9f735b7bdd21c18b91a332dbad74
+#17 exporting manifest sha256:ca731d4dcfe4bc22512c5494e8dfbc28817a9f735b7bdd21c18b91a332dbad74 0.0s done
+#17 exporting config sha256:5c8860a4fa0def1dcc4f75d95a7a004f1943c207196c4c3a1b38d990f5cd5b49 0.0s done
+#17 exporting attestation manifest sha256:543cfe5518ef8f959d9d675e5ad7a63556f3c5782283d109b61ac7f16ae709be 0.0s done
+#17 exporting manifest list sha256:a22eb1c7e91be778ab4ac694c842c9c33806a0a51672a3da4fa406bbb0e050a5 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-sink:latest
+#17 naming to docker.io/library/grpc-streaming-baseline-sink:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-sink:latest
+#17 unpacking to docker.io/library/grpc-streaming-baseline-sink:latest 0.2s done
+#17 DONE 1.3s
+Loading images into kind cluster grpc-stream-single...
+Image: "grpc-streaming-baseline-producer:latest" with ID "sha256:2dc405e0813c89840c31975891b214b4e307cca1f49300d6a4c3fd93148b52dd" not yet present on node "grpc-stream-single-control-plane", loading...
+Image: "grpc-streaming-baseline-transformer:latest" with ID "sha256:b40e8ce2a1d2f1d7513fa5fafaf37f8b227546f397c129c1cdc020868891526a" not yet present on node "grpc-stream-single-control-plane", loading...
+Image: "grpc-streaming-baseline-sink:latest" with ID "sha256:a22eb1c7e91be778ab4ac694c842c9c33806a0a51672a3da4fa406bbb0e050a5" not yet present on node "grpc-stream-single-control-plane", loading...
+namespace/streaming-experiments created
+persistentvolumeclaim/experiment-results created
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config created
+configmap/grpc-stream-rabbitmq-config created
+configmap/grpc-streaming-baseline-config created
+service/grpc-stream-kafka created
+service/grpc-stream-nats created
+service/grpc-stream-rabbitmq created
+service/grpc-stream-sink created
+service/grpc-stream-transformer created
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink created
+deployment.apps/grpc-stream-transformer created
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 0 of 1 updated replicas are available...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 1, transport: client-streaming)
+━━━ Running: probe-final-20260504-synthetic-clean-stream-p256-c1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/probe-final-20260504-synthetic-clean-stream-p256-c1-sink-analysis.json
+  Done: probe-final-20260504-synthetic-clean-stream-p256-c1
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\probe-final-20260504-synthetic-clean-summary.csv
+Finished preset: synthetic-clean
+Logging to /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/probe-final-20260504-rmqs-p4096-c16.log
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 1, transport: rabbitmq-streams)
+━━━ Running: probe-final-20260504-synthetic-clean-rmqs-p4096-c16 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-rabbitmq restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for RabbitMQ to be ready...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+  Warning: RabbitMQ did not report ready state before the producer job started
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/probe-final-20260504-synthetic-clean-rmqs-p4096-c16-sink-analysis.json
+  Done: probe-final-20260504-synthetic-clean-rmqs-p4096-c16
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\probe-final-20260504-synthetic-clean-summary.csv
+Finished preset: synthetic-clean
+Logging to /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/probe-final-20260504-nats-p16384-c4.log
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 1, transport: nats-jetstream)
+━━━ Running: probe-final-20260504-synthetic-clean-nats-p16384-c4 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...

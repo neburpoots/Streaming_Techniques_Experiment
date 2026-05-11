@@ -1,0 +1,2 @@
+resource_stats_valid=false
+missing_roles=producer

@@ -8,15 +8,16 @@ type sinkArrivalEvent struct {
 }
 
 type sinkAnalysisFile struct {
-	RunId                    string             `json:"run_id"`
-	TransportMode            string             `json:"transport_mode"`
-	RegisteredAtUnixNano     int64              `json:"registered_at_unix_nano"`
-	StartedAtUnixNano        int64              `json:"started_at_unix_nano"`
-	FinishedAtUnixNano       int64              `json:"finished_at_unix_nano"`
-	ExpectedMessages         uint64             `json:"expected_messages"`
-	TargetMessagesPerSecond  uint64             `json:"target_messages_per_second"`
-	UniqueEvents             []sinkArrivalEvent `json:"unique_events,omitempty"`
-	DuplicateArrivalUnixNano []int64            `json:"duplicate_arrival_unix_nanos,omitempty"`
+	RunId                            string             `json:"run_id"`
+	TransportMode                    string             `json:"transport_mode"`
+	RegisteredAtUnixNano             int64              `json:"registered_at_unix_nano"`
+	StartedAtUnixNano                int64              `json:"started_at_unix_nano"`
+	FinishedAtUnixNano               int64              `json:"finished_at_unix_nano"`
+	ExpectedMessages                 uint64             `json:"expected_messages"`
+	TargetMessagesPerSecond          uint64             `json:"target_messages_per_second"`
+	UniqueEvents                     []sinkArrivalEvent `json:"unique_events,omitempty"`
+	DuplicateArrivalUnixNano         []int64            `json:"duplicate_arrival_unix_nanos,omitempty"`
+	OrderingViolationArrivalUnixNano []int64            `json:"ordering_violation_arrival_unix_nanos,omitempty"`
 }
 
 func newSinkAnalysis(runID string, cfg *pb.RunConfig, registeredAtUnixNano int64) *sinkAnalysisFile {
@@ -35,12 +36,13 @@ func newSinkAnalysis(runID string, cfg *pb.RunConfig, registeredAtUnixNano int64
 	}
 
 	return &sinkAnalysisFile{
-		RunId:                    runID,
-		TransportMode:            cfg.GetTransportMode(),
-		RegisteredAtUnixNano:     registeredAtUnixNano,
-		ExpectedMessages:         cfg.GetExpectedTotalMessages(),
-		TargetMessagesPerSecond:  cfg.GetTargetMessagesPerSecond(),
-		UniqueEvents:             make([]sinkArrivalEvent, 0, capacity),
-		DuplicateArrivalUnixNano: make([]int64, 0, duplicateCapacity),
+		RunId:                            runID,
+		TransportMode:                    cfg.GetTransportMode(),
+		RegisteredAtUnixNano:             registeredAtUnixNano,
+		ExpectedMessages:                 cfg.GetExpectedTotalMessages(),
+		TargetMessagesPerSecond:          cfg.GetTargetMessagesPerSecond(),
+		UniqueEvents:                     make([]sinkArrivalEvent, 0, capacity),
+		DuplicateArrivalUnixNano:         make([]int64, 0, duplicateCapacity),
+		OrderingViolationArrivalUnixNano: make([]int64, 0, duplicateCapacity),
 	}
 }

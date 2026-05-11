@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-sink
+  namespace: streaming-experiments
+spec:
+  template:
+    spec:
+      containers:
+        - name: sink
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-transformer
+  namespace: streaming-experiments
+spec:
+  template:
+    spec:
+      containers:
+        - name: transformer
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: grpc-stream-producer
+  namespace: streaming-experiments
+spec:
+  template:
+    spec:
+      containers:
+        - name: producer
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-rabbitmq
+  namespace: streaming-experiments
+spec:
+  template:
+    spec:
+      containers:
+        - name: rabbitmq
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-nats
+  namespace: streaming-experiments
+spec:
+  template:
+    spec:
+      containers:
+        - name: nats
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-stream-kafka
+  namespace: streaming-experiments
+spec:
+  template:
+    spec:
+      containers:
+        - name: kafka
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: -Xms512m -Xmx1g
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi

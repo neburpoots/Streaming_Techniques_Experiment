@@ -35,7 +35,7 @@ Amsterdam, the Netherlands}
 \maketitle
 
 \begin{abstract}
-This thesis investigates how streaming communication can be introduced into DYNAMOS, a policy-driven middleware for data exchange based on dynamically composed microservices. The current system relies on unary gRPC request-response interactions, which become increasingly inefficient for large or continuous transfers. To ground the broader architectural and comparative study, the thesis first reviews candidate streaming mechanisms and evaluates them in a controlled \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink} pipeline. The current empirical results compare client-streaming gRPC, unary gRPC, RabbitMQ Streams, NATS JetStream, and Kafka in a single-repeat clean bulk-transfer matrix, with focused continuous, backpressure, recovery, and CSV-replay reruns now available for all five transports. Client-streaming provides the highest sustained throughput and unary keeps the lowest per-message latency. Among the brokered mappings, NATS JetStream becomes the strongest average performer only after explicit JetStream resource limits, async publish, batched pull consumption, and in-memory consumer-state tracking are configured. In the current clean rerun it averages 13{,}116.27~msg/s and 32.13~MiB/s, but it no longer remains duplicate-free: 5{,}086 duplicate deliveries appear in the 4~KiB/concurrency-16 and 16~KiB high-concurrency cells. RabbitMQ Streams remains a strong brokered reference, and Kafka moves into the middle of the pack once keyed partitioning, publisher flushing, and buffered consumer commits are configured. The final clean matrix still records a small number of duplicate deliveries in two 16~KiB Kafka cells, while the completed scenario reruns show that Kafka remains correctness-preserving under recovery but pays for that with heavier tail latency, slower backlog drain, and higher broker resource usage than the other brokered mappings. These findings define the current trade-off space for brokered versus direct streaming in DYNAMOS and motivate the remaining scenario-level and system-integration work.
+This thesis investigates how streaming communication can be introduced into DYNAMOS, a policy-driven middleware for data exchange based on dynamically composed microservices. The current system relies on unary gRPC request-response interactions, which become increasingly inefficient for large or continuous transfers. To ground the broader architectural and comparative study, the thesis first reviews candidate streaming mechanisms and evaluates them in a controlled \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink} pipeline. The headline empirical study is a single-node Kubernetes benchmark comparing client-streaming gRPC, unary gRPC, RabbitMQ Streams, NATS JetStream, and Kafka across a clean bulk-transfer matrix and three diagnostic scenarios (continuous steady-rate flow, slow-consumer backpressure, and forced-restart recovery). An exploratory three-broker clustered deployment, in which each broker type runs as a replicated StatefulSet across three worker nodes, is reported as a supporting observation rather than as headline evidence. In the single-node benchmark, client-streaming gRPC provides the highest sustained throughput on the clean matrix and the most stable pacing in the continuous scenario. Among the brokered transports, NATS JetStream achieves the highest clean-matrix throughput average once JetStream resource limits, async publish, and batched pull consumption are configured correctly; RabbitMQ Streams offers stable throughput under clean conditions but accumulates large tail latency under continuous and backpressure load; Kafka delivers duplicate-free and ordering-violation-free recovery, at the cost of heavier tail latency and higher broker resource usage. The clustered runs suggest that brokered transports benefit measurably from horizontal deployment, particularly Kafka and RabbitMQ under pressure, but coverage is limited and the headline conclusions are drawn from the single-node evidence. These findings establish a concrete trade-off map across throughput, latency, delivery semantics, and recovery behaviour for the purpose of selecting a streaming communication model for DYNAMOS.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -48,9 +48,9 @@ Many contemporary distributed systems operate in environments where data and com
 
 DYNAMOS (Dynamically Adaptive Microservice-based Operating System) is a data exchange middleware developed by the Complex Cyber-Infrastructure (CCI) group at the University of Amsterdam. The system implements a set of recurring data sharing archetypes that describe how data and computation are distributed among participants under policy constraints. DYNAMOS realizes these archetypes by dynamically composing chains of microservices that execute data sharing requests in compliance with formally evaluated policies. The middleware is designed to be adaptive, allowing architectural and execution decisions to change at runtime in response to policy requirements.
 
-The current implementation of DYNAMOS uses gRPC for inter-service communication and relies exclusively on atomic request--response interactions. This communication model is suitable for small or bounded data transfers but becomes limiting when applied to large-scale or continuous data exchange. In practice, data in distributed systems is often produced and consumed incrementally, for example in sensor data streams, distributed analytics pipelines, or staged processing of large research datasets.
+The current implementation of DYNAMOS uses gRPC for inter-service communication and relies exclusively on atomic request-response interactions. This communication model is suitable for small or bounded data transfers but becomes limiting when applied to large-scale or continuous data exchange. In practice, data in distributed systems is often produced and consumed incrementally, for example in sensor data streams, distributed analytics pipelines, or staged processing of large research datasets.
 
-When request--response communication is used in such scenarios, systems must either buffer large volumes of data before transmission or split transfers into multiple independent requests. Buffering increases memory usage and can lead to idle time between producers and consumers. Repeated request--response interactions introduce additional coordination overhead. Both effects negatively impact scalability and resource utilization as data volumes and the number of participating services increase.
+When request-response communication is used in such scenarios, systems must either buffer large volumes of data before transmission or split transfers into multiple independent requests. Buffering increases memory usage and can lead to idle time between producers and consumers. Repeated request-response interactions introduce additional coordination overhead. Both effects negatively impact scalability and resource utilization as data volumes and the number of participating services increase.
 
 Streaming-based communication has been proposed as a solution to these limitations. Streaming allows data to be transferred and processed incrementally, enabling overlap between computation and communication and reducing peak memory usage. gRPC supports several streaming interaction patterns, including client-side, server-side, and bidirectional streaming.
 
@@ -58,9 +58,24 @@ Integrating streaming communication into DYNAMOS is not straightforward. Streami
 
 The goal of this thesis is to investigate how streaming communication can be incorporated into DYNAMOS in a way that improves scalability and performance while preserving policy compliance and adaptive behavior. This involves analyzing existing streaming communication mechanisms, designing architectural extensions to the middleware, implementing streaming support, and evaluating the resulting system under realistic workloads.
 
-The main research question addressed in this thesis is how streaming communication can be integrated into a dynamically adaptive, policy-driven microservice-based data exchange middleware such as DYNAMOS while preserving compliance guarantees and improving scalability and performance. To answer this overarching question, the thesis is structured around three sub-questions: which streaming communication technologies, frameworks, and interaction patterns are suitable for large-scale and continuous data exchange in microservice-based systems such as DYNAMOS; how streaming communication can be integrated into a microservice-based architecture while preserving dynamic service composition, policy-driven orchestration, and isolation guarantees; and what impact streaming communication has on scalability, performance, and robustness compared to a traditional request--response approach under realistic workloads in a microservice-based architecture.
+The main research question addressed in this thesis is:
 
-The present document concentrates on the first empirical step in that broader programme. It narrows the design space through a literature-guided comparison, defines a reproducible benchmark for DYNAMOS-relevant streaming workloads, and reports the current five-transport clean-matrix benchmark results for client-streaming gRPC, unary gRPC, RabbitMQ Streams, NATS JetStream, and Kafka. Later thesis stages build on this comparison by extending scenario coverage and by evaluating architectural fit inside DYNAMOS itself.
+\begin{quote}
+\textbf{Main RQ:} How can streaming communication be integrated into a dynamically adaptive, policy-driven microservice-based data exchange middleware such as DYNAMOS, while preserving compliance guarantees and improving scalability and performance?
+\end{quote}
+
+To answer this question, the following sub-research questions are defined:
+
+\begin{itemize}
+  \item \textbf{RQ1:}
+  Which streaming communication technologies, frameworks, and interaction patterns are suitable for large-scale and continuous data exchange in microservice-based systems such as DYNAMOS?
+
+  \item \textbf{RQ2:}
+    How can streaming communication be integrated into a microservice-based architecture in a way that preserves dynamic service composition, policy-driven orchestration, and isolation guarantees?
+
+  \item \textbf{RQ3:}
+    What is the impact of streaming communication on scalability, performance, and robustness compared to a traditional request–response approach under realistic workloads in a microservice-based architecture?
+\end{itemize}
 
 \section{Related Work}
 
@@ -72,7 +87,7 @@ DYNAMOS is implemented as a dynamically composed microservice system deployed on
 
 gRPC provides native support for streaming through client-streaming, server-streaming, and bidirectional streaming RPCs. These interaction patterns differ in message flow control, lifetime of connections, buffering behaviour, and error propagation semantics. In the context of DYNAMOS, the choice of streaming pattern is not merely an API concern but has architectural consequences, as it affects memory usage, cancellation behaviour, and the ability to overlap communication and computation. The original DYNAMOS thesis identifies client-streaming as a promising mechanism for transferring large datasets incrementally, reducing peak memory pressure at the cost of increased handling complexity \cite{stutterheim2023thesis}.
 
-However, the use of long-lived streaming connections introduces operational challenges that are largely absent in unary request--response interactions. Starck and Ghofrani show that gRPC streaming complicates load balancing in Kubernetes environments, as persistent connections can cause traffic to become unevenly distributed across replicas \cite{starck2023streaminglb}. This observation is particularly relevant for systems such as DYNAMOS that rely on horizontal scaling and ephemeral execution units. Complementary benchmarking work demonstrates that the performance characteristics of streaming gRPC are sensitive to runtime configuration and virtualization overhead, with measurable effects on latency and resource utilisation in containerized environments \cite{sodankoor2026grpcbench}.
+However, the use of long-lived streaming connections introduces operational challenges that are largely absent in unary request-response interactions. Starck and Ghofrani show that gRPC streaming complicates load balancing in Kubernetes environments, as persistent connections can cause traffic to become unevenly distributed across replicas \cite{starck2023streaminglb}. This observation is particularly relevant for systems such as DYNAMOS that rely on horizontal scaling and ephemeral execution units. Complementary benchmarking work demonstrates that the performance characteristics of streaming gRPC are sensitive to runtime configuration and virtualization overhead, with measurable effects on latency and resource utilisation in containerized environments \cite{sodankoor2026grpcbench}.
 
 An alternative to direct service-to-service streaming is to externalise the data plane to a messaging or event streaming platform. Broker-based communication decouples producers and consumers in time, delegates buffering and persistence to the broker, and can simplify fan-out scenarios. Comparative benchmarks of Kafka, RabbitMQ, NATS, and ActiveMQ Artemis show that different brokers dominate under different workload characteristics, reinforcing that broker choice is highly workload dependent \cite{ibrahim2026brokers}. A cloud-native literature review comparing Kafka, Pulsar, and RabbitMQ further highlights trade-offs between throughput, reliability, operational complexity, and Kubernetes integration \cite{nuikka2021cloudnative}. While these studies are not conducted in the context of policy-driven middleware, they provide structured criteria that are directly applicable when evaluating broker-based alternatives for DYNAMOS.
 
@@ -86,13 +101,13 @@ Beyond the selection of a streaming mechanism, integrating streaming communicati
 
 Communication in DYNAMOS is abstracted through a sidecar-based architecture, decoupling communication concerns from core microservice logic. The sidecar pattern is widely used in cloud-native systems to address cross-cutting concerns such as observability, security, and traffic management. Figueira and Coutinho demonstrate how sidecars can be integrated into self-adaptive microservice architectures on Kubernetes, enabling runtime adaptation without violating service modularity \cite{figueira2024selfadaptive}. While their work does not explicitly address streaming data transfer, it illustrates how communication behaviour can be adapted dynamically at runtime.
 
-Several middleware frameworks operationalise sidecars as first-class runtime components. Dapr provides a protocol-agnostic communication abstraction that supports service invocation, pub/sub, and state management through a sidecar runtime \cite{figueira2024selfadaptive}. Dapr demonstrates that heterogeneous communication paradigms, including streaming and messaging, can be unified behind a stable interface. However, Dapr assumes relatively static service topologies and does not address dynamic chain composition driven by policy evaluation, limiting its applicability as a direct solution for DYNAMOS.
+Several middleware frameworks operationalise sidecars as first-class runtime components. Figueira and Coutinho discuss sidecar-based runtimes such as Dapr, which provide a protocol-agnostic communication abstraction supporting service invocation, pub/sub, and state management through a sidecar process \cite{figueira2024selfadaptive}. Such runtimes demonstrate that heterogeneous communication paradigms, including streaming and messaging, can be unified behind a stable interface. However, this class of runtimes assumes relatively static service topologies and does not address dynamic chain composition driven by policy evaluation, which limits their applicability as a direct solution for DYNAMOS.
 
 Existing architectural work therefore supports the feasibility of integrating streaming into sidecar-based microservice systems but does not address the combination of long-lived streaming connections with ephemeral, dynamically composed execution chains. This limitation is particularly relevant in systems that combine adaptivity with strict policy enforcement requirements.
 
 \subsection{Policy enforcement and compliance under continuous data exchange}
 
-Policy enforcement is a defining characteristic of DYNAMOS, where access rights, execution locations, and data-flow constraints are evaluated prior to execution and enforced through dynamically composed microservice chains \cite{stutterheim2023thesis,stutterheim2023icsa}. In the current architecture, policy enforcement is implicitly scoped to bounded request--response interactions. Introducing streaming communication challenges this assumption, as data transfer may span longer periods during which policies, system state, or execution context may change.
+Policy enforcement is a defining characteristic of DYNAMOS, where access rights, execution locations, and data-flow constraints are evaluated prior to execution and enforced through dynamically composed microservice chains \cite{stutterheim2023thesis,stutterheim2023icsa}. In the current architecture, policy enforcement is implicitly scoped to bounded request-response interactions. Introducing streaming communication challenges this assumption, as data transfer may span longer periods during which policies, system state, or execution context may change.
 
 Neumaier et al. propose a policy-aware architecture for decentralized dataset exchange that emphasizes continuous monitoring and runtime validation against machine-readable policies \cite{neumaier2021policyaware}. While their work does not explicitly target streaming RPC, it introduces an important distinction between one-time policy clearance and ongoing compliance monitoring, which becomes critical when data is exchanged incrementally over long-lived connections.
 
@@ -102,7 +117,7 @@ Despite these contributions, there is limited guidance on how policy enforcement
 
 \subsection{Resilience, backpressure, and fault handling in streaming workflows}
 
-Streaming-based communication introduces operational challenges that are less pronounced in request--response systems. Long-lived data flows must tolerate partial failures, adapt to fluctuating load, and prevent uncontrolled resource growth through effective backpressure mechanisms. These challenges are compounded in DYNAMOS by dynamic microservice composition and ephemeral execution units.
+Streaming-based communication introduces operational challenges that are less pronounced in request-response systems. Long-lived data flows must tolerate partial failures, adapt to fluctuating load, and prevent uncontrolled resource growth through effective backpressure mechanisms. These challenges are compounded in DYNAMOS by dynamic microservice composition and ephemeral execution units.
 
 Reactive microservice architectures emphasize asynchronous communication, non-blocking execution, and fault isolation as mechanisms for improving resilience under variable load \cite{rasheedh2021reactive}. Although this work does not focus on streaming RPC, its principles are directly applicable to streaming workflows, where failures and backpressure must be managed continuously rather than per request.
 
@@ -114,7 +129,7 @@ Existing literature provides well-established principles for resilience and faul
 
 \subsection{Validation practices, scalability, and performance evaluation}
 
-Empirical evaluation of streaming communication often focuses on comparing streaming and non-streaming interaction styles in terms of throughput, latency, and resource usage. Several benchmarking studies show that streaming RPCs outperform unary calls for large payloads and continuous data flows by enabling incremental processing and reducing buffering overhead \cite{sodankoor2026grpcbench}. Similar conclusions are drawn in broader comparisons between REST and gRPC, where binary protocols combined with streaming semantics demonstrate superior performance under load \cite{restgrpccomparison,lahtevenoja2021communication}.
+Empirical evaluation of streaming communication often focuses on comparing streaming and non-streaming interaction styles in terms of throughput, latency, and resource usage. Studies focused specifically on gRPC streaming show that streaming RPCs outperform unary calls for large payloads and continuous data flows by enabling incremental processing and reducing buffering overhead \cite{roohitavaf2019logplayer,sodankoor2026grpcbench}. Complementary protocol-level comparisons between REST and gRPC further establish that binary, multiplexed transports outperform request-response HTTP under load, which provides additional context for choosing gRPC as the baseline communication layer \cite{restgrpccomparison,lahtevenoja2021communication}.
 
 Scalability in containerized streaming systems has been studied through systematic mapping and empirical evaluations. A mapping study on performance analysis techniques for streaming workloads in containerized microservices identifies network contention, scheduling overhead, and coordination costs as primary scalability bottlenecks \cite{systematicstreaming}. Empirical studies of streaming pipelines deployed on Kubernetes further show that streaming approaches scale more gracefully than request-response models when concurrency increases, provided that backpressure and flow control are properly configured \cite{starck2023streaminglb}.
 
@@ -146,108 +161,74 @@ This makes RabbitMQ attractive as a hybrid comparison point between classic brok
 
 The NATS ecosystem deserves separate consideration because it targets lightweight, location-transparent distributed communication. Official NATS documentation presents core NATS as a connective technology for modern distributed systems with publish/subscribe and request/reply communication, while JetStream adds persistence, replay, replication, and consumer state on top of the base message bus \cite{nats2026overview,nats2026reqreply,nats2026jetstream}. JetStream explicitly supports replay from the beginning of a stream, from a specific sequence number, or from a time-based position, and it offers both push-based and pull-based consumers for different workload profiles \cite{nats2026jetstream}.
 
-For the thesis, NATS is interesting because it represents a lightweight alternative to Kafka and RabbitMQ rather than a direct substitute for either. JetStream supports durable streams, replay, replication, and scalable pull consumers, while core NATS preserves a simple request/reply and pub/sub model that is attractive for microservice systems \cite{nats2026reqreply,nats2026jetstream}. A key complication is that the literature still often discusses the older NATS Streaming layer rather than JetStream, which means published results do not always map perfectly to the current product. That mismatch should be made explicit in the thesis: the experiment should evaluate modern JetStream, but the literature review must interpret older NATS Streaming results with caution \cite{sharvari2019messaging,ciftci2025ipcmechanisms}. NATS with JetStream is most promising when lightweight deployment, elastic scaling, and a smaller operational surface are valued more highly than Kafka's larger ecosystem and benchmarking history.
+For the thesis, NATS is interesting because it represents a lightweight alternative to Kafka and RabbitMQ rather than a direct substitute for either. JetStream supports durable streams, replay, replication, and scalable pull consumers, while core NATS preserves a simple request/reply and pub/sub model that is attractive for microservice systems \cite{nats2026reqreply,nats2026jetstream}. A key complication is that comparative literature still often discusses the older NATS Streaming layer rather than JetStream, for example Sharvari and Sowmya Nag~\cite{sharvari2019messaging}, which means that published results do not always map perfectly to the current product. NATS with JetStream is most promising when lightweight deployment, elastic scaling, and a smaller operational surface are valued more highly than Kafka's larger ecosystem and benchmarking history.
 
 \subsection{Benchmark Design}
 
-\subsubsection{Methodological positioning}
+\subsubsection{Methodological positioning and scope}
 
-The benchmark design is not presented as a standard protocol copied directly from one prior study, nor as a completely novel framework. Instead, it adapts recurring benchmarking principles from streaming-system evaluation, distributed stream processing studies, and comparative IPC experiments to the specific constraints of DYNAMOS. In particular, the controlled multi-stage pipeline follows the style of prior streaming-pipeline evaluations such as DataXc \cite{coviello2022dataxc}; the insistence on identical business logic across mechanisms follows comparative benchmarking practice in distributed systems \cite{karimov2018benchmarking,Henning2021ScalabilityMetrics}; and the emphasis on throughput, latency, concurrency, resource pressure, and recovery reflects recurring evaluation dimensions in the literature \cite{systematicstreaming,ciftci2025ipcmechanisms}. The resulting design is therefore best understood as a literature-guided, thesis-specific operationalization of established evaluation concerns.
+The benchmark design adapts recurring evaluation principles to the specific constraints of DYNAMOS rather than copying a single prior protocol. The controlled multi-stage pipeline follows the style of prior streaming-pipeline evaluations such as DataXc \cite{coviello2022dataxc}; identical business logic across mechanisms follows comparative benchmarking practice for distributed systems, where Karimov et~al.\ require the same workload definitions and measurement points across systems under test, and Henning and Hasselbring define scalability as the rate of throughput growth per added resource unit \cite{karimov2018benchmarking,Henning2021ScalabilityMetrics}; the emphasis on throughput, latency, concurrency, resource pressure, and recovery reflects recurring evaluation dimensions in streaming and IPC (Inter-process communication) studies \cite{systematicstreaming,ciftci2025ipcmechanisms}.
 
-\subsubsection{Evaluation scope}
-
-The purpose of this benchmark is not to identify a universally best communication mechanism in the abstract. Instead, it narrows the design space for DYNAMOS by asking which communication model best fits which workload condition and which operational constraint. The central question is therefore: \emph{which streaming mechanism best supports large, ordered, and concurrent inter-service data transfer in a microservice pipeline under varying workload intensity, resource pressure, and recovery requirements?}
-
-This framing matters for interpretation. The chapter body focuses on the argument and on the most informative comparisons, while exhaustive preset definitions, full run matrices, and supplementary plots are better treated as appendix material once the multi-technology comparison is complete.
+The aim is not to identify a universally best mechanism, but to narrow the design space for DYNAMOS by asking which communication model best fits large, ordered, and concurrent inter-service transfer under realistic operational constraints. Five transport mappings are evaluated against the same pipeline, the same payload definitions, and the same correctness criteria, and the results are interpreted in terms of DYNAMOS integration. The chapter body keeps the main comparison compact: the completed single-node clean matrix, three focused operational scenarios, and the resulting architectural interpretation. Full preset definitions and detailed per-case tables remain in the appendix.
 
 \subsubsection{Common testbed and fairness constraints}
 
-To ensure that observed differences can be attributed to the communication mechanism rather than to application logic, all candidate mechanisms should be evaluated with the same payload schema, the same transformation logic, and the same deployment environment. The common testbed is a Go-based microservice chain deployed on Kubernetes with three services: \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}. The services are deployed in a dedicated namespace using Kustomize, with base manifests defining the common topology and overlay patches controlling the resource budget per experiment tier (CPU and memory requests and limits). Resource consumption is sampled at regular intervals via the Kubernetes metrics-server using \texttt{kubectl top}. This topology is small enough to reason about directly, but still rich enough to expose backpressure, buffering, and multi-hop propagation effects \cite{coviello2022dataxc,karimov2018benchmarking}.
+All candidate mechanisms were evaluated in the same Go-based microservice chain deployed on Kubernetes: \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}. The services ran in a dedicated namespace using the same manifests, the same payload schema, and the same transformation logic. Resource budgets were controlled through Kustomize overlays so that the comparison remained centered on the communication layer rather than on application-level differences \cite{karimov2018benchmarking,Henning2021ScalabilityMetrics}.
 
-The mechanism-specific mappings should remain as close as possible to one another. For gRPC, the default implementation should use client-streaming, with bidirectional streaming reserved for an extended scenario. For Kafka, messages should be keyed by flow identifier so that per-flow ordering is preserved within a partition. For RabbitMQ, the preferred setup is a stream rather than a classic queue, with super streams used only if scale-out beyond a single stream is necessary. For NATS, JetStream should be used with explicit acknowledgements and pull consumers. Holding business logic and payload shape constant is essential, because otherwise performance differences could be caused by application behaviour instead of the communication layer itself \cite{karimov2018benchmarking,Henning2021ScalabilityMetrics}.
+The transport mappings were also kept as close as possible to one another. Client-streaming and unary gRPC provided the direct, service-to-service reference points. Kafka preserved per-flow ordering through keyed partitioning. RabbitMQ used streams rather than classic queues. NATS used JetStream with explicit acknowledgement semantics. This alignment matters because it limits the risk that one mechanism benefits from a materially easier application mapping than the others.
 
-The service logic is intentionally simple. The producer emits synthetic records or chunked data, the transformer applies a deterministic lightweight operation such as validation, filtering, or hashing, and the sink records arrival times, latency summaries, and correctness counters. This keeps the benchmark focused on communication behaviour rather than on domain-specific business processing.
+The service logic remained intentionally lightweight. The producer emitted synthetic or replayed records, the transformer applied a deterministic operation, and the sink recorded latency, pacing, and correctness summaries. That kept the benchmark focused on transfer behaviour, buffering, and recovery rather than on domain-specific computation \cite{coviello2022dataxc,systematicstreaming}.
 
 \subsubsection{Evaluation dimensions}
 
-The literature supports evaluating streaming mechanisms along a small set of recurring dimensions rather than through a single headline metric. In this benchmark, five dimensions are treated as primary: transfer efficiency, meaning how much data the pipeline can move per second under comparable conditions; latency and pacing stability, meaning not only how fast messages arrive but how regularly they arrive under sustained flow \cite{coviello2022dataxc}; overload behaviour, meaning whether pressure is absorbed through queue growth, throttling, or admission failure; recovery and correctness, meaning how reconnects, retries, duplicates, and ordering behave when a running pipeline is interrupted; and resource and operational cost, meaning CPU, memory, network traffic, and the practical complexity of running the mechanism in Kubernetes.
-
-This dimensional view is important because it prevents the chapter from collapsing into a single throughput comparison. A mechanism may lead on bulk transport while still performing poorly under restart or overload, and such trade-offs are exactly what DYNAMOS must reason about.
+The literature consistently treats streaming evaluation as a multi-dimensional problem rather than a single throughput race \cite{coviello2022dataxc,systematicstreaming,ciftci2025ipcmechanisms}. This study follows that structure. Five dimensions matter most here: transfer efficiency, latency and pacing stability, overload behaviour, recovery correctness, and operational cost. A transport that leads the clean matrix but degrades badly under backpressure or restart is not automatically the best fit for DYNAMOS. The benchmark therefore keeps those dimensions visible throughout the chapter.
 
 \subsubsection{Scenario set and scenario-to-property mapping}
 
-The full benchmark design distinguishes three workload families: \emph{bulk transfer}, \emph{continuous steady-rate flow}, and \emph{bursty transfer}. The currently completed gRPC reference study covers the first two directly and supplements them with two targeted stress probes that operationalize the properties most relevant to DYNAMOS: slow-consumer backpressure and forced-restart recovery. A bursty profile remains part of the planned cross-technology matrix, but it has not yet been executed in the current gRPC-only reference stage.
+The completed RQ1 study uses four scenario families: a clean bulk-transfer matrix, a steady-rate continuous scenario, a slow-consumer backpressure scenario, and a forced-restart recovery scenario. Together they cover the properties most relevant to DYNAMOS: sustained transfer, regular pacing, overload handling, and behaviour during interruption.
 
 \begin{table*}[!t]
     \centering
     \footnotesize
-    \caption{Scenario-to-property mapping used in the benchmark design.}
+    \caption{Scenario-to-property mapping used in the RQ1 benchmark.}
     \label{tab:phase1-scenario-map}
     \setlength{\tabcolsep}{5pt}
     \begin{tabular}{p{0.17\textwidth}p{0.22\textwidth}p{0.49\textwidth}}
         \toprule
         Scenario & Primary property & Why it matters for DYNAMOS \\
         \midrule
-        Bulk transfer baseline & Protocol overhead, sustained throughput, multi-hop transfer efficiency & Large dataset exchange should remain efficient when data is moved incrementally through a composed service chain. \\
-        Continuous steady-rate flow & Latency stability, inter-arrival regularity, pacing precision, CPU cost & Long-lived flows matter when data is produced incrementally and consumers depend on relatively stable delivery rhythm. \\
-        Slow-consumer backpressure & Queue build-up, overload propagation, throttling versus delay accumulation & DYNAMOS pipelines may contain stages with unequal service rates, so overload handling must be explicit and interpretable. \\
-        Forced-restart recovery & Reconnect behaviour, duplicates, ordering preservation, recovery time & Ephemeral microservices and restarts are normal in Kubernetes-style deployments, so transport behaviour under interruption is a first-class concern. \\
+        Clean bulk transfer & Protocol overhead, sustained throughput, multi-hop transfer efficiency & Large dataset exchange should remain efficient when data moves incrementally through a composed service chain. \\
+        Continuous steady-rate flow & Latency stability, inter-arrival regularity, pacing precision & Long-lived flows matter when downstream services depend on a predictable delivery rhythm. \\
+        Slow-consumer backpressure & Queue build-up, overload propagation, throttling versus delay accumulation & DYNAMOS pipelines can contain stages with unequal service rates, so overload handling must remain interpretable. \\
+        Forced-restart recovery & Reconnect behaviour, duplicates, ordering preservation, recovery time & Ephemeral microservices and restarts are normal in Kubernetes-style deployments. \\
         \bottomrule
     \end{tabular}
 \end{table*}
 
-\begin{figure*}[!b]
-    \centering
-    \includegraphics[width=0.92\textwidth]{figures/phase1-evaluation-map.png}
-    \caption{Evaluation map showing the common benchmark pipeline and the four scenario probes used to operationalize the literature-backed evaluation dimensions.}
-    \label{fig:phase1-scenario-placeholder}
-\end{figure*}
-
 \subsubsection{Experimental factors}
 
-The independent variables cover the stress dimensions most frequently discussed in streaming-system and IPC benchmarking literature \cite{systematicstreaming,Henning2021ScalabilityMetrics,ciftci2025ipcmechanisms}: dataset size, to expose when buffering or backlog effects become significant; chunk or message size, to test the trade-off between per-message overhead and coarse-grained transfer latency; number of concurrent flows, to assess how each mechanism handles simultaneous transfers; pipeline depth, fixed here at a three-service chain so that raw transport overhead and multi-hop effects can still be distinguished; consumer speed mismatch, to expose backlog behaviour and flow-control effectiveness; resource budget, through explicit CPU and memory requests and limits for Kubernetes pods, defined as Kustomize overlay patches at three tiers (small: 100\,m\,CPU / 128\,MiB, medium: 250\,m\,CPU / 256\,MiB, large: 500\,m\,CPU / 512\,MiB); durability mode and replication factor, where the mechanism supports such trade-offs; and fault scenario, at minimum service restart during an ongoing transfer.
-
-Not every factor needs to be crossed exhaustively. A pragmatic design is to define a core matrix over mechanism, workload profile, resource budget, and concurrency, and then use targeted follow-up experiments for failure and durability scenarios. This keeps the study manageable while still covering the trade-offs the literature treats as most important \cite{sharvari2019messaging,ciftci2025ipcmechanisms}.
+The main independent variables are payload size, concurrency, target rate where applicable, sink slowdown in the backpressure case, and explicit failure injection in the recovery case. Resource budgets are held constant through Kubernetes overlays so that performance differences reflect the transport mapping rather than an uneven infrastructure allocation. This keeps the experiment matrix broad enough to expose real tradeoffs without turning the chapter into an exhaustive lab log \cite{sharvari2019messaging,ciftci2025ipcmechanisms}.
 
 \subsubsection{Result presentation and appendix boundary}
 
-The body of the thesis should present only the compact experiment matrix and a smaller set of focused figures that are necessary for the argument. A master table can summarize each run by mechanism, workload profile, dataset size, message size, concurrency level, resource budget, and durability mode, together with the most important metrics. The main text should then highlight the most informative sweeps, such as throughput versus concurrency, latency percentiles versus message size, and recovery behaviour by failure scenario. Full preset definitions, per-run outputs, and secondary plots should be moved to an appendix so that the chapter remains analytically clear rather than turning into an undifferentiated lab log. In the current draft, Appendix~B now carries the detailed per-case clean-matrix tables, while the body keeps the argument focused on cross-transport averages and the most decision-relevant slices.
+The main text reports one clean-summary table, one compact size-wise clean breakdown, and three focused scenario tables for continuous flow, backpressure, and recovery. Detailed per-case clean-matrix tables remain in Appendix~B. Broker resource figures are not used in the main argument because the currently available exported broker CPU series are not yet semantically comparable across transports.
 
-\subsection{gRPC Baseline Results}
+\subsection{Results}
 
-\subsubsection{Metrics definitions}
+\subsubsection{Metric definitions}
 
-Before presenting results, it is important to define the metrics used throughout the evaluation so that tables, figures, and prose refer to consistent quantities.
+The core metrics are throughput in messages per second and MiB per second, end-to-end latency percentiles, inter-arrival regularity, duplicate count, and ordering violations. Throughput indicates transfer efficiency. Latency percentiles show how quickly messages move through the pipeline. Inter-arrival and jitter show how regular that delivery remains over time. Duplicates and ordering violations capture correctness. The recovery scenario additionally separates pre-failure, recovery-window, and post-recovery throughput; time to first post-failure message; time to a sustained five-second window at or above 80\% of the target rate; throughput debt inside the fixed recovery window; recovery-window tail latency; post-failure correctness counts; backlog drain time; and completion.
 
-\begin{itemize}
-    \item \textbf{Throughput (msg/s)} is the number of messages successfully received by the sink per second of wall-clock time, averaged over the entire run.
-    \item \textbf{Throughput (MiB/s)} is the data volume received by the sink per second, computed as $(\mathrm{msg}/\mathrm{s}) \times \mathrm{message\ size}$.
-    \item \textbf{Latency percentiles ($p_{50}$, $p_{95}$, $p_{99}$, max)} describe end-to-end message delivery delay from producer send to sink receipt. The $p_{95}$ latency, for example, means that 95\% of messages were delivered within that time or less.
-    \item \textbf{Inter-arrival time} is the elapsed time between consecutive message arrivals at the sink. The $p_{95}$ inter-arrival time captures near-worst-case spacing between deliveries.
-    \item \textbf{Jitter} is defined as the standard deviation of the inter-arrival times. Lower jitter indicates a more regular, predictable delivery rhythm.
-    \item \textbf{Duplicates} is the number of messages received more than once by the sink. In a correct delivery, this count is zero.
-    \item \textbf{Ordering violations} is the number of messages received out of their original send order.
-    \item \textbf{CPU usage (\%)} is the average and peak CPU consumption per role (producer, transformer, sink), sampled at two-second intervals via \texttt{kubectl top pods} during the focused Kubernetes reruns and computed as a percentage of a single core.
-    \item \textbf{Memory usage (MiB)} is the average and peak resident memory per role, sampled on the same interval.
-    \item \textbf{Time to first post-failure message (ms)} is the wall-clock time between the estimated failure instant and the first message that reaches the sink afterwards.
-    \item \textbf{End-to-end recovery time (ms)} is the time required for the sink to observe three consecutive one-second windows at or above 90\% of the target rate. If that threshold is never met before the run completes, the metric is capped at the backlog-drain time and reported together with a boolean indicating that the target rate was not recovered.
-    \item \textbf{Backlog drain time (ms)} is the time between the estimated failure instant and the arrival of the final message for the run.
-\end{itemize}
+\subsubsection{Comparison scope}
 
-\subsubsection{Current comparison scope}
+The primary comparison in this chapter is the completed single-node Kubernetes benchmark across five transports: client-streaming gRPC, unary gRPC, RabbitMQ Streams, NATS JetStream, and Kafka. The three diagnostic scenario tables (continuous, backpressure, recovery) report the latest single-node run executed on 4 May 2026, with three repetitions per transport. The clean-matrix summary in Table~\ref{tab:grpc-preliminary-results} and the per-size breakdown in Table~\ref{tab:grpc-per-size}, together with the corresponding appendix tables, retain the earlier completed multi-cell run because not all broker cells were re-executed in the most recent refresh; the qualitative ranking on the clean matrix is consistent across the two runs, but absolute throughput levels differ and the reader should not directly cross-compare absolute numbers between the headline clean-matrix tables and the diagnostic scenario tables. Exploratory clustered broker runs were also executed; they are not part of the primary results because coverage was limited and startup or convergence effects materially influenced some first runs, and they are discussed briefly in the interpretation section rather than presented as headline evidence.
 
-The benchmark harness now covers five transport mappings in the same three-stage pipeline (\emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}): \emph{client-streaming gRPC}, \emph{unary gRPC}, \emph{RabbitMQ Streams}, \emph{NATS JetStream}, and \emph{Kafka}. The two gRPC variants remain informative because unary approximates the current direct request-response style used in DYNAMOS, whereas client-streaming represents the most direct streaming extension of that model. RabbitMQ Streams, NATS JetStream, and Kafka add broker-mediated reference points in which the producer publishes into a durable stream or topic and downstream stages consume through the broker rather than over a single long-lived RPC.
-
-The current empirical corpus is a completed single-repeat \texttt{synthetic-clean} matrix executed on the same single-node Kubernetes environment for all five transports. It uses synthetic payloads with message sizes from 256 bytes to 16 KiB and concurrency levels 1, 4, 8, and 16, producing 80 completed runs in total. The sink records throughput, end-to-end latency percentiles, inter-arrival behaviour, and correctness counters for every run. Resource utilisation is sampled through \texttt{kubectl top} and exported with the run summaries.
-
-This execution scope makes the current tables directly comparable across all five implemented transports, but it is still a single-pass benchmark suite rather than a repeated statistical study. The values reported below therefore establish a coherent comparison point for the present prototype, but they should be interpreted as point estimates rather than variance-aware performance envelopes. Focused continuous, backpressure, recovery, and CSV-replay scenarios have now been rerun across all five transports, so the scenario-level comparison is complete as a first single-pass benchmark corpus even though repeated runs are still needed before variance-aware claims are made.
-
-\begin{table}[t]
+\begin{table*}[!t]
     \centering
     \footnotesize
-    \caption{Completed synthetic-clean summary for the single-repeat five-transport benchmark suite.}
+    \caption{Single-node synthetic-clean summary, averaged across all payload sizes and concurrency levels.}
     \label{tab:grpc-preliminary-results}
-    \resizebox{\columnwidth}{!}{%
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lrrrrrr}
         \toprule
         Transport mode & Avg. msg/s & Avg. MiB/s & Avg. $p_{95}$ & Avg. $p_{99}$ & Duplicates & Ordering viol. \\
@@ -259,46 +240,18 @@ This execution scope makes the current tables directly comparable across all fiv
         Kafka & 7{,}354.42 & 20.12 & 1{,}729.34 & 1{,}901.42 & 9 & 0 \\
         \bottomrule
     \end{tabular}}
-\end{table}
+\end{table*}
 
-\begin{figure}[t]
-    \centering
-    \begin{tikzpicture}
-        \begin{axis}[
-            ybar,
-            bar width=10pt,
-            width=\columnwidth,
-            height=0.72\columnwidth,
-            ymin=0,
-            enlarge x limits=0.22,
-            ylabel={Avg. throughput (msg/s)},
-            symbolic x coords={Client-streaming,Unary,RabbitMQ,NATS,Kafka},
-            xtick=data,
-            scaled y ticks=false,
-            ymajorgrids=true,
-            grid style={dashed,gray!30},
-            yticklabel style={font=\scriptsize,/pgf/number format/fixed,/pgf/number format/precision=0,/pgf/number format/1000 sep={,}},
-            xticklabel style={font=\scriptsize, rotate=25, anchor=east},
-            ylabel style={font=\scriptsize},
-            nodes near coords,
-            every node near coord/.append style={font=\tiny, rotate=90, anchor=west},
-            point meta=y,
-        ]
-            \addplot coordinates {(Client-streaming,31259.76) (Unary,2291.37) (RabbitMQ,9110.73) (NATS,13116.27) (Kafka,7354.42)};
-        \end{axis}
-    \end{tikzpicture}
-    \caption{Average throughput for the completed single-repeat synthetic-clean matrix. Client-streaming sustains the highest average throughput overall, while NATS JetStream is the fastest brokered transport on average in the current clean rerun.}
-    \label{fig:grpc-preliminary-throughput}
-\end{figure}
+Table~\ref{tab:grpc-preliminary-results} shows a clear separation between the two direct gRPC mappings and the three brokered alternatives. Client-streaming is the fastest transport in the clean matrix by a wide margin. Unary is substantially slower, but it does so with very low tail latency. Among the brokered transports, NATS JetStream achieves the highest average throughput, followed by RabbitMQ Streams and Kafka. Ordering violations are absent in the clean matrix. The remaining correctness anomalies are concentrated in duplicate deliveries on NATS and, to a much smaller extent, Kafka.
 
-\subsubsection{Clean baseline matrix}
+\subsubsection{Clean bulk-transfer matrix}
 
-Table~\ref{tab:grpc-per-size} breaks the synthetic bulk-transfer results down by message size, averaging across concurrency levels 1, 4, 8, and 16 for each size. This disaggregation shows that the client-streaming advantage is strongly size-dependent: it delivers roughly $29.2\times$ the throughput of unary at 256~B, but that advantage narrows to about $3.8\times$ at 16~KiB as the unary path amortises part of its per-call overhead. The brokered transports now separate more clearly. NATS JetStream gives the highest brokered average throughput at every message size in the refreshed clean rerun, while RabbitMQ Streams remains a strong reference at 256~B and 1~KiB and Kafka remains competitive without retaking the brokered lead. The earlier pathological 1~KiB/concurrency-16 NATS cliff no longer reproduces; the main NATS caveat in the current rerun is delivery semantics rather than completion, with duplicate deliveries now emerging in the heavier rows.
+The size-wise breakdown in Table~\ref{tab:grpc-per-size} shows how the clean-matrix ranking changes with message size. Client-streaming remains the fastest option at every size. Its advantage over unary is largest at small payloads, where per-request overhead dominates, and narrows as the payload grows. NATS JetStream is the strongest brokered transport across all four size bands. RabbitMQ Streams is competitive at 256~B and 1~KiB, then declines more sharply at larger payloads. Kafka stays below NATS in every size tier, but remains broadly stable and avoids the sharp collapse seen in RabbitMQ at 16~KiB.
 
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Synthetic bulk-transfer message throughput by message size, averaged across concurrency levels 1, 4, 8, and 16 in the completed single-repeat suite.}
+    \caption{Single-node synthetic bulk-transfer throughput by message size, averaged across concurrency levels 1, 4, 8, and 16.}
     \label{tab:grpc-per-size}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -314,63 +267,16 @@ Table~\ref{tab:grpc-per-size} breaks the synthetic bulk-transfer results down by
     \end{tabular}}
 \end{table}
 
-Table~\ref{tab:grpc-per-size-mib} reports the same rows as data throughput. This view is important because DYNAMOS data exchange is often limited by transferred volume rather than only by message count.
+All clean-matrix runs reached the target message count. Full per-case tables remain in Appendix~B, but the main pattern is already visible here: client-streaming dominates bulk transfer, unary remains the low-latency reference rather than a throughput candidate, and the three brokered transports form a separate performance band with NATS at its front.
+
+\subsubsection{Continuous steady-rate scenario}
+
+The continuous scenario uses 1~KiB messages and a target rate of 1{,}000~msg/s. The purpose is not to maximize throughput, but to see how steadily each transport sustains an ongoing flow.
 
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Synthetic bulk-transfer data throughput by message size, averaged across concurrency levels 1, 4, 8, and 16 in the completed single-repeat suite.}
-    \label{tab:grpc-per-size-mib}
-    \setlength{\tabcolsep}{3pt}
-    \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{lrrrrr}
-        \toprule
-        Msg size & \shortstack{Stream\\MiB/s} & \shortstack{Unary\\MiB/s} & \shortstack{RabbitMQ\\MiB/s} & \shortstack{NATS\\MiB/s} & \shortstack{Kafka\\MiB/s} \\
-        \midrule
-        256 B   & 18.46 & 0.63 & 3.19 & 5.51 & 3.04 \\
-        1 KiB   & 27.03 & 2.54 & 14.04 & 15.07 & 7.40 \\
-        4 KiB   & 59.99 & 9.06 & 30.88 & 39.40 & 25.50 \\
-        16 KiB  & 99.92 & 25.97 & 17.06 & 68.55 & 44.53 \\
-        \bottomrule
-    \end{tabular}}
-\end{table}
-
-Three observations stand out. First, client-streaming throughput in msg/s drops substantially with payload size (from 75{,}604 to 6{,}395), but its data rate still rises from 18.46 to 99.92~MiB/s because larger messages amortise per-message overhead more effectively. Unary msg/s is much flatter across sizes (1{,}662--2{,}599), indicating that per-call overhead remains its main bottleneck. Second, RabbitMQ Streams performs much better in the final Kubernetes clean run than in the earlier local shakedown results, averaging 9{,}110.73 msg/s overall and 16.29~MiB/s. It still pays for brokered decoupling with much higher latency than unary, but it is no longer merely a low-throughput reference point. Third, NATS JetStream and Kafka expose different configuration sensitivities. NATS completed the full matrix only after JetStream memory and file-store limits were made explicit and aligned with the Kubernetes resource envelope. With async publish, batched pull consumption, and in-memory JetStream consumer state while keeping the stream itself file-backed, the refreshed NATS clean rerun now averages 13{,}116.27 msg/s and 32.13~MiB/s overall, overtaking RabbitMQ Streams and Kafka on average throughput in this single-pass suite. The main NATS caveat has shifted from a single pathological queueing cell to delivery semantics under heavier loads: the current rerun records 5{,}086 duplicate deliveries in total, concentrated in the 4~KiB concurrency-16 row and the 16~KiB concurrency-4, concurrency-8, and concurrency-16 rows, even though ordering violations remain zero across the clean matrix. Kafka no longer collapses in throughput after explicit key-hash partitioning, periodic publisher flushing, and buffered consumer commits: it now averages 7{,}354.42 msg/s and 20.12~MiB/s overall, overtakes unary in average throughput, and remains architecturally relevant as the durable-log reference. The remaining Kafka caveat is still tail behaviour and semantics rather than ordering: ordering violations dropped to zero across the final matrix, but the 16~KiB concurrency-4 and concurrency-16 cells still recorded nine duplicate deliveries in total.
-
-All completed clean-matrix runs reached the target message count, and ordering violations were eliminated for every transport in the final \texttt{synthetic-clean} preset. The remaining correctness anomalies are now concentrated in the brokered at-least-once mappings: Kafka still records nine duplicate deliveries, concentrated in the 16~KiB concurrency-4 and concurrency-16 cells, while NATS JetStream records 5{,}086 duplicate deliveries concentrated in the 4~KiB concurrency-16 and 16~KiB high-concurrency rows. The current baseline trade-off therefore includes a small duplicate caveat for Kafka and a materially larger duplicate caveat for NATS in addition to throughput, latency, buffering, broker configuration effort, and resource cost. The full per-case clean-matrix values are listed in Tables~\ref{tab:appendix-clean-throughput}--\ref{tab:appendix-clean-p99} in Appendix~B.
-
-\begin{table}[t]
-    \centering
-    \scriptsize
-    \caption{Peak broker resource use observed in the single-repeat synthetic-clean matrix. Direct gRPC modes have no external broker role.}
-    \label{tab:broker-resource-clean}
-    \setlength{\tabcolsep}{4pt}
-    \resizebox{0.7\columnwidth}{!}{%
-    \begin{tabular}{lrr}
-        \toprule
-        Brokered mode & Peak broker CPU (\%) & Peak broker memory (MiB) \\
-        \midrule
-        RabbitMQ Streams & 465.10 & 510 \\
-        NATS JetStream & 11.20 & 15 \\
-        Kafka & 69.40 & 395 \\
-        \bottomrule
-    \end{tabular}}
-\end{table}
-
-The clean matrices alone, however, are not enough to judge whether a transport is suitable for long-lived, policy-constrained data exchange. DYNAMOS-style workflows also care about pacing regularity, behaviour under consumer mismatch, and failure recovery. Three focused stress scenarios were therefore added after the baseline.
-
-\subsubsection{Diagnostic focused stress scenarios}
-
-The following focused stress results now combine the earlier diagnostic suite for client-streaming gRPC, unary gRPC, and RabbitMQ Streams with refreshed reruns for NATS JetStream and Kafka. They remain useful because they explain why the benchmark records pacing, backpressure, recovery, and duplicate metrics rather than only clean throughput. The tables below therefore form the first completed single-repeat five-transport scenario comparison for the current prototype.
-
-\paragraph{Continuous steady-rate scenario.}
-
-The first focused experiment was a continuous steady-rate scenario. It used 1 KiB synthetic messages, a fixed target rate of 1,000 messages per second, and concurrency levels of 4 and 8, without artificial sink delay or injected failures. The goal was to measure not just throughput and latency, but also inter-arrival regularity under a long-running steady stream.
-
-\begin{table}[t]
-    \centering
-    \scriptsize
-    \caption{Continuous steady-rate scenario from the completed single-repeat five-transport suite.}
+    \caption{Continuous steady-rate scenario: single-node results (1\,KiB payload, 1{,}000 msg/s target, one repetition per cell). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}
     \label{tab:grpc-continuous-results}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -378,30 +284,30 @@ The first focused experiment was a continuous steady-rate scenario. It used 1 Ki
         \toprule
         Transport mode & Concur. & Throughput & Avg. $p_{95}$ & \shortstack{$p_{95}$ inter-\\arrival} & Jitter \\
         \midrule
-        Client-streaming & 4 & 1,016.80 & 8.82 & 1.59 & 0.66 \\
-        Client-streaming & 8 & 995.35 & 6.85 & 1.55 & 0.67 \\
-        Unary & 4 & 1,049.43 & 1.66 & 2.12 & 2.06 \\
-        Unary & 8 & 918.58 & 2.71 & 2.15 & 1.55 \\
-        RabbitMQ Streams & 4 & 504.41 & 769.51 & 3.21 & 6.88 \\
-        RabbitMQ Streams & 8 & 471.69 & 627.62 & 4.90 & 7.85 \\
-        NATS JetStream & 4 & 919.23 & 22.74 & 2.13 & 0.89 \\
-        NATS JetStream & 8 & 919.26 & 70.55 & 2.15 & 0.90 \\
-        Kafka & 4 & 909.64 & 377.43 & 0.01 & 8.16 \\
-        Kafka & 8 & 901.43 & 1{,}784.66 & 0.02 & 8.92 \\
+        Client-streaming & 4 & 1{,}049.69 & 7.16 & 1.66 & 0.68 \\
+        Client-streaming & 8 & 1{,}050.93 & 7.14 & 1.65 & 0.70 \\
+        Unary & 4 & 1{,}050.84 & 0.88 & 2.10 & 1.09 \\
+        Unary & 8 & 1{,}050.73 & 0.91 & 2.11 & 0.99 \\
+        RabbitMQ Streams & 4 & 1{,}047.83 & 34.07 & 2.89 & 1.30 \\
+        RabbitMQ Streams & 8 & 1{,}049.16 & 49.36 & 3.51 & 2.11 \\
+        NATS JetStream & 4 & 1{,}052.71 & 26.67 & 1.95 & 0.84 \\
+        NATS JetStream & 8 & 1{,}052.03 & 102.25 & 3.07 & 2.71 \\
+        Kafka & 4 & 1{,}042.55 & 326.52 & 0.01 & 8.22 \\
+        Kafka & 8 & 1{,}033.59 & 387.36 & 0.03 & 7.94 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-    In this single-repeat continuous scenario, both gRPC modes stay near the 1,000 msg/s target, but they shape the flow differently. Client-streaming maintains the tighter delivery rhythm in both concurrency settings: its jitter remains near 0.66--0.67 ms and its $p_{95}$ inter-arrival delay stays near 1.55--1.59 ms. Unary keeps the lower end-to-end latency, with $p_{95}$ values between 1.66 and 2.71 ms instead of 6.85--8.82 ms for client-streaming, but its pacing is less regular. NATS JetStream reaches a third operating point: it stays near 919 msg/s at both concurrency levels with sub-millisecond jitter, but its $p_{95}$ latency rises to 22.74 ms at concurrency 4 and 70.55 ms at concurrency 8. Kafka lands close to the same throughput region as NATS, yet with a much less stable delivery rhythm: its $p_{95}$ latency rises to 377.43 ms at concurrency 4 and 1{,}784.66 ms at concurrency 8, while jitter climbs above 8 ms in both cases. RabbitMQ Streams falls into a different regime altogether. Throughput drops to 472--504 msg/s and $p_{95}$ latency rises to 628--770 ms, while inter-arrival jitter grows sharply. In other words, NATS keeps a brokered path relatively close to the target rate with moderate latency cost, Kafka keeps the target rate but pays for it with much heavier latency and pacing variance, and RabbitMQ no longer does so at a rate or latency level that matches the direct RPC paths.
+All five transports sustain the 1{,}000~msg/s target and overshoot it slightly (1{,}033--1{,}053~msg/s) in this run, so the comparison is dominated by latency stability rather than by who can keep up. Client-streaming and unary have by far the lowest tail latency, with unary $p_{95}$ below 1~ms and client-streaming $p_{95}$ around 7~ms in both concurrency settings. Among the brokered transports, NATS at concurrency~4 (26.7~ms $p_{95}$) and RabbitMQ Streams (34--49~ms $p_{95}$) are close to one another, while NATS at concurrency~8 widens to 102~ms. Kafka remains the slowest in the tail, with $p_{95}$ between 327~ms and 387~ms; its inter-arrival distribution is dominated by short bursts (0.01--0.03~ms $p_{95}$) and its jitter is the highest of any transport (around 8~ms), reflecting Kafka's batched delivery pattern.
 
-\paragraph{Slow-consumer backpressure scenario.}
+\subsubsection{Backpressure scenario}
 
-The second focused experiment was a backpressure scenario. It used the same 1 KiB payload size with concurrency 8, but the single sink instance was slowed down by adding a 2\,ms processing delay per message while the producer still targeted 4{,}000 messages per second. Because the sink can process at most $\lfloor 1000/2 \rfloor = 500$ messages per second per connection, the aggregate theoretical sink capacity is $500 \times 8 = 4{,}000$ messages per second, which means the scenario operates at the boundary of the sink's processing budget. Any transport overhead or scheduling jitter pushes the effective throughput below the requested rate, causing messages to accumulate either in the gRPC transport buffers of the transformer or in the RabbitMQ broker path. This scenario was designed to expose whether the transport absorbs overload through explicit throttling or through queue growth and accumulated delay.
+The backpressure scenario keeps the payload at 1~KiB and concurrency at 8, but adds a 2~ms sink delay while the producer targets 4{,}000~msg/s. This exposes how each transport behaves once downstream processing becomes the bottleneck.
 
 \begin{table}[t]
     \centering
     \scriptsize
-    \caption{Backpressure scenario with an intentionally slow sink in the completed single-repeat suite.}
+    \caption{Backpressure scenario: single-node results (1\,KiB, concurrency 8, 4{,}000 msg/s target, 2\,ms sink delay, one repetition per transport). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}
     \label{tab:grpc-backpressure-results}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -409,87 +315,72 @@ The second focused experiment was a backpressure scenario. It used the same 1 Ki
         \toprule
         Transport mode & Throughput & Median lat. & Avg. $p_{95}$ & \shortstack{$p_{95}$ inter-\\arrival} & Jitter \\
         \midrule
-        Client-streaming & 3,459.04 & 1,311.43 & 2,044.41 & 2.13 & 0.64 \\
-        Unary & 2,363.38 & 0.45 & 0.83 & 3.16 & 1.10 \\
-        RabbitMQ Streams & 478.94 & 198.11 & 413.74 & 3.06 & 8.81 \\
-        NATS JetStream & 3,092.38 & 1,551.54 & 3,807.50 & 2.14 & 0.66 \\
-        Kafka & 1,249.06 & 5,239.01 & 9,118.73 & 2.35 & 1.11 \\
+        Client-streaming & 3{,}333.93 & 1{,}443.26 & 1{,}878.90 & 2.14 & 0.64 \\
+        Unary & 2{,}091.96 & 0.53 & 1.41 & 3.40 & 1.23 \\
+        RabbitMQ Streams & 2{,}557.86 & 2{,}603.70 & 3{,}476.80 & 2.26 & 1.68 \\
+        NATS JetStream & 2{,}973.05 & 1{,}768.99 & 3{,}034.92 & 2.14 & 0.69 \\
+        Kafka & 1{,}268.34 & 4{,}879.51 & 11{,}363.59 & 2.53 & 1.32 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-    This scenario shows that higher throughput is not automatically the better outcome. Under backpressure, client-streaming kept the highest realized throughput at 3,459 msg/s, but it did so by allowing the pipeline to accumulate a large queue: median end-to-end latency rose to about 1.31 seconds and $p_{95}$ latency to about 2.04 seconds. Unary behaved almost oppositely. It gave up throughput, but kept latency near the sub-millisecond range for successfully delivered requests. NATS JetStream moved close to the client-streaming regime rather than the RabbitMQ one: it sustained 3,092 msg/s, but paid for that with a 1.55-second median latency and a 3.81-second $p_{95}$ latency. Kafka entered a harsher brokered regime under the same load. It sustained only 1,249 msg/s, while median latency rose above 5.2 seconds and $p_{95}$ latency exceeded 9.1 seconds. RabbitMQ Streams throttled even harder than unary, sustaining only 479 msg/s. That stronger throttling kept its median and $p_{95}$ latencies below the client-streaming row in this particular run, but the transport also exhibited a 21.2-second maximum latency and far higher jitter. The current interpretation is therefore that client-streaming and NATS preserve bulk movement by buffering aggressively, unary protects responsiveness by throttling, Kafka preserves correctness but sheds throughput only after a large backlog has already accumulated, and RabbitMQ Streams pays for brokered decoupling with a severe throughput collapse and a heavier long-tail backlog.
+Client-streaming, NATS, and RabbitMQ Streams all keep their realised throughput in the 2.5--3.3\,k\,msg/s range under pressure, well below the 4{,}000 msg/s target but clearly above the unary baseline. They achieve this by absorbing queueing delay: medians around 1.4--2.6~s and $p_{95}$ values between 1.9~s and 3.5~s. Unary gives up throughput earlier (2{,}092 msg/s) and therefore stays extremely low-latency for the requests that complete (median 0.5~ms, $p_{95}$ 1.4~ms), which is the expected effect of per-request acknowledgement under sink slowdown. Kafka is the most throughput-constrained transport in this single-node backpressure case (1{,}268 msg/s) and develops the heaviest tail of any transport ($p_{95}$ above 11~s), again reflecting its batched delivery pattern under load.
 
-\paragraph{Forced-restart recovery scenario.}
+\subsubsection{Recovery scenario}
 
-The third focused experiment was a recovery scenario. This run used 4 KiB messages, concurrency 8, a continuous target rate of 2,000 messages per second, and a forced \textit{Transformer} restart after 3 seconds. The producer was allowed to retry up to 120 times with a 250 ms backoff. The purpose of this scenario was not to replace the main matrix, but to observe how the currently implemented transport mappings behave when the pipeline is interrupted during an active stream.
+The recovery scenario uses 4~KiB messages at 2{,}000~msg/s and forces a transformer restart after 3~seconds. The table separates the run into pre-failure throughput, a fixed 10~s recovery window, and the post-recovery tail so that restart visibility, sustained recovery, backlog drain, and correctness cost are not collapsed into one ambiguous number.
 
-\begin{table}[t]
+\begin{table*}[!t]
     \centering
     \scriptsize
-    \caption{Recovery scenario with a forced transformer restart in the completed single-repeat suite.}
+    \caption{Recovery scenario: single-node results (4\,KiB, concurrency 8, 2{,}000 msg/s, transformer restart at 3\,s). One repetition per transport. Throughput values are in msg/s; time, latency, and drain values are in milliseconds. Sustained recovery is the first five complete one-second buckets inside the configured target band, with no fallback to backlog drain. Dashes indicate that the value was not observed in the run or that no messages arrived in that phase/window.}
     \label{tab:grpc-recovery-results}
-    \setlength{\tabcolsep}{3pt}
-    \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{lrrrrrrrr}
+    \setlength{\tabcolsep}{2pt}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lrrrrrrrrrrc}
         \toprule
-        Transport mode & Throughput & $p_{95}$ lat. & Duplicates & Ordering & First post-fail. & E2E recovery & Backlog drain & Reached target \\
+        Transport mode & \shortstack{Pre\\msg/s} & \shortstack{Recovery\\msg/s} & \shortstack{Post\\msg/s} & \shortstack{First\\post-fail} & \shortstack{Sustained\\80\%/5s} & Debt & \shortstack{Recovery\\$p_{95}$} & \shortstack{Post-fail\\dup.} & \shortstack{Post-fail\\order} & \shortstack{Backlog\\drain} & Done \\
         \midrule
-        Client-streaming & 1,467.13 & 28.38 & 9,145 & 0 & 0.00 & 6,000.00 & 10,632.03 & Yes \\
-        Unary & 597.21 & 1.66 & 0 & 0 & 23,819.02 & 24,000.00 & 30,489.03 & Yes \\
-        RabbitMQ Streams & 1,539.17 & 5,111.95 & 4,056 & 0 & 1,009.89 & 6,000.00 & 9,993.99 & Yes \\
-        NATS JetStream & 608.89 & 800.03 & 0 & 6 & 2.11 & 0.00 & 29,846.80 & Yes \\
-        Kafka & 589.41 & 28,234.42 & 0 & 0 & 1,667.00 & 30,932.12 & 30,932.12 & No \\
+        Client-streaming & 2{,}711 & 939 & 1{,}999 & 0.18 & -- & 10{,}630 & 2.74 & 10{,}615 & 0 & 11{,}446.21 & Yes \\
+        Unary & 2{,}161 & 0 & 777 & 21{,}824.57 & 22{,}000 & 20{,}000 & -- & 0 & 0 & 27{,}734.03 & Yes \\
+        RabbitMQ Streams & 1{,}778 & 2{,}011 & -- & 292.74 & -- & 4{,}868 & 3{,}921.74 & 886 & 0 & 7{,}463.72 & Yes \\
+        NATS JetStream & 2{,}297 & 1{,}351 & 0.10 & 2.56 & -- & 7{,}847 & 388.89 & 0 & 2 & 29{,}228.03 & Yes \\
+        Kafka & 2{,}343 & 0 & 710 & 29{,}224.26 & -- & 20{,}000 & -- & 62 & 0 & 29{,}760.29 & Yes \\
         \bottomrule
     \end{tabular}}
-\end{table}
+\end{table*}
 
-    The recovery scenario now needs to be read from the sink rather than from the producer alone. Client-streaming resumed almost immediately after the forced restart: the first post-failure message arrived after roughly 0.003~ms, and the sink observed sustained recovery back to the target rate after 6~s. That continuity is not free, however. The current reconnect strategy replays each worker's sequence range, which produced 9,145 duplicate messages and a backlog-drain time of 10.6~s in this run. Unary shows the opposite behaviour. It remained duplicate-free and kept overall $p_{95}$ latency low for delivered requests, but it did so while the pipeline stalled for much longer: the sink saw a 23.8~s delivery gap, 24.0~s to regain the target rate, and 30.5~s to fully drain the backlog.
+Before failure, all transports are close enough to the configured 2{,}000~msg/s target to make the recovery comparison meaningful. The disruption then separates the mechanisms sharply. Client-streaming produces the fastest visible resumption, with the first post-failure message arriving within 1~ms, but its recovery-window throughput falls to 939~msg/s and it accumulates 10{,}630 messages of throughput debt. Its 10{,}615 post-failure duplicates are a direct consequence of the current reconnect policy: after a stream send fails, the producer reopens the stream and replays the worker stream rather than resuming exactly at the failed chunk. The historical 20{,}000-message run ends before five complete stable buckets can be observed after the later recovery point, so the sustained-recovery field is intentionally blank rather than inferred.
 
-    RabbitMQ Streams changes the semantics rather than mirroring either gRPC row directly. Because the producer publishes into a broker, the forced \textit{Transformer} restart is not observed as a producer-side reconnect event, so the producer-side recovery counters remain near zero and are useful only as diagnostics. The sink-side outcome is still not free. In the full rerun, RabbitMQ resumed much earlier than unary, with the first post-failure message arriving after 1.01~s, and it matched client-streaming on the 6~s sustained-recovery threshold while achieving the highest overall throughput in this single run. That better bulk continuity still comes with cost: the brokered path recorded a $p_{95}$ latency of 5.11~s, a backlog-drain time of 9.99~s, and 4,056 duplicate messages. NATS JetStream reaches a different recovery trade-off again. In the refreshed rerun, the first post-failure message reached the sink after 2.11~ms and no duplicate deliveries were recorded, but throughput fell to 608.89 msg/s, backlog drain stretched to 29.85~s, and the sink still observed six ordering violations. Kafka preserves the same zero-duplicate and zero-ordering-violation outcome in this scenario, but with the slowest effective recovery profile in the suite: the first post-failure message arrived after 1.67~s, $p_{95}$ latency rose to 28.23~s, backlog drain reached 30.93~s, and the sink never re-established the sustained-throughput threshold before the run ended. The brokered paths therefore differ not only in speed but in which semantic cost they pay during recovery.
+Unary shows the opposite shape. It preserves correctness, but it delivers no messages in the fixed recovery window, waits roughly 21.8~s before the first post-failure message, and accumulates the full 20{,}000-message recovery-window debt. It eventually records a sustained five-second window at 22~s, but by then the useful distinction is already visible: unary turns the restart into an extended outage rather than a buffered drain.
+
+The brokered transports expose three different buffering behaviours. RabbitMQ Streams resumes within 293~ms and drains the run fastest, with recovery-window throughput slightly above target, but it pays for that with 886 post-failure duplicates and a recovery-window $p_{95}$ latency near 3.9~s. NATS JetStream is the case where the new metrics matter most: the first post-failure message arrives after only 2.6~ms, but the fixed recovery window still shows 7{,}847 messages of debt and no sustained recovery because the early replay plateau is followed by an extended quiet period. Kafka is the most delayed in this run: no messages arrive during the recovery window, the first post-failure message appears after about 29.2~s, and the run remains backlog-dominated until completion, although it keeps post-failure duplicates low and preserves ordering.
 
 \subsubsection{Discussion}
 
-The current results support a more precise conclusion than a simple "streaming beats unary" claim. In the clean bulk-transfer baseline, client-streaming is the strongest choice for high-volume inter-service data movement, with the throughput advantage over unary varying from roughly $29.2\times$ for 256~B messages to $3.8\times$ for 16~KiB messages. Unary remains the lower-latency direct RPC option, with an average $p_{95}$ latency of 3.01~ms across the final clean matrix, but it cannot match client-streaming's bulk transfer rate. This makes unary a useful control and a reasonable fit for small, latency-sensitive exchanges, not for large sustained data movement.
+The benchmark and the DYNAMOS architecture do not point to exactly the same answer, and that distinction matters. In the isolated pipeline benchmark, client-streaming gRPC is the strongest raw transport: it leads the clean matrix, remains stable in the continuous scenario, and avoids the broker overheads seen in the other transports. If RQ1 were answered only at the level of transport efficiency in a controlled pipeline, client-streaming would be the clearest winner.
 
-The brokered transports do not form one homogeneous category. NATS JetStream becomes the strongest brokered performer on average in the refreshed clean matrix once its mapping is tuned for explicit JetStream limits, async publish, batched pulls, and in-memory consumer state. It averages 13{,}116.27 msg/s and 32.13~MiB/s, outperforming both RabbitMQ Streams and Kafka on average throughput, and its average $p_{95}$ latency falls to 1{,}581.11~ms. That result now comes with a different methodological caveat from the earlier draft: the old 1~KiB/concurrency-16 cliff no longer reproduces, but the clean rerun now exposes 5{,}086 duplicate deliveries concentrated in the 4~KiB concurrency-16 and 16~KiB high-concurrency rows. RabbitMQ Streams remains a strong brokered reference, averaging 9{,}110.73 msg/s and 16.29~MiB/s, but it no longer leads the brokered pack in this rerun. Kafka now occupies a different position from the earlier draft: after enforcing key-hash partition affinity, periodic publisher flushes, and buffered consumer commits, it averages 7{,}354.42 msg/s and 20.12~MiB/s, overtakes unary overall, and remains architecturally attractive as the durable-log and replay-oriented option. Kafka therefore still carries a semantic caveat: no ordering violations remain, yet the 16~KiB concurrency-4 and concurrency-16 cells record nine duplicate deliveries in total. The main Kafka limitation in this single-node prototype is now tail behaviour and delivery stability in the largest-payload cases rather than outright throughput collapse.
+DYNAMOS as implemented today, however, has two different communication regimes. Within a deployed microservice-chain job, services already communicate locally over gRPC inside a single Pod, where latency is negligible and where chunked gRPC transfer is a natural fit. Across agents, by contrast, DYNAMOS currently relies on sidecar-mediated RabbitMQ communication, ephemeral per-job queue management, and retry logic that explicitly tolerates the fact that the destination job may not yet be ready when data is sent. The main large-object transfer problem in current DYNAMOS is therefore not an already-local in-Pod hop, but the inter-agent exchange of bounded SQL-style result sets that are currently packed into a single protobuf payload and forwarded through the brokered path.
 
-The NATS debugging step is itself a useful methodological finding. The original NATS deployment allowed JetStream to infer host-scale memory while Kubernetes limited the container to 512~MiB, which produced OOM kills in the 16~KiB high-concurrency cells. Making JetStream memory and file-store limits explicit, reducing the per-stream storage cap, and allocating a 2~GiB pod memory limit made the full clean matrix complete without restarts. A second bottleneck remained in the benchmark mapping itself: switching NATS to async publish, batched pull consumption, and in-memory consumer state while keeping the stream file-backed changed the transport from a low-throughput outlier into the fastest brokered average performer. Even after that change, however, the broker pod itself stays lightly utilized in the clean matrix, peaking at only 2.2\% CPU and 13~MiB, while the 1~KiB concurrency-16 row still exhibits severe queueing. That combination indicates the remaining instability is not explained by JetStream container exhaustion alone. This supports the transparency requirement of the benchmark: broker configuration is not incidental metadata, because it directly determines whether a result measures transport behaviour or accidental resource exhaustion.
+Viewed through that architectural lens, RabbitMQ Streams becomes the strongest first implementation candidate for DYNAMOS, even though it does not win the benchmark outright. It preserves temporal decoupling between producer and consumer, fits naturally with ephemeral jobs and cold-start behaviour, reuses the current sidecar and RabbitMQ operational model, and still enables incremental chunked transfer so that peak memory usage can be reduced. It also offers a more natural path toward auditability and replay than direct RPC if future compliance requirements require message-level evidence or reconstruction of inter-agent transfers. Its downside is lower raw transport efficiency than client-streaming and the continued presence of broker latency and broker resource cost.
 
-The diagnostic stress scenarios reinforce why the final RQ1 answer should not be based on clean throughput alone. In the current five-transport scenario comparison, client-streaming preserved throughput under slow-consumer pressure by accumulating queueing delay, unary protected latency by sacrificing throughput, NATS behaved more like a high-throughput buffered path than a throttling one, RabbitMQ changed where backlog and recovery costs appeared, and Kafka showed the clearest durable-log trade-off: it kept duplicates and ordering violations at zero in the rerun scenarios, but paid for that with much heavier steady-rate latency, deeper backpressure queues, and the slowest recovery profile. These scenario rows justify the selected metrics: throughput tells the bulk-transfer story, latency percentiles expose backlog and tail effects, inter-arrival jitter captures pacing regularity, and duplicate/order counters reveal semantic costs during recovery.
+Client-streaming gRPC nevertheless remains a serious option, but as a more targeted optimisation than as an unconditional system-wide recommendation. Its main attraction for DYNAMOS is efficient chunked transfer with immediate pipelining once both endpoints are alive. Its main cost is that DYNAMOS would need to re-implement, at application level, some of the temporal decoupling that RabbitMQ already provides: reconnect handling, replay boundaries, and idempotent recovery when the destination job is not yet ready or restarts mid-transfer. The recovery benchmark already shows that these concerns are not theoretical. For DYNAMOS, client-streaming therefore looks strongest as a second MVP to compare against RabbitMQ Streams on the specific inter-agent large-result path, rather than as the obvious first transport to standardise across the system.
 
-Taken together, the current RQ1 result is a trade-off map. Client-streaming gRPC is the strongest default candidate for direct DYNAMOS-style bulk transfer when temporal coupling is acceptable. Unary gRPC remains the latency-oriented baseline and should not be replaced blindly for small request-like exchanges. RabbitMQ Streams remains a strong brokered reference when decoupling is needed without aggressive transport tuning. NATS JetStream is now the strongest brokered throughput candidate in the current prototype, but the refreshed reruns show that it should be treated as an explicitly at-least-once mapping with duplicate and occasional recovery-ordering costs rather than as a duplicate-free brokered default. Kafka is now a credible durable-log reference point rather than an obvious throughput outlier, and the completed scenario reruns clarify its actual niche in this prototype: it preserves recovery correctness better than RabbitMQ and NATS, but it does so with the heaviest latency and broker-resource cost among the brokered options.
+Kafka and NATS JetStream are lower-priority options for the current DYNAMOS architecture. Both would require a more substantial platform change, and both bring strengths, large-scale replay, log-centric consumption, multi-consumer stream processing, or subject-based pub/sub flexibility, that DYNAMOS' present request-shaped SQL workloads do not strongly exploit. They remain valuable comparison points in the benchmark and possible future directions if DYNAMOS evolves toward persistent, replay-heavy, or multi-consumer workloads, but they do not appear to be the most pragmatic next step for the system as it exists today.
+
+The most defensible next step is therefore a staged RQ2 integration strategy: preserve classic RabbitMQ queues for the control plane, prototype RabbitMQ Streams for the inter-agent data path as the lowest-risk architectural evolution, and build a smaller client-streaming gRPC MVP for the same path as a targeted alternative. RQ3 can then evaluate both end-to-end inside DYNAMOS, where startup behaviour, policy enforcement, failure handling, and real workload structure can be weighed against the isolated transport-level results reported here.
 
 \subsection{Threats to Validity}
 
-Several threats to validity should be acknowledged when interpreting the current results.
-
-\paragraph{Internal validity.}
-The current benchmark corpus is a single-repeat suite, so no confidence intervals or variance estimates are reported for the main tables. The results may therefore be affected by transient system-level effects such as CPU scheduling variance, garbage collection pauses, or short-lived background contention in the cluster. Short run durations also mean that the study may not capture warm-up effects or long-term stability behaviour that would emerge in sustained production workloads. The current NATS JetStream clean results already show this sensitivity: after the configuration and consumer-state fixes removed the earlier OOM failures, the clean rerun no longer reproduces the original 1~KiB/concurrency-16 cliff, but it now exposes duplicate-heavy heavier-payload rows instead. The current five-transport results now cover both the clean synthetic matrix and the focused scenario suite, but they still do so as single-pass observations rather than repeated measurements, so scenario-level conclusions should still be treated as provisional point estimates.
-
-\paragraph{External validity.}
-The benchmark uses a synthetic three-stage pipeline with lightweight deterministic logic, which does not replicate the full complexity of a DYNAMOS deployment. Real DYNAMOS chains may involve additional processing stages, policy-enforcement sidecars, and heterogeneous service implementations. Furthermore, the tests are conducted in a single-node Kubernetes cluster, whereas production DYNAMOS deployments span multiple nodes with network partitioning and scheduling constraints that may affect latency and throughput characteristics differently. The Kafka and broker configurations are intentionally minimal single-node configurations, so their results should be read as prototype transport mappings rather than optimized production deployments. The Go-based benchmark services share the same runtime and gRPC library version, so results may not generalize to polyglot microservice chains.
-
-\paragraph{Construct validity.}
-Jitter is operationalized as the standard deviation of inter-arrival times, which captures variability in delivery rhythm but does not distinguish between periodic jitter and isolated outliers. Alternative metrics such as mean absolute deviation or percentile-based spread could complement the current definition. The clean matrix treats broker resource cost as measured Kubernetes CPU and memory usage, but it does not yet include broker-internal metrics such as Kafka log flush behaviour, JetStream store pressure, RabbitMQ stream segment state, or network traffic. Recovery is operationalized with sink-side time-to-first-message, end-to-end recovery to a sustained throughput threshold, backlog-drain time, and duplicate-related counters in the diagnostic stress presets. That definition still depends on the chosen 90\% threshold, the three-window smoothing rule, and the estimated failure timestamp derived from the configured restart point rather than a transport-native fault signal.
-
-\section{Planned: Scenario-Level Cross-Technology Comparison}
-
-The benchmark design and the completed five-transport clean matrix presented in section~III address the first empirical part of \emph{RQ1}. The benchmark harness now implements Apache Kafka and NATS JetStream under the same workload definitions, fairness constraints, and evaluation dimensions, and the focused CSV replay, continuous, backpressure, and recovery reruns are now available across the same five transports. The remaining empirical step for RQ1 is therefore to repeat the most important presets often enough to obtain variance estimates and to confirm that the current scenario trade-offs remain stable across runs. These results will allow the clean-matrix trade-off map to be extended from bulk-transfer performance to pacing, overload, recovery, and DYNAMOS-shaped payload realism with greater statistical confidence.
-
-\section{Planned: Architectural Integration Design}
-
-This section will address \emph{RQ2}: how streaming communication can be integrated into DYNAMOS' microservice architecture while preserving dynamic service composition, policy-driven orchestration, and isolation guarantees. The work will examine how the selected streaming model aligns with the data-sharing archetypes implemented by DYNAMOS, specify how streaming channels are created and torn down within dynamically composed execution chains, define how sidecar responsibilities are divided for streaming versus non-streaming traffic, and address how long-lived connections interact with policy enforcement boundaries. The output will be a documented integration design accompanied by a prototype implementation that demonstrates feasibility.
-
-\section{Planned: System-Level Evaluation}
-
-This section will address \emph{RQ3}: what impact streaming communication has on scalability, performance, and robustness compared to the current request-response approach under realistic workloads in DYNAMOS. The benchmark logic and evaluation dimensions established in the current study will be reused, but applied within the full DYNAMOS context rather than in an isolated benchmark pipeline. The evaluation will assess whether the trade-offs identified in the current five-transport clean matrix and later scenario-level comparison carry over to the integrated system, or whether integration-specific effects such as policy enforcement overhead, sidecar latency, or orchestration coordination dominate.
+Three limits are important when interpreting these results. First, the primary five-transport comparison is based on completed single-node runs, and the focused operational scenarios are point measurements rather than confidence-interval estimates. They are strong enough for comparative interpretation, but not for a fully statistical treatment. Second, the benchmark pipeline is intentionally simple. That makes transport behaviour easier to isolate, but it does not capture every coordination cost that appears in a full DYNAMOS deployment. Third, the cross-transport \emph{ranking} of broker CPU usage in the clean matrix is not used as headline evidence, because the currently exported CPU series are not yet semantically aligned across transports at that scale. The resource figures cited from Appendix~D in the operational-cost argument are restricted to the diagnostic continuous and recovery scenarios and are used only to indicate the order of magnitude of broker overhead, not to compare brokers against each other on CPU efficiency.
 
 \section{Conclusion}
 
-This thesis establishes the first empirical basis for evaluating streaming communication in DYNAMOS. The literature review narrows the relevant design space to direct gRPC streaming and broker-based alternatives such as Kafka, RabbitMQ Streams, and NATS JetStream. The completed single-repeat clean matrix shows that client-streaming gRPC is markedly stronger for sustained bulk transfer, while unary gRPC remains preferable when low per-message latency dominates. Among the brokered implementations, NATS JetStream currently gives the strongest average throughput in the prototype once JetStream limits and consumer-state handling are configured explicitly, but the refreshed clean rerun also shows that this higher-throughput mapping now exposes duplicate deliveries in the heavier rows instead of the earlier isolated queueing cliff. RabbitMQ Streams remains a strong brokered reference, and Kafka's durable-log model becomes competitive once partitioning, batching, and buffered consumer commits are configured correctly. The completed scenario reruns, however, also show the corresponding Kafka cost profile more clearly: duplicate-free recovery comes with much heavier tail latency, slower backlog drain, and higher broker memory use than the other brokered mappings. Rather than yielding a single winner, the present results identify a concrete trade-off space around throughput, latency, broker configuration, delivery semantics, and resource cost.
+RQ1 asks which streaming communication technologies, frameworks, and interaction patterns are suitable for large-scale and continuous data exchange in microservice-based systems such as DYNAMOS. At the level of isolated transport performance, client-streaming gRPC is the strongest result in this chapter: it provides the highest sustained throughput on the clean matrix and the most stable pacing in the continuous scenario. That makes it the clearest benchmark winner.
 
-That evidence provides a defensible benchmark baseline for the remainder of the thesis, even though the current corpus is still a single-pass suite rather than a repeated statistical study. The planned next phases repeat the most decision-relevant presets for variance estimation, examine how the most promising options align with DYNAMOS' archetypes and policy model, and translate those findings into an integration design and system-level validation.
+For DYNAMOS as it is currently implemented, however, the most plausible first integration candidate is RabbitMQ Streams rather than client-streaming gRPC. DYNAMOS already depends on broker-mediated inter-agent communication, ephemeral jobs, sidecar abstraction, and queue or routing-key based decoupling between sender and receiver. RabbitMQ Streams preserves these properties while still enabling chunked, memory-efficient transfer of large bounded result sets. Client-streaming gRPC remains an attractive targeted alternative, especially for large inter-agent transfers where pipelining matters more than decoupling, but it would require more application-level recovery logic to fit cleanly into DYNAMOS' existing operational model. Kafka and NATS JetStream remain useful benchmark references and possible longer-term directions, but they appear to require more architectural change than their current DYNAMOS-specific benefit justifies.
+
+The recommendation made here is therefore deliberately two-level and conditional. The benchmark winner is client-streaming gRPC; the current system-fit recommendation for DYNAMOS is to prototype RabbitMQ Streams first for the inter-agent data path, keep classic RabbitMQ queues for the control plane, and build a smaller client-streaming MVP as a direct comparison before committing to one design. The remainder of the thesis addresses that decision process. RQ2 turns these candidate communication models into concrete integration designs for DYNAMOS, with attention to dynamic service composition, policy enforcement, recovery, and lifecycle management. RQ3 then evaluates them at full system level, asking which option offers the best overall trade-off once orchestration overhead, middleware behaviour, multi-node deployment, and real DYNAMOS workloads are included. The architectural choice is therefore not yet a closed result; it is a benchmark-informed hypothesis that must be validated inside DYNAMOS itself.
 
 \appendices
 
@@ -521,7 +412,7 @@ This appendix documents the complete preset definitions used in the benchmark. E
 \section{Full Run Matrix}
 \label{app:run-matrix}
 
-This appendix summarizes the canonical run scopes used in the current thesis draft. The body of the thesis presents the most decision-relevant subsets, while the benchmark result directory stores the corresponding per-run JSON, NDJSON, and CSV exports generated by the execution scripts. The current chapter is based on the completed single-repeat five-transport \texttt{synthetic-clean} matrix, supplemented by single-repeat diagnostic scenario reruns across the same five transports.
+This appendix summarizes the canonical run scopes used in the current thesis. The body of the thesis presents the most decision-relevant subsets, while the benchmark result directory stores the corresponding per-run JSON, NDJSON, and CSV exports generated by the execution scripts. The chapter is based on the single-node five-transport \texttt{synthetic-clean} matrix, the single-node diagnostic scenario suite, and the three-broker clustered scenario runs with three repetitions per transport per scenario.
 
 \begin{table}[h]
     \centering
@@ -530,15 +421,20 @@ This appendix summarizes the canonical run scopes used in the current thesis dra
     \label{tab:appendix-run-scope}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{lp{2.3cm}p{2.6cm}p{1.3cm}p{2.6cm}}
+    \begin{tabular}{lp{2cm}p{2.4cm}p{1.2cm}p{2.8cm}}
         \toprule
-        Scope & Transports & Variable dimensions & Repetitions & Role in thesis \\
+        Scope & Transports & Variable dimensions & Reps & Role in thesis \\
         \midrule
-        Synthetic clean matrix & Client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka & Payload size and concurrency sweep & 1 & Main five-transport bulk-transfer baseline in Section III \\
-        CSV replay check & Client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka & Batch size and concurrency subset & 1 & Realism validation available across all five transports \\
-        Focused continuous & Client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka & Concurrency 4 and 8 at fixed 1 KiB and 1{,}000 msg/s & 1 & Diagnostic pacing and jitter evidence across all five transports \\
-        Focused backpressure & Client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka & Fixed 1 KiB, concurrency 8, 4{,}000 msg/s, 2 ms sink delay & 1 & Diagnostic overload and queueing evidence across all five transports \\
-        Focused recovery & Client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka & Fixed 4 KiB, concurrency 8, forced transformer restart & 1 & Diagnostic recovery and replay evidence across all five transports \\
+        Single-node clean matrix & Client-streaming, unary, RabbitMQ, NATS, Kafka & Payload 256\,B--16\,KiB, concurrency 1--16 & 1 & Full bulk-transfer baseline (Section~III) \\
+        Single-node CSV replay & All five & Batch size 25 and 100, concurrency subset & 1 & Realism validation \\
+        Single-node continuous & All five & Concurrency 4 and 8, 1\,KiB, 1{,}000 msg/s & 1 & Pacing and jitter evidence \\
+        Single-node backpressure & All five & 1\,KiB, concurrency 8, 4{,}000 msg/s, 2\,ms sink delay & 1 & Overload and queueing evidence \\
+        Single-node recovery & All five & 4\,KiB, concurrency 8, transformer restart & 1 & Recovery and correctness evidence \\
+        \midrule
+        Clustered clean (3-broker) & RabbitMQ, NATS, Kafka & 4\,KiB, concurrency 8 & 3 & Clustered bulk-transfer cross-run consistency (Section~III) \\
+        Clustered continuous (3-broker) & RabbitMQ, NATS, Kafka & 1\,KiB, concurrency 8, 1{,}000 msg/s & 3 & Clustered pacing under broker replication \\
+        Clustered backpressure (3-broker) & RabbitMQ, NATS, Kafka & 1\,KiB, concurrency 8, 4{,}000 msg/s, 2\,ms delay & 3 & Clustered overload behaviour \\
+        Clustered recovery (3-broker) & RabbitMQ, NATS, Kafka & 4\,KiB, concurrency 8, transformer restart & 3 & Clustered recovery correctness and variability \\
         \bottomrule
     \end{tabular}}
 \end{table}
@@ -687,7 +583,7 @@ This appendix records the full completed five-transport \texttt{synthetic-clean}
 \section{Resource Utilisation Details}
 \label{app:resource-details}
 
-This appendix summarizes resource metrics for the diagnostic Kubernetes scenario suite where CPU and memory data are most informative. For brokered modes, the broker is reported as a separate role because its buffering layer is a core part of the transport cost. The backpressure preset produced too few stable \texttt{kubectl top} samples to support a meaningful per-role comparison across all transports, so the appendix focuses on the currently available continuous and recovery scenarios across all five transports. The five-transport clean-matrix broker resource summary is reported in Table~\ref{tab:broker-resource-clean}.
+This appendix summarizes resource metrics for the diagnostic Kubernetes scenario suite where CPU and memory data are most informative. For brokered modes, the broker is reported as a separate role because its buffering layer is a core part of the transport cost. The backpressure preset produced too few stable \texttt{kubectl top} samples to support a meaningful per-role comparison across all transports, so the appendix focuses on the currently available continuous and recovery scenarios across all five transports. A clean-matrix broker CPU summary is intentionally omitted because the currently exported broker CPU series are not semantically comparable enough to support a defensible cross-transport claim.
 
 \begin{table}[h]
     \centering

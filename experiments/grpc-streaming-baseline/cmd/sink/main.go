@@ -368,6 +368,9 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 	if last, exists := state.lastByWorker[chunk.GetProducerWorker()]; exists && chunk.GetSequence() <= last {
 		state.orderingViolations++
 		s.metrics.orderingViolations.Inc()
+		if state.analysis != nil {
+			state.analysis.OrderingViolationArrivalUnixNano = append(state.analysis.OrderingViolationArrivalUnixNano, now.UnixNano())
+		}
 	}
 	state.lastByWorker[chunk.GetProducerWorker()] = chunk.GetSequence()
 	latencyMillis := float64(now.UnixNano()-chunk.GetCreatedAtUnixNano()) / float64(time.Millisecond)

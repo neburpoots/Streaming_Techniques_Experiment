@@ -57,6 +57,12 @@ NAMESPACE="streaming-experiments"
 REPEAT_SUFFIX=""
 RUN_ID_PREFIX=""
 KIND_CLUSTER_NAME=""
+STRICT_RESOURCE_VALIDATION="${STRICT_RESOURCE_VALIDATION:-false}"
+PRODUCER_TIMEOUT_SECONDS="${PRODUCER_TIMEOUT_SECONDS:-420s}"
+EXPORT_TIMEOUT_SECONDS="${EXPORT_TIMEOUT_SECONDS:-900s}"
+ACTIVE_STATS_PID=""
+ACTIVE_STATS_STOP_FILE=""
+FAILURE_PID=""
 
 # ── Parse arguments ──
 while [[ $# -gt 0 ]]; do
@@ -127,12 +133,49 @@ validate_transport_filter
 
 POWERSHELL_EXE="/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
 
+run_with_timeout() {
+    local timeout_duration="$1"
+    shift
+
+    if command -v timeout >/dev/null 2>&1; then
+        timeout "${timeout_duration}" "$@"
+        return
+    fi
+
+    "$@"
+}
+
+cleanup_active_backgrounds() {
+    if [[ -n "${ACTIVE_STATS_STOP_FILE}" ]]; then
+        touch "${ACTIVE_STATS_STOP_FILE}" 2>/dev/null || true
+    fi
+    if [[ -n "${ACTIVE_STATS_PID}" ]] && kill -0 "${ACTIVE_STATS_PID}" 2>/dev/null; then
+        kill "${ACTIVE_STATS_PID}" 2>/dev/null || true
+        wait "${ACTIVE_STATS_PID}" 2>/dev/null || true
+    fi
+    if [[ -n "${FAILURE_PID}" ]] && kill -0 "${FAILURE_PID}" 2>/dev/null; then
+        kill "${FAILURE_PID}" 2>/dev/null || true
+        wait "${FAILURE_PID}" 2>/dev/null || true
+    fi
+}
+
+trap cleanup_active_backgrounds EXIT INT TERM
+
+kill_stale_stats_collectors() {
+    local stale_pids=""
+    stale_pids="$(pgrep -f "${STATS_SCRIPT}" 2>/dev/null || true)"
+    if [[ -n "${stale_pids}" ]]; then
+        echo "Stopping stale Kubernetes stats collector process(es): ${stale_pids}"
+        pkill -f "${STATS_SCRIPT}" 2>/dev/null || true
+    fi
+}
+
 run_export_powershell() {
     local script_path="$1"
     shift
 
     if command -v pwsh &>/dev/null; then
-        pwsh -File "${script_path}" "$@"
+        run_with_timeout "${EXPORT_TIMEOUT_SECONDS}" pwsh -File "${script_path}" "$@"
         return
     fi
 
@@ -153,7 +196,7 @@ run_export_powershell() {
             esac
         done
 
-        "${POWERSHELL_EXE}" -NoProfile -ExecutionPolicy Bypass -File "${windows_script}" "${translated_args[@]}"
+        run_with_timeout "${EXPORT_TIMEOUT_SECONDS}" "${POWERSHELL_EXE}" -NoProfile -ExecutionPolicy Bypass -File "${windows_script}" "${translated_args[@]}"
         return
     fi
 
@@ -247,6 +290,45 @@ cleanup_broker_overlay_conflicts() {
 
     echo "Cleaning up broker workloads before applying overlay..."
     kubectl delete "${stale_resources[@]}" -n "${NAMESPACE}" --ignore-not-found=true >/dev/null 2>&1 || true
+}
+
+scale_workload_if_present() {
+    local name="$1"
+    local replicas="$2"
+
+    if kubectl get deployment "${name}" -n "${NAMESPACE}" >/dev/null 2>&1; then
+        kubectl scale deployment "${name}" -n "${NAMESPACE}" --replicas="${replicas}" >/dev/null
+        return 0
+    fi
+    if kubectl get statefulset "${name}" -n "${NAMESPACE}" >/dev/null 2>&1; then
+        kubectl scale statefulset "${name}" -n "${NAMESPACE}" --replicas="${replicas}" >/dev/null
+        return 0
+    fi
+
+    return 0
+}
+
+scale_brokers_for_transport() {
+    local transport_mode="$1"
+    local rabbitmq_replicas=0
+    local nats_replicas=0
+    local kafka_replicas=0
+
+    case "${transport_mode}" in
+        rabbitmq-streams)
+            rabbitmq_replicas=1
+            ;;
+        nats-jetstream)
+            nats_replicas=1
+            ;;
+        kafka)
+            kafka_replicas=1
+            ;;
+    esac
+
+    scale_workload_if_present grpc-stream-rabbitmq "${rabbitmq_replicas}"
+    scale_workload_if_present grpc-stream-nats "${nats_replicas}"
+    scale_workload_if_present grpc-stream-kafka "${kafka_replicas}"
 }
 
 # ── ConfigMap patching ──
@@ -351,9 +433,20 @@ wait_for_rabbitmq_ready() {
     rollout_status grpc-stream-rabbitmq 600s
 
     local rabbitmq_pod=""
-    for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+    for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
         rabbitmq_pod="$(kubectl get pods -n "${NAMESPACE}" -l app=grpc-stream-rabbitmq -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
-        if [[ -n "${rabbitmq_pod}" ]] && kubectl exec -n "${NAMESPACE}" "${rabbitmq_pod}" -- rabbitmq-diagnostics -q ping >/dev/null 2>&1; then
+        if [[ -n "${rabbitmq_pod}" ]] \
+            && kubectl exec -n "${NAMESPACE}" "${rabbitmq_pod}" -- rabbitmq-diagnostics -q ping >/dev/null 2>&1 \
+            && kubectl exec -n "${NAMESPACE}" "${rabbitmq_pod}" -- bash -ec '
+                for _ in 1 2 3; do
+                    rabbitmq-diagnostics -q listeners | grep -Eiq "port:[[:space:]]*5552" || exit 1
+                    : > /dev/tcp/grpc-stream-rabbitmq/5552 || exit 1
+                    sleep 1
+                done
+            ' >/dev/null 2>&1; then
+            # The rollout becomes available before the stream listener is reliably
+            # accepting connections from other pods, so give it a short settle window.
+            sleep 8
             return 0
         fi
         sleep 2
@@ -362,9 +455,44 @@ wait_for_rabbitmq_ready() {
     echo "  Warning: RabbitMQ did not report ready state before the producer job started" >&2
 }
 
+assert_required_result_artifacts() {
+    local run_id="$1"
+    local missing=0
+    local required_files=(
+        "${RESULTS_DIR}/${run_id}-producer-result.json"
+        "${RESULTS_DIR}/${run_id}-sink-summary.json"
+    )
+    local path=""
+
+    for path in "${required_files[@]}"; do
+        if [[ ! -f "${path}" ]]; then
+            echo "  Warning: missing result artifact ${path}" >&2
+            missing=1
+        fi
+    done
+
+    if [[ "${missing}" -ne 0 ]]; then
+        return 1
+    fi
+
+    return 0
+}
+
 wait_for_nats_ready() {
     echo "  Waiting for NATS to be ready..."
     rollout_status grpc-stream-nats 300s
+
+    local nats_pod=""
+    for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+        nats_pod="$(kubectl get pods -n "${NAMESPACE}" -l app=grpc-stream-nats -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
+        if [[ -n "${nats_pod}" ]] \
+            && kubectl exec -n "${NAMESPACE}" "${nats_pod}" -- sh -ec 'printf "INFO\r\n" | nc -w 2 127.0.0.1 4222 | grep -q "\"jetstream\":true"' >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep 2
+    done
+
+    echo "  Warning: NATS did not report JetStream ready state before the producer job started" >&2
 }
 
 wait_for_kafka_ready() {
@@ -396,23 +524,45 @@ wait_for_ready() {
     sleep 2
 }
 
+wait_for_broker_ready() {
+    local transport_mode="${1:-client-streaming}"
+    case "${transport_mode}" in
+        rabbitmq-streams)
+            wait_for_rabbitmq_ready
+            ;;
+        nats-jetstream)
+            wait_for_nats_ready
+            ;;
+        kafka)
+            wait_for_kafka_ready
+            ;;
+    esac
+}
+
 # ── Restart deployments to pick up new ConfigMap values ──
 restart_deployments() {
     local transport_mode="${1:-client-streaming}"
     case "${transport_mode}" in
         rabbitmq-streams)
             rollout_restart grpc-stream-rabbitmq
+            wait_for_rabbitmq_ready
             ;;
         nats-jetstream)
             rollout_restart grpc-stream-nats
+            wait_for_nats_ready
             ;;
         kafka)
             rollout_restart grpc-stream-kafka
+            wait_for_kafka_ready
             ;;
     esac
     rollout_restart grpc-stream-sink
     rollout_restart grpc-stream-transformer
-    wait_for_ready "${transport_mode}"
+    echo "  Waiting for sink and transformer to be ready..."
+    rollout_status grpc-stream-sink 120s
+    rollout_status grpc-stream-transformer 120s
+    wait_for_broker_ready "${transport_mode}"
+    sleep 2
 }
 
 wait_for_metrics_ready() {
@@ -426,6 +576,137 @@ wait_for_metrics_ready() {
     done
 
     echo "  Warning: metrics-server did not report sink/transformer pod metrics before the run started" >&2
+}
+
+wait_for_producer_metrics() {
+    local top_output=""
+    local producer_pod=""
+
+    for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+        producer_pod="$(kubectl get pods -n "${NAMESPACE}" -l job-name=grpc-stream-producer -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
+        if [[ -n "${producer_pod}" ]]; then
+            top_output="$(kubectl top pods -n "${NAMESPACE}" --no-headers 2>/dev/null || true)"
+            if grep -q "^${producer_pod}[[:space:]]" <<< "${top_output}"; then
+                return 0
+            fi
+        fi
+        sleep 1
+    done
+
+    echo "  Warning: metrics-server did not report producer pod metrics during the run startup window" >&2
+}
+
+wait_for_stats_samples() {
+    local stats_file="$1"
+    shift
+    local required_roles=("$@")
+    local role=""
+
+    for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+        local all_present=true
+        for role in "${required_roles[@]}"; do
+            if ! stats_file_has_role_samples "${stats_file}" "${role}"; then
+                all_present=false
+                break
+            fi
+        done
+
+        if [[ "${all_present}" == "true" ]]; then
+            return 0
+        fi
+
+        sleep 1
+    done
+
+    echo "  Warning: stats collector did not capture required pre-run samples (${required_roles[*]}) before producer launch" >&2
+    return 1
+}
+
+required_resource_roles() {
+    local transport_mode="$1"
+    local target_mps="$2"
+    local failure_after="$3"
+    local roles=(transformer sink)
+
+    case "${transport_mode}" in
+        rabbitmq-streams)
+            roles+=(rabbitmq)
+            ;;
+        nats-jetstream)
+            roles+=(nats)
+            ;;
+        kafka)
+            roles+=(kafka)
+            ;;
+    esac
+
+    if [[ "${target_mps}" != "0" || "${failure_after}" != "0" ]]; then
+        roles+=(producer)
+    fi
+
+    printf '%s\n' "${roles[@]}"
+}
+
+stats_file_has_role_samples() {
+    local stats_file="$1"
+    local role="$2"
+
+    if [[ ! -f "${stats_file}" ]]; then
+        return 1
+    fi
+
+    case "${role}" in
+        producer)
+            grep -Eq '"Role":"producer"|"Name":"grpc-stream-producer|"Name":"grpc-streaming-baseline-producer-' "${stats_file}"
+            ;;
+        transformer)
+            grep -Eq '"Role":"transformer"|"Name":"grpc-stream-transformer|"Name":"grpc-streaming-baseline-transformer-' "${stats_file}"
+            ;;
+        sink)
+            grep -Eq '"Role":"sink"|"Name":"grpc-stream-sink|"Name":"grpc-streaming-baseline-sink-' "${stats_file}"
+            ;;
+        rabbitmq)
+            grep -Eq '"Role":"rabbitmq"|"Name":"grpc-stream-rabbitmq|"Name":"grpc-streaming-baseline-rabbitmq-' "${stats_file}"
+            ;;
+        nats)
+            grep -Eq '"Role":"nats"|"Name":"grpc-stream-nats|"Name":"grpc-streaming-baseline-nats-' "${stats_file}"
+            ;;
+        kafka)
+            grep -Eq '"Role":"kafka"|"Name":"grpc-stream-kafka|"Name":"grpc-streaming-baseline-kafka-' "${stats_file}"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+validate_stats_artifact() {
+    local run_id="$1"
+    local transport_mode="$2"
+    local target_mps="$3"
+    local failure_after="$4"
+    local stats_file="$5"
+    local validation_file="${stats_file%.ndjson}-validation.txt"
+    mapfile -t required_roles < <(required_resource_roles "${transport_mode}" "${target_mps}" "${failure_after}")
+    local missing_roles=()
+    local role=""
+
+    rm -f "${validation_file}"
+
+    for role in "${required_roles[@]}"; do
+        if ! stats_file_has_role_samples "${stats_file}" "${role}"; then
+            missing_roles+=("${role}")
+        fi
+    done
+
+    if [[ "${#missing_roles[@]}" -eq 0 ]]; then
+        printf 'resource_stats_valid=true\n' > "${validation_file}"
+        return 0
+    fi
+
+    printf 'resource_stats_valid=false\nmissing_roles=%s\n' "$(IFS=,; echo "${missing_roles[*]}")" > "${validation_file}"
+    echo "  Warning: incomplete resource samples for ${run_id} (missing: $(IFS=,; echo "${missing_roles[*]}") )" >&2
+    return 1
 }
 
 delete_producer_job() {
@@ -548,7 +829,8 @@ run_case() {
         "${failure_action}" "${failure_target}" "${failure_after}" \
         "${dataset_files}" "${dataset_rows_per_msg}" "${dataset_repeat}"
 
-    # 2. Restart deployments to pick up new ConfigMap
+    # 2. Keep only the active broker family running, then restart workloads.
+    scale_brokers_for_transport "${transport_mode}"
     restart_deployments "${transport_mode}"
     wait_for_metrics_ready
 
@@ -560,9 +842,24 @@ run_case() {
     local stop_file="${RESULTS_DIR}/${effective_run_id}-stop.txt"
     rm -f "${stats_file}" "${stop_file}"
 
-    NAMESPACE="${NAMESPACE}" STOP_FILE="${stop_file}" \
+    NAMESPACE="${NAMESPACE}" INTERVAL_SECONDS=1 ACTIVE_TRANSPORT_MODE="${transport_mode}" STOP_FILE="${stop_file}" \
         bash "${STATS_SCRIPT}" "${stats_file}" &
     local stats_pid=$!
+    ACTIVE_STATS_PID="${stats_pid}"
+    ACTIVE_STATS_STOP_FILE="${stop_file}"
+
+    mapfile -t required_roles < <(required_resource_roles "${transport_mode}" "${target_mps}" "${failure_after}")
+    local prerun_roles=()
+    local role=""
+    for role in "${required_roles[@]}"; do
+        if [[ "${role}" != "producer" ]]; then
+            prerun_roles+=("${role}")
+        fi
+    done
+
+    if [[ "${#prerun_roles[@]}" -gt 0 ]]; then
+        wait_for_stats_samples "${stats_file}" "${prerun_roles[@]}"
+    fi
 
     # 5. Start failure injection if configured
     FAILURE_PID=""
@@ -570,9 +867,12 @@ run_case() {
 
     # 6. Create and run the producer job
     apply_producer_job
+    if [[ "${target_mps}" != "0" || "${failure_after}" != "0" ]]; then
+        wait_for_producer_metrics
+    fi
     echo "  Waiting for producer job to complete..."
-    if ! kubectl wait --for=condition=Complete job/grpc-stream-producer \
-            -n "${NAMESPACE}" --timeout=300s 2>/dev/null; then
+    if ! run_with_timeout "${PRODUCER_TIMEOUT_SECONDS}" kubectl wait --for=condition=Complete job/grpc-stream-producer \
+            -n "${NAMESPACE}" --timeout="${PRODUCER_TIMEOUT_SECONDS}" 2>/dev/null; then
         echo "  Warning: Producer job did not complete within timeout" >&2
         kubectl logs job/grpc-stream-producer -n "${NAMESPACE}" --tail=20 2>/dev/null || true
     fi
@@ -581,14 +881,29 @@ run_case() {
     touch "${stop_file}"
     wait "${stats_pid}" 2>/dev/null || true
     rm -f "${stop_file}"
+    ACTIVE_STATS_PID=""
+    ACTIVE_STATS_STOP_FILE=""
 
     # Wait for failure injection to finish
     if [[ -n "${FAILURE_PID}" ]]; then
         wait "${FAILURE_PID}" 2>/dev/null || true
+        FAILURE_PID=""
     fi
 
     # 8. Copy results from PVC
     copy_results_from_pvc "${effective_run_id}"
+
+    if ! assert_required_result_artifacts "${effective_run_id}"; then
+        echo "  Aborting because required result artifacts are missing" >&2
+        return 1
+    fi
+
+    if ! validate_stats_artifact "${effective_run_id}" "${transport_mode}" "${target_mps}" "${failure_after}" "${stats_file}"; then
+        if [[ "${STRICT_RESOURCE_VALIDATION}" == "true" ]]; then
+            echo "  Aborting because STRICT_RESOURCE_VALIDATION=true" >&2
+            return 1
+        fi
+    fi
 
     # 9. Clean up producer job (keep deployments for next run)
     delete_producer_job
@@ -650,7 +965,7 @@ run_synthetic_recovery() {
     for transport_mode in $(selected_transport_modes); do
         local ts; ts=$(transport_short "${transport_mode}")
         run_case "synthetic-recovery-${ts}-p4096-c8" \
-            "${transport_mode}" "synthetic" "continuous" "20000" "4096" "8" "2000" \
+            "${transport_mode}" "synthetic" "continuous" "50000" "4096" "8" "2000" \
             "0" "0" "120" "250" "restart" "transformer" "3"
     done
 }
@@ -674,6 +989,7 @@ transport_short() {
 
 # ── Main ──
 
+kill_stale_stats_collectors
 ensure_base_resources
 
 # Upload CSV datasets as a ConfigMap if needed for csv-replay presets
@@ -750,6 +1066,12 @@ if run_export_powershell "${EXPORT_SCRIPT}" \
     -ResultsDir "${RESULTS_DIR}" \
     -RunIdPrefix "${summary_prefix}" \
     -OutputPath "${RESULTS_DIR}/${summary_prefix}-summary.csv"; then
+    if [[ -f "${RESULTS_DIR}/${summary_prefix}-summary.csv" ]]; then
+        invalid_resource_rows="$(tail -n +2 "${RESULTS_DIR}/${summary_prefix}-summary.csv" | grep -c '"False"' || true)"
+        if [[ "${invalid_resource_rows}" -gt 0 ]]; then
+            echo "Warning: ${invalid_resource_rows} row(s) in ${summary_prefix}-summary.csv have incomplete resource samples." >&2
+        fi
+    fi
     if [[ "${REPEAT}" -gt 1 && -f "${AGGREGATE_SCRIPT}" ]]; then
         run_export_powershell "${AGGREGATE_SCRIPT}" \
             -SummaryPath "${RESULTS_DIR}/${summary_prefix}-summary.csv" \

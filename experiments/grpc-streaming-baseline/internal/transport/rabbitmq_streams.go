@@ -22,6 +22,7 @@ type RabbitMQStreamPublisher struct {
 	confirmErr  error
 	pendingAcks map[int64]chan error
 	pendingZero chan struct{}
+	confirmSlots chan struct{}
 	confirmDone chan struct{}
 }
 
@@ -45,10 +46,11 @@ type RabbitMQStreamDelivery struct {
 }
 
 const (
-	rabbitMQAutoCommitCount      = 500
+	rabbitMQAutoCommitCount      = 100
 	rabbitMQAutoCommitFlushAfter = 5 * time.Second
-	rabbitMQInitialCredits       = 500
+	rabbitMQInitialCredits       = 64
 	rabbitMQConfirmationTimeout  = 10 * time.Second
+	rabbitMQMaxPendingConfirms   = 64
 )
 
 func NewRabbitMQStreamPublisher(cfg RabbitMQConfig, streamName string) (*RabbitMQStreamPublisher, error) {
@@ -76,6 +78,7 @@ func NewRabbitMQStreamPublisher(cfg RabbitMQConfig, streamName string) (*RabbitM
 		producer:    producer,
 		pendingAcks: make(map[int64]chan error),
 		pendingZero: closedSignal(),
+		confirmSlots: make(chan struct{}, rabbitMQMaxPendingConfirms),
 		confirmDone: make(chan struct{}),
 	}
 
@@ -96,7 +99,7 @@ func NewRabbitMQStreamConsumer(cfg RabbitMQConfig, streamName string, consumerNa
 		return nil, err
 	}
 
-	deliveries := make(chan *RabbitMQStreamDelivery, 256)
+	deliveries := make(chan *RabbitMQStreamDelivery, 64)
 	errCh := make(chan error, 1)
 	closed := make(chan struct{})
 
@@ -166,8 +169,12 @@ func (p *RabbitMQStreamPublisher) PublishChunk(ctx context.Context, chunk *pb.Da
 		"created_at_unix_nano": chunk.GetCreatedAtUnixNano(),
 	}
 
+	if err := p.acquireConfirmationSlot(ctx); err != nil {
+		return err
+	}
 	_, err = p.registerPendingConfirmation(publishID)
 	if err != nil {
+		p.releaseConfirmationSlot()
 		return err
 	}
 
@@ -360,6 +367,7 @@ func (p *RabbitMQStreamPublisher) cancelPendingConfirmation(publishID int64) {
 	p.confirmMu.Unlock()
 
 	if exists {
+		p.releaseConfirmationSlot()
 		close(ackCh)
 	}
 	p.notifyPendingZero()
@@ -393,6 +401,7 @@ func (p *RabbitMQStreamPublisher) finishPendingConfirmation(publishID int64, err
 	p.confirmMu.Unlock()
 
 	if exists {
+		p.releaseConfirmationSlot()
 		ackCh <- err
 		close(ackCh)
 	}
@@ -413,10 +422,33 @@ func (p *RabbitMQStreamPublisher) failPendingConfirmations(err error) {
 	p.confirmMu.Unlock()
 
 	for _, ackCh := range pending {
+		p.releaseConfirmationSlot()
 		ackCh <- err
 		close(ackCh)
 	}
 	p.notifyPendingZero()
+}
+
+func (p *RabbitMQStreamPublisher) acquireConfirmationSlot(ctx context.Context) error {
+	if p.confirmSlots == nil {
+		return nil
+	}
+	select {
+	case p.confirmSlots <- struct{}{}:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+func (p *RabbitMQStreamPublisher) releaseConfirmationSlot() {
+	if p.confirmSlots == nil {
+		return
+	}
+	select {
+	case <-p.confirmSlots:
+	default:
+	}
 }
 
 func (p *RabbitMQStreamPublisher) waitForPendingConfirmations(timeout time.Duration) error {
