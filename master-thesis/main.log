@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.8)  11 MAY 2026 13:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.8)  26 MAY 2026 10:08
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -762,6 +762,12 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 38.
 (C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 3
+8.
+
+(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
 Underfull \hbox (badness 1776) in paragraph at lines 49--50
 []\OT1/ptm/m/n/10 DYNAMOS (Dy-nam-ic-ally Ad-apt-ive Microservice-based
  []
@@ -832,129 +838,146 @@ Underfull \hbox (badness 10000) in paragraph at lines 203--203
  []
 
 [5] [6] [7] [8]
-Underfull \hbox (badness 2111) in paragraph at lines 381--382
-\OT1/ptm/m/n/10 pre-serves these prop-er-ties while still en-abling chunked,
+Underfull \hbox (badness 10000) in paragraph at lines 415--416
+[]\OT1/ptm/m/n/10 The three chunked vari-ants use the
  []
 
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 4
-09.
-(C:\Users\nebur\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-)
-Underfull \hbox (badness 3668) in paragraph at lines 409--409
+
+Underfull \hbox (badness 10000) in paragraph at lines 415--416
+\OT1/pcr/m/n/10 feature/rabbitmq-streams \OT1/ptm/m/n/10 branch at com-mit
+ []
+
+
+Underfull \hbox (badness 1838) in paragraph at lines 433--433
+[]\OT1/ptm/m/n/8 Closest baseline to ori-ginal DY-NAMOS
+ []
+
+
+Underfull \hbox (badness 4699) in paragraph at lines 433--433
+[]\OT1/ptm/m/n/8 Preserves the de-coupled message-driven
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+[]\OT1/ptm/m/n/8 Strong stream se-mantics, but tighter
+ []
+
+[9] [10] [11]
+Underfull \hbox (badness 3668) in paragraph at lines 579--579
 []\OT1/ptm/m/n/7 Synthetic pay-loads from
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 409--409
+Underfull \hbox (badness 10000) in paragraph at lines 579--579
 []\OT1/ptm/m/n/7 Baseline bulk-transfer through-put,
  []
 
 
-Underfull \hbox (badness 5417) in paragraph at lines 409--409
+Underfull \hbox (badness 5417) in paragraph at lines 579--579
 []\OT1/ptm/m/n/7 1 KiB pay-loads, 1,000
  []
 
 
-Underfull \hbox (badness 5417) in paragraph at lines 409--409
+Underfull \hbox (badness 5417) in paragraph at lines 579--579
 []\OT1/ptm/m/n/7 1 KiB pay-loads, 4,000
  []
 
 
-Underfull \hbox (badness 5417) in paragraph at lines 409--409
+Underfull \hbox (badness 5417) in paragraph at lines 579--579
 []\OT1/ptm/m/n/7 4 KiB pay-loads, 2,000
  []
 
 
-Underfull \hbox (badness 1533) in paragraph at lines 409--409
+Underfull \hbox (badness 1533) in paragraph at lines 579--579
 \OT1/ptm/m/n/7 3 s, 120 re-tries at 250
  []
 
-[9]
-Underfull \hbox (badness 10000) in paragraph at lines 439--439
+
+Underfull \hbox (badness 10000) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 Client-streaming,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 439--439
+Underfull \hbox (badness 10000) in paragraph at lines 609--609
 \OT1/ptm/m/n/7 un-ary, Rab-bitMQ,
  []
 
 
-Underfull \hbox (badness 1852) in paragraph at lines 439--439
+Underfull \hbox (badness 1852) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 1KiB, con-cur-rency 8,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 439--439
+Underfull \hbox (badness 10000) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 Overload and queueing
  []
 
 
-Underfull \hbox (badness 1852) in paragraph at lines 439--439
+Underfull \hbox (badness 1852) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 4KiB, con-cur-rency 8,
  []
 
 
-Underfull \hbox (badness 3039) in paragraph at lines 439--439
+Underfull \hbox (badness 3039) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 Recovery and cor-rect-ness
  []
 
 
-Underfull \hbox (badness 4569) in paragraph at lines 439--439
+Underfull \hbox (badness 4569) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 RabbitMQ, NATS,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 439--439
+Underfull \hbox (badness 10000) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 Clustered bulk-transfer
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 439--439
+Underfull \hbox (badness 10000) in paragraph at lines 609--609
 \OT1/ptm/m/n/7 cross-run con-sist-ency
  []
 
 
-Underfull \hbox (badness 4569) in paragraph at lines 439--439
+Underfull \hbox (badness 4569) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 RabbitMQ, NATS,
  []
 
 
-Underfull \hbox (badness 1852) in paragraph at lines 439--439
+Underfull \hbox (badness 1852) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 1KiB, con-cur-rency 8,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 439--439
+Underfull \hbox (badness 10000) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 Clustered pa-cing un-der
  []
 
 
-Underfull \hbox (badness 4569) in paragraph at lines 439--439
+Underfull \hbox (badness 4569) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 RabbitMQ, NATS,
  []
 
 
-Underfull \hbox (badness 1852) in paragraph at lines 439--439
+Underfull \hbox (badness 1852) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 1KiB, con-cur-rency 8,
  []
 
 
-Underfull \hbox (badness 5741) in paragraph at lines 439--439
+Underfull \hbox (badness 5741) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 Clustered over-load be-ha-
  []
 
 
-Underfull \hbox (badness 4569) in paragraph at lines 439--439
+Underfull \hbox (badness 4569) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 RabbitMQ, NATS,
  []
 
 
-Underfull \hbox (badness 1852) in paragraph at lines 439--439
+Underfull \hbox (badness 1852) in paragraph at lines 609--609
 []\OT1/ptm/m/n/7 4KiB, con-cur-rency 8,
  []
 
+[12]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
@@ -962,13 +985,34 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+Underfull \vbox (badness 1024) has occurred while \output is active []
 
-[10]
+ [13]
+(main.bbl [14]
+Underfull \hbox (badness 6078) in paragraph at lines 211--215
+[]\OT1/ptm/m/n/8 DYNAMOS Con-trib-ut-ors, ``DY-NAMOS source re-pos-it-ory, main
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+ []
 
-(main.bbl [11])
+
+Underfull \hbox (badness 6110) in paragraph at lines 211--215
+\OT1/ptm/m/n/8 tree / 747912e975c358ba14d7df28f6adaad4b20323c1$, 2026, ac-cesse
+d:
+ []
+
+
+Underfull \hbox (badness 4108) in paragraph at lines 217--221
+[]\OT1/ptm/m/n/8 ------, ``DY-NAMOS stream-ing pro-to-type, feature/rabbitmq-st
+reams
+ []
+
+
+Underfull \hbox (badness 3271) in paragraph at lines 217--221
+\OT1/ptm/m/n/8 tree / 923b018e622e30ed6141a3e9c925417ce9150e5d$, 2026, ac-cesse
+d:
+ []
+
+)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -980,7 +1024,7 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[12
+[15
 
 ] (main.aux)
  ***********
@@ -989,13 +1033,13 @@ L3 programming layer <2025-12-24>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 24603 strings out of 467871
- 640339 string characters out of 5418377
- 1222672 words of memory out of 5000000
- 53083 multiletter control sequences out of 15000+600000
- 669507 words of font info for 123 fonts, out of 8000000 for 9000
+ 24624 strings out of 467871
+ 640780 string characters out of 5418377
+ 1215672 words of memory out of 5000000
+ 53101 multiletter control sequences out of 15000+600000
+ 670537 words of font info for 127 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,15n,118p,2242b,609s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,17n,118p,2507b,609s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmmi10.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmmi7.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/pu
@@ -1005,15 +1049,18 @@ type1/public/amsfonts/cm/cmr5.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX
 /MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/nebur/AppData/Local/P
 rograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/nebur/AppDat
 a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/nebu
-r/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Us
-ers/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/
-Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/
-Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:
-/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:
-/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (12 pages, 218145 bytes).
+r/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Us
+ers/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pf
+b><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrb8a.
+pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8
+a.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8
+a.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi
+8a.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr
+8a.pfb><C:/Users/nebur/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr
+i8a.pfb>
+Output written on main.pdf (15 pages, 253648 bytes).
 PDF statistics:
- 115 PDF objects out of 1000 (max. 8388607)
+ 135 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 

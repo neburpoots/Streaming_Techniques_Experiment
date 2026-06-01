@@ -201,4 +201,38 @@ S.~Henning and W.~Hasselbring, ``How to measure scalability of distributed
   Conference on Performance Engineering (ICPE '21)}.\hskip 1em plus 0.5em minus
   0.4em\relax ACM, 2021, pp. 85--88.
 
+\bibitem{jongejans2025scattered}
+J.~Jongejans, A.~Koufakis, and A.~Oprescu, ``Vertical federated learning on
+  scattered directive: Enforcing policies on {VFL} workflows,'' in
+  \emph{Proceedings of the 2025 IEEE International Conference on Big Data
+  (BigData)}, 2025, pp. 267--274.
+
+\bibitem{dynamosMainCommit2026}
+{DYNAMOS Contributors}, ``{DYNAMOS} source repository, main branch, commit
+  747912e,''
+  \url{https://github.com/neburpoots/DYNAMOS/tree/747912e975c358ba14d7df28f6adaad4b20323c1},
+  2026, accessed: 2026-05-25.
+
+\bibitem{dynamosStreamingCommit2026}
+------, ``{DYNAMOS} streaming prototype, feature/rabbitmq-streams branch,
+  commit 923b018,''
+  \url{https://github.com/neburpoots/DYNAMOS/tree/923b018e622e30ed6141a3e9c925417ce9150e5d},
+  2026, accessed: 2026-05-25.
+
+\bibitem{scatteredDirectiveRepo2026}
+{DYNAMOS-UVA}, ``Scattered directive source repository,''
+  \url{https://github.com/DYNAMOS-UVA/Scattered-Directive}, 2026, accessed:
+  2026-05-25.
+
+\bibitem{baldin2019fabric}
+I.~Baldin, A.~Nikolich, J.~Griffioen, I.~I.~S. Monga, K.-C. Wang, T.~Lehman,
+  P.~Ruth, and E.~Deelman, ``{FABRIC}: A national-scale programmable
+  experimental network infrastructure,'' \emph{IEEE Internet Computing},
+  vol.~23, no.~6, pp. 38--47, 2019.
+
+\bibitem{fabricPortal2026}
+{FABRIC Testbed}, ``About {FABRIC},''
+  \url{https://portal.fabric-testbed.net/about/about-fabric}, 2026, accessed:
+  2026-05-25.
+
 \end{thebibliography}
