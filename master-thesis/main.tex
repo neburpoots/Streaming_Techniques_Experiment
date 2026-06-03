@@ -19,6 +19,10 @@
 \usepackage{booktabs}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{tikz}
+\setlength{\marginparwidth}{2cm}
+\usepackage[colorinlistoftodos,textsize=tiny]{todonotes}
+\usetikzlibrary{arrows.meta,positioning,fit}
 \pgfplotsset{compat=1.18}
 
 
@@ -35,7 +39,9 @@ Amsterdam, the Netherlands}
 \maketitle
 
 \begin{abstract}
-This thesis investigates how streaming communication can be introduced into DYNAMOS, a policy-driven middleware for data exchange based on dynamically composed microservices. The current system relies on unary gRPC request-response interactions, which become increasingly inefficient for large or continuous transfers. To ground the broader architectural and comparative study, the thesis first reviews candidate streaming mechanisms and evaluates them in a controlled \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink} pipeline. The headline empirical study is a single-node Kubernetes benchmark comparing client-streaming gRPC, unary gRPC, RabbitMQ Streams, NATS JetStream, and Kafka across a clean bulk-transfer matrix and three diagnostic scenarios (continuous steady-rate flow, slow-consumer backpressure, and forced-restart recovery). An exploratory three-broker clustered deployment, in which each broker type runs as a replicated StatefulSet across three worker nodes, is reported as a supporting observation rather than as headline evidence. In the single-node benchmark, client-streaming gRPC provides the highest sustained throughput on the clean matrix and the most stable pacing in the continuous scenario. Among the brokered transports, NATS JetStream achieves the highest clean-matrix throughput average once JetStream resource limits, async publish, and batched pull consumption are configured correctly; RabbitMQ Streams offers stable throughput under clean conditions but accumulates large tail latency under continuous and backpressure load; Kafka delivers duplicate-free and ordering-violation-free recovery, at the cost of heavier tail latency and higher broker resource usage. A follow-up DYNAMOS benchmark on bulk \texttt{dataThroughTtp} retrieval shows that chunked unary batching, gRPC streaming, and RabbitMQ Streams all reduce median completion time and peak memory compared with the original classic-unary baseline, with unary-batched currently giving the best local DYNAMOS fit. The clustered runs suggest that brokered transports benefit measurably from horizontal deployment, particularly Kafka and RabbitMQ under pressure, but coverage is limited and the headline conclusions are drawn from the single-node evidence. These findings establish a concrete trade-off map across throughput, latency, delivery semantics, recovery behaviour, and DYNAMOS integration fit.
+This thesis investigates how streaming communication can be introduced into DYNAMOS, a policy-driven middleware for data exchange based on dynamically composed microservices. The current system relies on unary gRPC request-response interactions, which become increasingly inefficient for large or continuous transfers. To ground the broader architectural and comparative study, the thesis first reviews candidate streaming mechanisms and evaluates them in a controlled \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink} pipeline. The headline empirical study is a single-node Kubernetes benchmark comparing client-streaming gRPC, unary gRPC, RabbitMQ Streams, NATS JetStream, and Kafka across a clean bulk-transfer matrix and three diagnostic scenarios: continuous steady-rate flow, slow-consumer backpressure, and forced-restart recovery. In the single-node benchmark, client-streaming gRPC provides the highest sustained throughput on the clean matrix and the most stable pacing in the continuous scenario. Among the brokered transports, NATS JetStream achieves the highest clean-matrix throughput average once JetStream resource limits, async publish, and batched pull consumption are configured correctly; RabbitMQ Streams offers stable throughput under clean conditions but accumulates large tail latency under continuous and backpressure load; Kafka delivers duplicate-free and ordering-violation-free recovery, at the cost of heavier tail latency and higher broker resource usage. The DYNAMOS implementation then applies the strongest design lesson from this comparison: large results must be chunked before they enter the dynamically generated job path, and those chunks must remain visible across the agent and gateway path. A local DYNAMOS validation on bulk \texttt{dataThroughTtp} retrieval shows that chunked unary batching, intra-job gRPC streaming, and RabbitMQ Streams at the agent boundary all reduce median completion time and peak memory compared with the original classic-unary baseline. These findings establish a concrete trade-off map across throughput, latency, delivery semantics, recovery behaviour, and DYNAMOS integration fit.
+\todo[inline]{The abstract is currently too much information cramped a bit too chaotically.}
+
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -58,6 +64,8 @@ Integrating streaming communication into DYNAMOS is not straightforward. Streami
 
 The goal of this thesis is to investigate how streaming communication can be incorporated into DYNAMOS in a way that improves scalability and performance while preserving policy compliance and adaptive behavior. This involves analyzing existing streaming communication mechanisms, designing architectural extensions to the middleware, implementing streaming support, and evaluating the resulting system under realistic workloads.
 
+\todo{Do we need to reference sources? Original DYNAMOS papers for instance?}
+
 The main research question addressed in this thesis is:
 
 \begin{quote}
@@ -74,7 +82,7 @@ To answer this question, the following sub-research questions are defined:
     How can streaming communication be integrated into a microservice-based architecture in a way that preserves dynamic service composition, policy-driven orchestration, and isolation guarantees?
 
   \item \textbf{RQ3:}
-    What is the impact of streaming communication on scalability, performance, and robustness compared to a traditional request–response approach under realistic workloads in a microservice-based architecture?
+    What is the impact of the implemented streaming data paths on scalability, performance, and robustness compared to a traditional request-response approach under realistic DYNAMOS workloads?
 \end{itemize}
 
 \section{Related Work}
@@ -94,6 +102,8 @@ An alternative to direct service-to-service streaming is to externalise the data
 Several studies also emphasize that streaming design is influenced not only by technology choice but by the underlying communication model. DataXc contrasts push-based streaming approaches with pull-based designs and reports improved latency stability and throughput under consumer-controlled flow \cite{coviello2022dataxc}. Although the application domain differs, the distinction between producer-driven and consumer-driven streaming is directly relevant to backpressure management and resource utilisation in DYNAMOS-compatible workflows.
 
 Overall, existing literature provides a broad comparison of streaming technologies and interaction patterns, but these comparisons are typically conducted in generic microservice or stream-processing settings. There is limited work that evaluates these mechanisms under the specific constraints of dynamically composed, policy-driven middleware with ephemeral execution units, leaving open questions regarding their suitability in such environments.
+
+\todo{I think I need to find a couple more studies that compare streaming techniques which are also partially used for the methodology of rq1.}
 
 \subsection{Architectural integration of streaming in adaptive microservice middleware}
 
@@ -177,6 +187,8 @@ All candidate mechanisms were evaluated in the same Go-based microservice chain 
 
 The transport mappings were also kept as close as possible to one another. Client-streaming and unary gRPC provided the direct, service-to-service reference points. Kafka preserved per-flow ordering through keyed partitioning. RabbitMQ used streams rather than classic queues. NATS used JetStream with explicit acknowledgement semantics. This alignment matters because it limits the risk that one mechanism benefits from a materially easier application mapping than the others.
 
+\todo{The nats jetstream does explicit ack? but I am pretty sure this wasn't the case or I am misunderstanding the sentence above. We need to check because I think all of the ones are set up in such a way that they are async and don't wait on acks. This was done for better speed and more equal comparison.}
+
 The service logic remained intentionally lightweight. The producer emitted synthetic or replayed records, the transformer applied a deterministic operation, and the sink recorded latency, pacing, and correctness summaries. That kept the benchmark focused on transfer behaviour, buffering, and recovery rather than on domain-specific computation \cite{coviello2022dataxc,systematicstreaming}.
 
 \subsubsection{Evaluation dimensions}
@@ -186,6 +198,7 @@ The literature consistently treats streaming evaluation as a multi-dimensional p
 \subsubsection{Scenario set and scenario-to-property mapping}
 
 The completed RQ1 study uses four scenario families: a clean bulk-transfer matrix, a steady-rate continuous scenario, a slow-consumer backpressure scenario, and a forced-restart recovery scenario. Together they cover the properties most relevant to DYNAMOS: sustained transfer, regular pacing, overload handling, and behaviour during interruption.
+\todo{Is it in any way possible to find more research backing into this type of testing? Do we have any papers currently in this workspace that could be cited here? Is this then novel and should we present it as such?}
 
 \begin{table*}[!t]
     \centering
@@ -213,15 +226,21 @@ The main independent variables are payload size, concurrency, target rate where 
 
 The main text reports one clean-summary table, one compact size-wise clean breakdown, and three focused scenario tables for continuous flow, backpressure, and recovery. Detailed per-case clean-matrix tables remain in Appendix~B. Broker resource figures are not used in the main argument because the currently available exported broker CPU series are not yet semantically comparable across transports.
 
+\todo{This text here above here needs to change. The last sentence is especially bad, what does it even mean? Why are they currently not yet semantically comparable? Is this even true still? If it isn't true why isn't it true. If it isn't true what are the implication and can we just leave this out?}
+
 \subsection{Results}
 
 \subsubsection{Metric definitions}
 
 The core metrics are throughput in messages per second and MiB per second, end-to-end latency percentiles, inter-arrival regularity, duplicate count, and ordering violations. Throughput indicates transfer efficiency. Latency percentiles show how quickly messages move through the pipeline. Inter-arrival and jitter show how regular that delivery remains over time. Duplicates and ordering violations capture correctness. The recovery scenario additionally separates pre-failure, recovery-window, and post-recovery throughput; time to first post-failure message; time to a sustained five-second window at or above 80\% of the target rate; throughput debt inside the fixed recovery window; recovery-window tail latency; post-failure correctness counts; backlog drain time; and completion.
 
+\todo{These metrics in my opinion are not good and we have to change this. It could be done with bulletpoints with a short explanation for each metric. I think we either have to explain the metrics for each scenario seperately or do them in bulletpoints with the metric and then what the metric is in around 3 to for sentences to make sure the reader understands what it means so that they are better able to intepret the data.}
+
 \subsubsection{Comparison scope}
 
 The primary comparison in this chapter is the completed single-node Kubernetes benchmark across five transports: client-streaming gRPC, unary gRPC, RabbitMQ Streams, NATS JetStream, and Kafka. The three diagnostic scenario tables (continuous, backpressure, recovery) report the  single-node run executed on 4 May 2026, with three repetitions per transport. The clean-matrix summary in Table~\ref{tab:grpc-preliminary-results} and the per-size breakdown in Table~\ref{tab:grpc-per-size}, together with the corresponding appendix tables, retain the earlier completed multi-cell run because not all broker cells were re-executed in the most recent refresh; the qualitative ranking on the clean matrix is consistent across the two runs, but absolute throughput levels differ and the reader should not directly cross-compare absolute numbers between the headline clean-matrix tables and the diagnostic scenario tables. Exploratory clustered broker runs were also executed; they are not part of the primary results because coverage was limited and startup or convergence effects materially influenced some first runs, and they are discussed briefly in the interpretation section rather than presented as headline evidence.
+
+\todo{The text above here says something along the lines of retain the earlier completed multi-cell run. This is awful, Why would a text reference it's own runs. It should just state it did three runs, The date of the run also doesn't have to be there. Also what does the text afterwards mean, for instance why is this here: "the qualitative ranking on the clean matrix is consistent across the two runs, but absolute throughput levels differ and the reader should not directly cross-compare absolute numbers between the headline clean-matrix tables and the diagnostic scenario tables." Again this is awful for a finished thesis. Why is this the case? Is it still the case. I would rather get rid of that part. Then about the comparison scope. I think we need to quickly in two to three sentences explain that the benchmarks are run in single node, what that is, that brokers can also be run in multi-node clusters and that it can increase performance (this could have one or two sources backing the definitions and the statement) and that the multi-node runs were tested but are not part of the primary results because of the relevance to a system like dynamos and the fact that multi-node testing would extend the testing to a much larger scale}
 
 \begin{table*}[!t]
     \centering
@@ -243,6 +262,8 @@ The primary comparison in this chapter is the completed single-node Kubernetes b
 \end{table*}
 
 Table~\ref{tab:grpc-preliminary-results} shows a clear separation between the two direct gRPC mappings and the three brokered alternatives. Client-streaming is the fastest transport in the clean matrix by a wide margin. Unary is substantially slower, but it does so with very low tail latency. Among the brokered transports, NATS JetStream achieves the highest average throughput, followed by RabbitMQ Streams and Kafka. Ordering violations are absent in the clean matrix. The remaining correctness anomalies are concentrated in duplicate deliveries on NATS and, to a much smaller extent, Kafka.
+
+\todo{If possible explain the metrics a bit. Why does nats and kafka have duplicates. Why is client-streaming so fast? Why is unary so slow? Why does unary have such low latency? Why do the brokered transports have higher latency?}
 
 \subsubsection{Clean bulk-transfer matrix}
 
@@ -268,6 +289,8 @@ The size-wise breakdown in Table~\ref{tab:grpc-per-size} shows how the clean-mat
 \end{table}
 
 All clean-matrix runs reached the target message count. Full per-case tables remain in Appendix~B, but the main pattern is already visible here: client-streaming dominates bulk transfer, unary remains the low-latency reference rather than a throughput candidate, and the three brokered transports form a separate performance band with NATS at its front.
+
+\todo{What is does concurrency mean in the results? Does it mean that there are multiple producer instances running in parallel?}
 
 \subsubsection{Continuous steady-rate scenario}
 
@@ -368,7 +391,7 @@ Client-streaming gRPC nevertheless remains a serious option, but as a more targe
 
 Kafka and NATS JetStream are lower-priority options for the current DYNAMOS architecture. Both would require a more substantial platform change, and both bring strengths, large-scale replay, log-centric consumption, multi-consumer stream processing, or subject-based pub/sub flexibility, that DYNAMOS' present request-shaped SQL workloads do not strongly exploit. They remain valuable comparison points in the benchmark and possible future directions if DYNAMOS evolves toward persistent, replay-heavy, or multi-consumer workloads, but they do not appear to be the most pragmatic next step for the system as it exists today.
 
-The most defensible next step is therefore a staged RQ2 integration strategy: preserve classic RabbitMQ queues for the control plane, prototype RabbitMQ Streams for the inter-agent data path as the lowest-risk architectural evolution, and build a smaller client-streaming gRPC MVP for the same path as a targeted alternative. RQ3 can then evaluate both end-to-end inside DYNAMOS, where startup behaviour, policy enforcement, failure handling, and real workload structure can be weighed against the isolated transport-level results reported here.
+Therefore it is important to separate transport efficiency from DYNAMOS integration fit. RQ2 uses the benchmark evidence to design chunk-aware DYNAMOS data paths at the right architectural boundaries. RQ3 then validates those paths inside DYNAMOS, where startup behaviour, policy enforcement, failure handling, and real workload structure can be weighed against the isolated transport-level results reported here.
 
 \subsection{Threats to Validity}
 
@@ -377,79 +400,127 @@ Three limits are important when interpreting these results. First, the primary f
 \section{Streaming Integration in DYNAMOS}
 \label{sec:dynamos-rq2}
 
-This section addresses RQ2 by moving from an isolated transport benchmark to an implementation inside DYNAMOS. The question is no longer only which transport is fast in a generic pipeline, but how chunked transfer can be integrated into DYNAMOS without losing the properties that make the middleware useful: dynamic microservice composition, policy-driven orchestration, ephemeral jobs, and sidecar-mediated decoupling.
+This section addresses RQ2 by moving from a generic transport benchmark to an implementation inside DYNAMOS. The question is no longer only which communication mechanism is fast. The implementation must also preserve DYNAMOS' policy approval path, generated job model, sidecar-mediated communication, and isolation between data stewards.
+\todo[inline]{Example note: use this style for supervisor or self-review comments.}
 
-\subsection{Motivation and baseline}
+\subsection{Motivation}
 
 The original DYNAMOS implementation already identifies large message transfer as a limitation. The DYNAMOS thesis notes that the default maximum size of a gRPC method is around 4 MB, corresponding to approximately 30{,}000 records in the original experiments, and that the current gRPC implementation uses unary RPCs: one request and one response \cite{stutterheim2023thesis}. The same discussion observes that increasing the message size is theoretically possible but memory-heavy, and explicitly names streaming as the unfinished solution. This makes large-result transfer an appropriate point at which to evaluate streaming techniques inside DYNAMOS rather than only in a synthetic pipeline.
 
-The workload used for this RQ2 evaluation is deliberately different from the average-query example commonly used in DYNAMOS demonstrations. An average query is a reduction workload: it may scan many records but returns one scalar result. That tests computation near the data source, but it does not test whether DYNAMOS can transport many aligned records. Bulk retrieval is relevant for scenarios such as vertical federated learning (VFL), where parties may hold complementary features for the same entities and exchange embeddings, gradients, labels, or aligned intermediate rows rather than only a single aggregate value. The Scattered Directive work makes this connection explicit by extending DYNAMOS with cross-node microservice chains for policy-aware VFL workflows and by introducing Shared Execution via a Trusted Third Party as an archetype for multi-party collaborative computation \cite{jongejans2025scattered}.
+The implementation target is deliberately different from the average-query example commonly used in DYNAMOS demonstrations. An average query is a reduction workload: it may scan many records but returns one scalar result. That tests computation near the data source, but it does not test whether DYNAMOS can transport many aligned rows. Bulk retrieval is relevant for vertical federated learning (VFL), where parties may hold complementary features for the same entities and need to exchange aligned intermediate rows, labels, embeddings, or gradients. The Scattered Directive work makes this connection explicit by extending DYNAMOS with cross-node microservice chains for policy-aware VFL workflows and by introducing Shared Execution through a Trusted Third Party as an archetype for collaborative computation \cite{jongejans2025scattered}.
+
+\subsection{DYNAMOS execution path}
+
+DYNAMOS separates the control path from the data path. A client request first passes through the gateway, policy evaluation, orchestration, and the relevant agents. Only after that approval and composition step are generated job pods used to execute the request. For the \texttt{dataThroughTtp} archetype, the data provider job retrieves rows, the Trusted Third Party (TTP) or SURF-side job performs the compute-provider part of the chain, and the response eventually returns through the agent and gateway path.
 
 \begin{figure*}[!t]
     \centering
-    \footnotesize
-    \fbox{%
-    \begin{minipage}{0.96\textwidth}
-    \centering
-    Benchmark client $\rightarrow$ API gateway $\rightarrow$ policy/orchestration $\rightarrow$ TTP/SURF agent $\rightarrow$ UVA data-provider agent $\rightarrow$ generated job pod
-    
-    \vspace{0.5em}
-    \begin{tabular}{c}
-    SQL query service $\rightarrow$ aggregate service $\rightarrow$ algorithm service \\
-    \emph{chunking point: provider emits row batches; aggregate and algorithm preserve chunk boundaries for non-average batched workloads}
-    \end{tabular}
-    
-    \vspace{0.5em}
-    generated job pod $\rightarrow$ UVA agent $\rightarrow$ TTP/SURF agent $\rightarrow$ API gateway $\rightarrow$ NDJSON result events
-    \end{minipage}}
-    \caption{DYNAMOS bulk retrieval path evaluated for RQ2. Chunking is introduced at the SQL query service and must be preserved through the aggregate, algorithm, agent, and gateway path to avoid rebuilding one complete result table before the client sees progress.}
+    \scriptsize
+    \begin{tikzpicture}[
+        node distance=0.62cm and 0.52cm,
+        box/.style={draw, rounded corners=1.5pt, align=center, minimum height=0.66cm, inner sep=3pt},
+        wide/.style={box, minimum width=1.55cm},
+        arrow/.style={-{Latex[length=2mm]}, thick},
+        note/.style={align=center, font=\scriptsize, text width=3.2cm}
+    ]
+        \node[wide] (client) {Benchmark\\client};
+        \node[wide, right=of client] (gateway) {API\\gateway};
+        \node[wide, right=of gateway] (policy) {Policy and\\orchestration};
+        \node[wide, right=of policy] (surf) {TTP/SURF\\agent};
+        \node[wide, right=of surf] (uva) {UVA\\agent};
+
+        \node[box, below=1.12cm of uva, minimum width=1.35cm] (sql) {SQL\\query};
+        \node[box, right=0.50cm of sql, minimum width=1.35cm] (aggregate) {Aggregate};
+        \node[box, right=0.50cm of aggregate, minimum width=1.35cm] (algorithm) {Algorithm};
+        \node[box, below=0.62cm of aggregate, minimum width=1.45cm] (sidecar) {Sidecar};
+        \node[draw, dashed, rounded corners=2pt, fit=(sql)(aggregate)(algorithm)(sidecar), inner sep=0.28cm, label={[font=\scriptsize]above:generated ephemeral job pod}] (pod) {};
+
+        \draw[arrow] (client) -- (gateway);
+        \draw[arrow] (gateway) -- (policy);
+        \draw[arrow] (policy) -- (surf);
+        \draw[arrow] (surf) -- (uva);
+        \draw[arrow] (uva) -- (pod);
+        \draw[arrow] (sql) -- (aggregate);
+        \draw[arrow] (aggregate) -- (algorithm);
+        \draw[arrow] (algorithm) |- (sidecar);
+        \draw[arrow] (sidecar) -| (uva);
+        \draw[arrow] (uva) to[bend left=16] (surf);
+        \draw[arrow] (surf) to[bend left=18] (gateway);
+        \draw[arrow] (gateway) to[bend left=18] (client);
+
+        \node[note, above=0.36cm of uva] {agent boundary:\\normal AMQP chunks or\\RabbitMQ Streams};
+    \end{tikzpicture}
+    \caption{DYNAMOS bulk retrieval path used for RQ2. The implementation changes the bulk data path after policy approval. Chunking starts at the SQL query service and must be preserved through the generated job, agent path, and gateway response to avoid rebuilding one complete result table before the client sees progress.}
     \label{fig:dynamos-rq2-path}
 \end{figure*}
 
-Figure~\ref{fig:dynamos-rq2-path} summarizes the evaluated path. The important distinction is that streaming is applied at several layers. The SQL query service can emit chunks; the generated job's microservice chain can move those chunks either as repeated unary messages or over a gRPC stream; the inter-agent path can preserve chunks through RabbitMQ Streams; and the gateway can expose partial \texttt{providerResult} events to the client. A fair DYNAMOS comparison therefore needs to distinguish provider-side batching, in-pod microservice streaming, inter-agent streaming, and response streaming to the benchmark client.
+Figure~\ref{fig:dynamos-rq2-path} shows the boundary that matters for the implementation. In the original path, a large result can be rebuilt several times before the client sees anything: inside the SQL response, inside the generated service chain, inside the agent response, and again at the gateway. The streaming implementation therefore treats chunk preservation as the central requirement. A transport is only useful for this workload if the first rows can leave the provider path before the final rows have been read and serialized.
+
+\subsection{Common chunk model}
+
+All chunked variants use the same logical stream model. The SQL query service reads the bulk result in fixed row batches. Each batch carries stream metadata: provider identity, correlation identifier, sequence number, row count, partial or final status, and ordered column names. The ordered-column metadata is important because Go protobuf structs can otherwise expose map fields in nondeterministic order, which would make equal results appear different across transports.
+
+The aggregate and algorithm stages preserve chunk boundaries for non-average bulk workloads. They do not merge all incoming rows into one table unless the request explicitly uses the classic unary baseline. The gateway exposes chunk progress to the benchmark client through NDJSON \texttt{providerResult} events, with partial events before the final event. This keeps the external response shape compatible with the existing gateway while making progress visible.
+
+Policy enforcement is not moved into the stream. DYNAMOS still evaluates the request before execution, constructs the permitted job path, and then lets that generated path process the approved data exchange. The current implementation therefore preserves the original policy decision point. It does not claim per-chunk policy revocation during a running stream.
 
 \subsection{Implemented variants}
 
-Four implementations were evaluated. The classic unary baseline uses the original DYNAMOS \texttt{main} branch at commit \texttt{747912e} \cite{dynamosMainCommit2026}. For the benchmark, its gRPC/message-size limits were configured high enough to complete 50k, 100k, and 250k row requests. This avoids an unfair baseline failure caused only by the historical 4 MB ceiling. Classic unary remains intentionally full-buffered: it represents the original DYNAMOS data-transfer style with the size ceiling raised.
-
-The three chunked variants use the \texttt{feature/rabbitmq-streams} branch at commit \texttt{923b018} \cite{dynamosStreamingCommit2026}. In all three, the provider-side SQL service emits chunks of 5{,}000 rows and carries stream metadata such as sequence number, row count, final/partial flags, provider identifier, and ordered column information. The aggregate and algorithm stages pass non-average batched chunks through rather than rebuilding a complete table. The existing \texttt{classicUnary} option remains the switch for the full-buffer baseline.
+Four paths are compared in the thesis. The first is the original DYNAMOS style and the other three are chunk-aware implementations. This distinction matters because the RabbitMQ Streams path still needs chunking before it reaches the broker. If the generated job first built one giant result and only then wrote it into RabbitMQ Streams, the client would not receive an earlier first result and the memory problem would largely remain.
 
 \begin{table*}[!t]
     \centering
     \footnotesize
-    \caption{DYNAMOS RQ2 implementation variants.}
+    \caption{DYNAMOS implementation variants and the architectural boundary changed by each variant.}
     \label{tab:dynamos-rq2-variants}
     \setlength{\tabcolsep}{4pt}
     \resizebox{\textwidth}{!}{%
-    \begin{tabular}{p{0.16\textwidth}p{0.18\textwidth}p{0.26\textwidth}p{0.28\textwidth}}
+    \begin{tabular}{p{0.16\textwidth}p{0.18\textwidth}p{0.18\textwidth}p{0.22\textwidth}p{0.24\textwidth}}
         \toprule
-        Variant & Source & Transfer behaviour & Architectural interpretation \\
+        Variant & In-pod service chain & Agent boundary & Buffering behaviour & Architectural purpose \\
         \midrule
-        Classic unary & \begin{tabular}[t]{@{}l@{}}\texttt{main}\\commit \texttt{747912e}\end{tabular} & Complete result buffered into one logical response & Closest baseline to original DYNAMOS once the gRPC size ceiling is raised. \\
-        Unary-batched & \begin{tabular}[t]{@{}l@{}}\texttt{feature/}\\\texttt{rabbitmq-streams}\\commit \texttt{923b018}\end{tabular} & Provider emits row chunks; chunks move as separate messages through the existing DYNAMOS path & Preserves the decoupled message-driven style while avoiding one giant result. \\
-        gRPC streaming & \begin{tabular}[t]{@{}l@{}}\texttt{feature/}\\\texttt{rabbitmq-streams}\\commit \texttt{923b018}\end{tabular} & Chunks with one correlation ID move through a long-lived \texttt{SendDataStream} in the microservice chain & Strong stream semantics, but tighter sender/receiver lifetime coupling. \\
-        RabbitMQ Streams & \begin{tabular}[t]{@{}l@{}}\texttt{feature/}\\\texttt{rabbitmq-streams}\\commit \texttt{923b018}\end{tabular} & Chunks crossing agent queues are split into RabbitMQ stream records and reassembled & Best match for broker-mediated decoupling and distributed inter-agent transfer, with additional overhead. \\
+        Classic unary & Unary gRPC, full response & Classic RabbitMQ message path & Complete result is buffered into one logical response & Baseline closest to original DYNAMOS once the gRPC size ceiling is raised. \\
+        Chunked unary & Repeated unary calls carrying row chunks & Classic RabbitMQ carries separate chunk messages & Chunks stay separate through aggregate, algorithm, agent, and gateway & Smallest architectural change; preserves the message-driven style. \\
+        Intra-job gRPC streaming & Long-lived \texttt{SendDataStream} through the generated service chain & Classic RabbitMQ carries separate chunk messages & Chunks stream inside the pod and remain chunks after leaving it & Tests native gRPC streaming where DYNAMOS already uses local gRPC. \\
+        RabbitMQ Streams at agent boundary & Chunked unary path inside the generated job & RabbitMQ stream records replace classic queue messages for chunk transfer & Local chunks are written as broker stream records and reassembled downstream & Tests stream-log semantics for distributed inter-agent transfer. \\
         \bottomrule
     \end{tabular}}
 \end{table*}
 
-Unary-batched is the least disruptive variant. It keeps the existing DYNAMOS request path and sidecar model, but replaces one large result with a sequence of smaller messages. gRPC streaming is the cleanest stream abstraction inside the microservice chain, and aligns with gRPC's native streaming support \cite{grpc2024coreconcepts}, but it introduces long-lived sender/receiver coupling. RabbitMQ Streams is the strongest architectural fit for distributed inter-agent decoupling because streams are append-only, persistent, replayable data structures in RabbitMQ \cite{rabbitmq2026streams}; however, its broker-mediated path adds coordination and reassembly overhead.
+The classic unary baseline uses the original DYNAMOS \texttt{main} branch at commit \texttt{747912e} \cite{dynamosMainCommit2026}. For the benchmark, its gRPC and message-size limits are configured high enough to complete the tested row counts. This avoids treating the historical 4 MB ceiling as the result. Classic unary remains intentionally full-buffered, because that is the behaviour the streaming implementations are meant to improve.
+
+The three chunked paths use the streaming implementation branch at commit \texttt{923b018} \cite{dynamosStreamingCommit2026}. Chunked unary is the least disruptive path. It keeps unary calls and the existing agent style, but it sends many smaller result messages instead of one large result. Intra-job gRPC streaming replaces repeated unary calls inside the generated service chain with one stream. That matches gRPC's native streaming model \cite{grpc2024coreconcepts}, but it couples sender and receiver lifetimes more tightly. RabbitMQ Streams changes the agent boundary. It keeps the chunked local path, then uses RabbitMQ's append-only stream abstraction for chunk transfer between agents \cite{rabbitmq2026streams}.
+
+These variants are not three independent full-stack streaming systems. They are interventions at different parts of the same DYNAMOS path. The local performance improvement of the RabbitMQ Streams variant is therefore not caused by RabbitMQ Streams alone. It is caused by the common chunk-aware data path, with RabbitMQ Streams adding a different broker representation at the agent boundary.
+
+\subsection{RQ2 answer}
+
+Streaming can be integrated into DYNAMOS by changing the bulk data path after policy approval while leaving the control path intact. The implementation introduces an explicit chunk model at the SQL query service, preserves those chunks through aggregate and algorithm services, carries them through the agent boundary, and exposes partial result events to the client. This keeps dynamic service composition and policy-driven orchestration in place, while removing the need to repeatedly materialize one complete result table before progress is visible.
+
+The best architectural choice is boundary-specific. Chunked unary is the best current local default because it gives chunking without changing the DYNAMOS execution model very much. Intra-job gRPC streaming is useful where both endpoints are already in the generated pod and a direct stream is acceptable. RabbitMQ Streams is more relevant at the inter-agent boundary, especially for future distributed deployments where retained streams, replay, and independent consumers may matter more than local latency.
+
+\section{Evaluation of DYNAMOS Streaming Implementations}
+\label{sec:dynamos-rq3}
+
+This section addresses RQ3 by validating the implemented DYNAMOS data paths on a large-result workload. RQ2 explains how the variants are integrated. RQ3 measures whether those variants improve completion time, time-to-first-result, and resource usage compared with the classic unary baseline.
 
 \subsection{Benchmark method}
 
-The DYNAMOS benchmark uses the \texttt{dataThroughTtp} archetype with the \texttt{UVA} provider set. Each request executes a bulk projection query over the large \texttt{Personen} and \texttt{Aanstellingen} tables and limits the result to 50{,}000, 100{,}000, or 250{,}000 rows. The comparison therefore focuses on the large-result transfer path rather than on multi-provider fanout.
+The benchmark uses the \texttt{dataThroughTtp} archetype with a single data provider, \texttt{UVA}. The request still follows the TTP/SURF compute-provider path defined by the archetype, but the data fanout is intentionally limited to one provider so that the experiment isolates large-result transfer rather than multi-provider coordination.
 
-Each cell was executed with 10 warm repetitions. Runs were accepted only when row counts matched the expected limit and result hashes validated the returned content. For the chunked variants, the benchmark also required partial result events before completion. The parser records raw and canonical content hashes so that transport-specific event ordering does not hide schema drift. Resource usage was sampled from Kubernetes across the DYNAMOS namespaces and summarized as peak total CPU millicores and peak total memory.
+Each request executes a bulk projection query over the large \texttt{PersonenLarge} and \texttt{AanstellingenLarge} tables and joins them on \texttt{Unieknr}. The result is limited to 50{,}000, 100{,}000, or 250{,}000 rows. The chunked variants use 5{,}000 rows per SQL chunk, which gives 10, 20, and 50 total chunks respectively. This value is an experimental configuration rather than a claimed optimum: it is large enough to avoid turning the benchmark into a per-row messaging test and small enough to expose partial progress.
 
-One reproducibility caveat is important. The classic unary baseline required generated \texttt{surf} and \texttt{uva} jobs to be cleaned between repetitions. Without this cleanup, later repetitions returned fast 502 or empty-provider responses because stale generated jobs were still present. The cleaned baseline is therefore the valid comparison used in this section, and the cleanup requirement should be retained in the final experiment protocol.
+Four implementations are compared. Classic unary is taken from the original DYNAMOS \texttt{main} branch at commit \texttt{747912e}. The chunked unary, intra-job gRPC streaming, and RabbitMQ Streams variants are taken from the streaming implementation branch at commit \texttt{923b018}. Every cell uses 10 warm repetitions. Runs are accepted only when row counts match the expected limit and canonical content hashes validate the returned content. For chunked variants, the benchmark also requires partial result events before completion.
 
-\subsection{Results}
+Resource usage is sampled from Kubernetes across the relevant DYNAMOS namespaces and summarized as peak total CPU millicores and peak total memory in MiB. The classic unary baseline required generated \texttt{surf} and \texttt{uva} jobs to be cleaned between repetitions. Without this cleanup, later repetitions could return fast 502 or empty-provider responses because stale generated jobs were still present. The cleaned baseline is therefore the comparison used here.
+
+\subsection{Completion latency}
 
 \begin{table}[!t]
     \centering
     \scriptsize
     \caption{Median completion latency for DYNAMOS bulk retrieval. All cells completed 10/10 valid repetitions.}
-    \label{tab:dynamos-rq2-latency}
+    \label{tab:dynamos-rq3-latency}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
     \begin{tabular}{lrrr}
@@ -457,20 +528,55 @@ One reproducibility caveat is important. The classic unary baseline required gen
         Implementation & 50k rows & 100k rows & 250k rows \\
         \midrule
         Classic unary & 12.240s & 15.939s & 26.880s \\
-        Unary-batched & 7.731s & 7.870s & 12.158s \\
-        gRPC streaming & 7.278s & 9.299s & 12.495s \\
-        RabbitMQ Streams & 7.809s & 9.394s & 14.756s \\
+        Chunked unary & 7.731s & 7.870s & 12.158s \\
+        Intra-job gRPC streaming & 7.278s & 9.299s & 12.495s \\
+        RabbitMQ Streams boundary & 7.809s & 9.394s & 14.756s \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-Table~\ref{tab:dynamos-rq2-latency} shows that all three chunked variants reduce median completion latency compared with classic unary. At 250k rows, unary-batched is 2.21x faster than classic unary, gRPC streaming is 2.15x faster, and RabbitMQ Streams is 1.82x faster. The 100k row case is especially favourable to unary-batched, which finishes in 7.870s compared with 15.939s for classic unary. The 50k row case is closer, but still shows a clear advantage for the chunked designs.
+\begin{figure*}[!t]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.86\textwidth,
+            height=5.2cm,
+            xlabel={Rows returned},
+            ylabel={Median completion time (s)},
+            xtick={50000,100000,250000},
+            xticklabels={50k,100k,250k},
+            scaled x ticks=false,
+            ymin=0,
+            grid=major,
+            legend columns=2,
+            legend style={at={(0.5,-0.23)},anchor=north,draw=none},
+            tick label style={font=\scriptsize},
+            label style={font=\scriptsize},
+            legend style={font=\scriptsize}
+        ]
+            \addplot+[mark=*] coordinates {(50000,12.240) (100000,15.939) (250000,26.880)};
+            \addlegendentry{Classic unary}
+            \addplot+[mark=square*] coordinates {(50000,7.731) (100000,7.870) (250000,12.158)};
+            \addlegendentry{Chunked unary}
+            \addplot+[mark=triangle*] coordinates {(50000,7.278) (100000,9.299) (250000,12.495)};
+            \addlegendentry{Intra-job gRPC streaming}
+            \addplot+[mark=diamond*] coordinates {(50000,7.809) (100000,9.394) (250000,14.756)};
+            \addlegendentry{RabbitMQ Streams boundary}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Median completion time for the local DYNAMOS bulk retrieval benchmark. Chunking is the dominant improvement: all chunk-aware variants scale better than classic unary as the returned row count grows.}
+    \label{fig:dynamos-rq3-latency}
+\end{figure*}
+
+Table~\ref{tab:dynamos-rq3-latency} and Figure~\ref{fig:dynamos-rq3-latency} show that all three chunk-aware variants reduce median completion latency compared with classic unary. At 250k rows, chunked unary is 2.21x faster than classic unary, intra-job gRPC streaming is 2.15x faster, and the RabbitMQ Streams boundary variant is 1.82x faster. The 100k row case is especially favourable to chunked unary, which finishes in 7.870s compared with 15.939s for classic unary.
+
+\subsection{Time to first result}
 
 \begin{table}[!t]
     \centering
     \scriptsize
     \caption{Time-to-first-result and partial result behaviour. Classic unary has no partial results, so first result equals completion.}
-    \label{tab:dynamos-rq2-first}
+    \label{tab:dynamos-rq3-first}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
     \begin{tabular}{lrrrr}
@@ -480,26 +586,28 @@ Table~\ref{tab:dynamos-rq2-latency} shows that all three chunked variants reduce
         Classic unary & 50k & 12.240s & 12.240s & 0 \\
         Classic unary & 100k & 15.939s & 15.939s & 0 \\
         Classic unary & 250k & 26.880s & 26.880s & 0 \\
-        Unary-batched & 50k & 7.186s & 7.731s & 9 \\
-        Unary-batched & 100k & 6.054s & 7.870s & 19 \\
-        Unary-batched & 250k & 5.857s & 12.158s & 49 \\
-        gRPC streaming & 50k & 6.522s & 7.278s & 9 \\
-        gRPC streaming & 100k & 7.682s & 9.299s & 19 \\
-        gRPC streaming & 250k & 6.459s & 12.495s & 49 \\
-        RabbitMQ Streams & 50k & 6.915s & 7.809s & 9 \\
-        RabbitMQ Streams & 100k & 6.737s & 9.394s & 19 \\
-        RabbitMQ Streams & 250k & 7.014s & 14.756s & 49 \\
+        Chunked unary & 50k & 7.186s & 7.731s & 9 \\
+        Chunked unary & 100k & 6.054s & 7.870s & 19 \\
+        Chunked unary & 250k & 5.857s & 12.158s & 49 \\
+        Intra-job gRPC streaming & 50k & 6.522s & 7.278s & 9 \\
+        Intra-job gRPC streaming & 100k & 7.682s & 9.299s & 19 \\
+        Intra-job gRPC streaming & 250k & 6.459s & 12.495s & 49 \\
+        RabbitMQ Streams boundary & 50k & 6.915s & 7.809s & 9 \\
+        RabbitMQ Streams boundary & 100k & 6.737s & 9.394s & 19 \\
+        RabbitMQ Streams boundary & 250k & 7.014s & 14.756s & 49 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-Table~\ref{tab:dynamos-rq2-first} shows the qualitative benefit of chunking. Classic unary cannot expose progress: the first result is the final result. The chunked variants emit partial results substantially earlier, and at 250k rows the first partial result appears after approximately 5.9--7.0s while completion follows after 12.2--14.8s. This matters for workflows that can process data incrementally, for monitoring long-running requests, and for diagnosing whether a large request is making progress.
+Table~\ref{tab:dynamos-rq3-first} shows the qualitative benefit of chunking. Classic unary cannot expose progress: the first result is the final result. The chunked variants emit partial results substantially earlier. At 250k rows, the first partial result appears after about 5.9s to 7.0s, while completion follows after 12.2s to 14.8s. This matters for workflows that can process data incrementally and for diagnosing whether a large request is still making progress.
+
+\subsection{Resource usage}
 
 \begin{table}[!t]
     \centering
     \scriptsize
     \caption{Peak sampled resource usage during DYNAMOS bulk retrieval. CPU is peak total millicores; memory is peak total MiB across sampled Kubernetes namespaces.}
-    \label{tab:dynamos-rq2-resources}
+    \label{tab:dynamos-rq3-resources}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
     \begin{tabular}{lrrr}
@@ -509,48 +617,74 @@ Table~\ref{tab:dynamos-rq2-first} shows the qualitative benefit of chunking. Cla
         Classic unary & 50k & 782m & 1{,}571 MiB \\
         Classic unary & 100k & 813m & 2{,}046 MiB \\
         Classic unary & 250k & 1{,}198m & 3{,}695 MiB \\
-        Unary-batched & 50k & 403m & 1{,}151 MiB \\
-        Unary-batched & 100k & 469m & 1{,}723 MiB \\
-        Unary-batched & 250k & 1{,}097m & 1{,}378 MiB \\
-        gRPC streaming & 50k & 351m & 1{,}198 MiB \\
-        gRPC streaming & 100k & 479m & 1{,}230 MiB \\
-        gRPC streaming & 250k & 1{,}418m & 1{,}495 MiB \\
-        RabbitMQ Streams & 50k & 457m & 1{,}161 MiB \\
-        RabbitMQ Streams & 100k & 982m & 1{,}436 MiB \\
-        RabbitMQ Streams & 250k & 1{,}687m & 1{,}715 MiB \\
+        Chunked unary & 50k & 403m & 1{,}151 MiB \\
+        Chunked unary & 100k & 469m & 1{,}723 MiB \\
+        Chunked unary & 250k & 1{,}097m & 1{,}378 MiB \\
+        Intra-job gRPC streaming & 50k & 351m & 1{,}198 MiB \\
+        Intra-job gRPC streaming & 100k & 479m & 1{,}230 MiB \\
+        Intra-job gRPC streaming & 250k & 1{,}418m & 1{,}495 MiB \\
+        RabbitMQ Streams boundary & 50k & 457m & 1{,}161 MiB \\
+        RabbitMQ Streams boundary & 100k & 982m & 1{,}436 MiB \\
+        RabbitMQ Streams boundary & 250k & 1{,}687m & 1{,}715 MiB \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-The resource data in Table~\ref{tab:dynamos-rq2-resources} supports the main architectural claim. At 250k rows, classic unary reaches 3{,}695 MiB peak memory, while unary-batched stays at 1{,}378 MiB, gRPC streaming at 1{,}495 MiB, and RabbitMQ Streams at 1{,}715 MiB. Chunking therefore reduces memory pressure consistently. CPU is more nuanced. Unary-batched uses slightly less peak CPU than classic unary at 250k rows, but gRPC streaming and RabbitMQ Streams peak higher. This is expected: chunking replaces one large buffer with more messages, more metadata handling, more serialization boundaries, and, in RabbitMQ Streams, broker stream handling and reassembly. The defensible claim is therefore that chunking improves latency and memory; CPU remains transport-dependent.
+\begin{figure}[!t]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            width=\columnwidth,
+            height=5.3cm,
+            ylabel={Peak memory at 250k rows (MiB)},
+            symbolic x coords={Classic,Chunked,gRPC,RabbitMQ},
+            xtick=data,
+            x tick label style={font=\scriptsize, rotate=20, anchor=east},
+            tick label style={font=\scriptsize},
+            label style={font=\scriptsize},
+            ymin=0,
+            bar width=9pt,
+            grid=major
+        ]
+            \addplot coordinates {(Classic,3695) (Chunked,1378) (gRPC,1495) (RabbitMQ,1715)};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Peak sampled memory at 250k rows. Chunk-aware variants avoid the largest full-result buffer and keep memory below the classic unary baseline.}
+    \label{fig:dynamos-rq3-memory}
+\end{figure}
 
-\subsection{Discussion and RQ2 answer}
+The resource data in Table~\ref{tab:dynamos-rq3-resources} and Figure~\ref{fig:dynamos-rq3-memory} support the main architectural claim. At 250k rows, classic unary reaches 3{,}695 MiB peak memory. Chunked unary stays at 1{,}378 MiB, intra-job gRPC streaming at 1{,}495 MiB, and the RabbitMQ Streams boundary variant at 1{,}715 MiB. Chunking therefore reduces memory pressure consistently.
 
-The DYNAMOS-specific benchmark changes the interpretation of the earlier generic transport study. The isolated RQ1 benchmark favoured client-streaming gRPC for raw transfer efficiency, but the end-to-end DYNAMOS evaluation shows that the best integration choice is not determined by throughput alone. DYNAMOS is a policy-driven, dynamically composed middleware in which decoupling, ephemeral job lifecycle, sidecar communication, and diagnosable failure behaviour matter as much as raw transport speed.
+CPU is more nuanced. Chunked unary uses slightly less peak CPU than classic unary at 250k rows, but intra-job gRPC streaming and the RabbitMQ Streams boundary variant peak higher. This is expected. Chunking replaces one large buffer with more messages, more metadata handling, more serialization boundaries, and, in the RabbitMQ Streams variant, broker stream handling and reassembly. The defensible claim is therefore that chunking improves latency and memory. CPU remains transport-dependent.
 
-For the current DYNAMOS implementation, unary-batched is the strongest default candidate. It has the best median completion time at 100k and 250k rows, the lowest 250k memory peak, and the smallest architectural change from the original message-driven DYNAMOS design. It preserves chunk boundaries without requiring every sender and receiver to maintain a long-lived stream, which makes it easier to fit into the existing job and sidecar model.
+\subsection{Discussion and RQ3 answer}
 
-gRPC streaming remains a strong technical option. It is close to unary-batched at 250k rows and slightly faster at 50k rows, and it offers clean stream semantics inside a microservice chain. Its weakness is architectural rather than numerical: long-lived direct streams couple producer and consumer lifetime more tightly, which complicates dynamic composition, restart handling, and load balancing in Kubernetes-style deployments \cite{starck2023streaminglb}. It is therefore best interpreted as a targeted optimisation for controlled in-pod or direct service-to-service flows rather than as the immediate default for all DYNAMOS communication.
+The DYNAMOS-specific benchmark changes the interpretation of the isolated RQ1 transport study. RQ1 showed that client-streaming gRPC is the strongest raw transport in the controlled pipeline. The DYNAMOS evaluation shows that integration fit matters as much as raw transport speed. DYNAMOS is a policy-driven, dynamically composed middleware in which decoupling, generated job lifecycle, sidecar communication, and diagnosable failure behaviour are part of the design problem.
 
-RabbitMQ Streams is the most promising distributed option. It preserves the broker-mediated decoupling that DYNAMOS already uses between agents and could be valuable when parties are deployed across network-separated sites. Its current local benchmark result, however, shows higher CPU and slower 250k completion than unary-batched and gRPC streaming. This suggests that RabbitMQ Streams should be evaluated further in a distributed setting rather than selected as the local default based on this concept run alone.
+For the current local DYNAMOS implementation, chunked unary is the strongest default candidate. It has the best median completion time at 100k and 250k rows, the lowest 250k memory peak, and the smallest architectural change from the original message-driven design. It also shows why the main bottleneck was not simply "gRPC versus broker", but full-result buffering across the DYNAMOS path.
 
-The answer to RQ2 is therefore that streaming communication can be integrated into DYNAMOS by preserving the original control plane and replacing the full-buffered bulk data path with chunked row batches carrying explicit stream metadata. This integration preserves policy-driven orchestration because policy approval still precedes execution; it preserves dynamic composition because generated jobs and microservice chains remain the execution unit; and it improves isolation because the classic full-result payload is no longer materialized repeatedly across the path. Among the evaluated variants, unary-batched is the best current fit for DYNAMOS, while gRPC streaming and RabbitMQ Streams remain important alternatives for specific communication scopes.
+Intra-job gRPC streaming remains a strong technical option. It is close to chunked unary at 250k rows and slightly faster at 50k rows. Its main weakness is architectural. Long-lived direct streams couple producer and consumer lifetime more tightly, which complicates dynamic composition, restart handling, and load balancing in Kubernetes-style deployments \cite{starck2023streaminglb}. It is therefore best interpreted as a targeted optimisation for controlled in-pod or direct service-to-service flows.
 
-\subsection{Bridge to RQ3}
+The RabbitMQ Streams boundary variant should be interpreted carefully. It beats classic unary because it uses the common chunk-aware path, not because RabbitMQ Streams is faster than normal RabbitMQ chunks in the local benchmark. Compared with chunked unary, it is slower and uses more peak CPU and memory in this run. Its value is therefore not local latency. Its value is the stream-specific broker model: retained records, offset-based replay, non-destructive consumption, and a closer fit for distributed inter-agent transfer. Those properties are more relevant to Scattered Directive and FABRIC-style deployments than to a single local cluster.
 
-The local benchmark is not the final scalability answer. Scattered Directive extends DYNAMOS with cross-node microservice chains for policy-aware VFL workflows and uses FABRIC to automate distributed deployment \cite{jongejans2025scattered,scatteredDirectiveRepo2026}. FABRIC itself is a programmable research infrastructure with compute and storage resources interconnected by high-speed dedicated links, designed for distributed systems and networking experiments at scale \cite{baldin2019fabric,fabricPortal2026}. This makes it the natural next environment for RQ3.
+The answer to RQ3 is that the implemented chunk-aware DYNAMOS data paths improve local bulk-retrieval scalability compared with classic unary. They reduce completion time, expose earlier partial results, and lower peak memory usage for 50k, 100k, and 250k row result sets. The best current local default is chunked unary. Intra-job gRPC streaming is a close alternative for pod-local service chains. RabbitMQ Streams should be kept as a distributed-boundary candidate, but its advantage must be validated under cross-site conditions rather than inferred from the local latency result.
 
-An RQ3 experiment should therefore ask how the streaming variants behave when the TTP and data providers are separated across FABRIC nodes under VFL-like workflows. The metric set should extend the local benchmark with network throughput, broker lag or stream backlog, cross-site tail latency, failure recovery, concurrent-job scaling, and policy-change responsiveness. RabbitMQ Streams deserves special attention in that setting: its local overhead may be outweighed by its stronger decoupling and durability once agents are no longer co-located in one local cluster.
+\subsection{Scalability outlook}
+
+The local benchmark is not the final distributed scalability answer. Scattered Directive extends DYNAMOS with cross-node microservice chains for policy-aware VFL workflows and uses FABRIC to automate distributed deployment \cite{jongejans2025scattered,scatteredDirectiveRepo2026}. FABRIC provides programmable compute and storage resources connected by high-speed dedicated links, which makes it a natural environment for testing DYNAMOS when the TTP and data providers are separated across sites \cite{baldin2019fabric,fabricPortal2026}.
+
+A later FABRIC experiment should keep the RQ3 metrics from this section and add network throughput, broker lag or stream backlog, cross-site tail latency, failure recovery, concurrent-job scaling, and policy-change responsiveness. RabbitMQ Streams deserves special attention in that setting because its local overhead may be outweighed by retained-stream and replay semantics once agents are no longer co-located.
 
 \section{Conclusion}
 
 RQ1 asks which streaming communication technologies, frameworks, and interaction patterns are suitable for large-scale and continuous data exchange in microservice-based systems such as DYNAMOS. At the level of isolated transport performance, client-streaming gRPC is the strongest result in the generic pipeline benchmark: it provides the highest sustained throughput on the clean matrix and the most stable pacing in the continuous scenario. That result establishes the value of direct streaming RPC as a technical baseline, while the brokered alternatives expose the cost and benefit of decoupling, persistence, and replay.
 
-RQ2 asks how streaming communication can be integrated into DYNAMOS while preserving dynamic service composition, policy-driven orchestration, and isolation. The DYNAMOS bulk-retrieval evaluation shows that the integration should be chunk-aware end to end, not only at the SQL provider. Provider-side chunks must remain chunks through aggregate, algorithm, agent, and gateway stages; otherwise the system merely hides a full-buffered result behind a streaming interface. With that integration in place, all three chunked variants beat the classic unary baseline in median latency and peak memory for 50k, 100k, and 250k row result sets.
+RQ2 asks how streaming communication can be integrated into DYNAMOS while preserving dynamic service composition, policy-driven orchestration, and isolation. The implementation keeps the existing control path intact: requests are still evaluated and composed before execution, and generated jobs remain the execution unit. The change is in the bulk data path. Provider-side chunks must remain chunks through aggregate, algorithm, agent, and gateway stages; otherwise the system merely hides a full-buffered result behind a streaming interface.
 
-The current system-fit recommendation is unary-batched. It is not the most theoretically pure streaming mechanism, but it gives the best 100k and 250k DYNAMOS medians, the lowest 250k memory peak, and the smallest architectural shift from the original DYNAMOS message-driven design. gRPC streaming remains valuable as a targeted optimisation where long-lived streams are acceptable, and RabbitMQ Streams remains the most promising option for distributed inter-agent deployments. Kafka and NATS JetStream remain useful benchmark references and possible longer-term directions, but they require more architectural change than their current DYNAMOS-specific benefit justifies.
+RQ3 validates the implemented DYNAMOS variants on local bulk \texttt{dataThroughTtp} retrieval. All chunk-aware variants beat the classic unary baseline in median completion time and peak memory for 50k, 100k, and 250k row result sets. They also expose earlier partial results, which classic unary cannot do because its first result is its final result. The strongest local recommendation is chunked unary. It gives the best 100k and 250k medians, the lowest 250k memory peak, and the smallest architectural shift from the original message-driven design.
 
-RQ3 should validate these conclusions under distributed conditions. The Scattered Directive and FABRIC context is especially relevant because it moves DYNAMOS toward cross-node VFL workflows, where network separation, broker placement, policy changes, and multi-party scaling can dominate local transfer costs. The architectural choice is therefore no longer an unsupported hypothesis, but it is still concept-stage evidence: the local results support unary-batched as the current DYNAMOS default, while FABRIC-scale experiments should determine whether RabbitMQ Streams becomes more attractive once decoupling and durability matter more than local overhead.
+The more general conclusion is boundary-specific. Intra-job gRPC streaming is useful where a direct stream between generated services is acceptable. RabbitMQ Streams is not the source of the local speedup by itself, because that speedup mainly comes from chunk preservation. Its stronger case is distributed inter-agent transfer, where retained records, replay, and independent consumers may matter more than local latency. The Scattered Directive and FABRIC context is therefore the natural next step: it moves DYNAMOS toward cross-node VFL workflows, where network separation, broker placement, policy changes, and multi-party scaling can dominate local transfer costs.
 
 \appendices
 
