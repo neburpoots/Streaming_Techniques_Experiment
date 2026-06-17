@@ -6,9 +6,10 @@ metadata:
 data:
   nats.conf: |
     listen: 0.0.0.0:4222
+    max_pending: 512MB
 
     jetstream {
       store_dir: "/data/jetstream"
-      max_mem_store: 1536MB
+      max_mem_store: 512MB
       max_file_store: 40GB
     }

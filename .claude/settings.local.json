@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wsl.exe -d ubuntu -- bash -lc \"cd ~/Streaming_Techniques_Experiment && git status --short | head -30 && echo --- && git log --oneline -5 && echo --- && ls\")",
+      "PowerShell(wsl.exe -d ubuntu -- bash /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/scripts/inspect-cell-times.sh)"
+    ]
+  }
+}

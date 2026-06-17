@@ -29,6 +29,7 @@ type transformerConfig struct {
 	transportMode string
 	workIters     int
 	concurrency   int
+	grpcMaxBytes  int
 	rabbitMQ      transport.RabbitMQConfig
 	nats          transport.NATSConfig
 	kafka         transport.KafkaConfig
@@ -90,7 +91,14 @@ func main() {
 		}
 	}()
 
-	conn, err := grpc.NewClient(cfg.sinkAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(
+		cfg.sinkAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallSendMsgSize(cfg.grpcMaxBytes),
+			grpc.MaxCallRecvMsgSize(cfg.grpcMaxBytes),
+		),
+	)
 	if err != nil {
 		log.Fatalf("connect sink %s: %v", cfg.sinkAddr, err)
 	}
@@ -101,7 +109,10 @@ func main() {
 		log.Fatalf("listen %s: %v", cfg.listenAddr, err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.MaxRecvMsgSize(cfg.grpcMaxBytes),
+		grpc.MaxSendMsgSize(cfg.grpcMaxBytes),
+	)
 	server := &transformerServer{
 		sinkClient: pb.NewSinkClient(conn),
 		metrics:    serverMetrics,
@@ -142,6 +153,13 @@ func loadConfig() (*transformerConfig, error) {
 	if concurrency <= 0 {
 		return nil, fmt.Errorf("CONCURRENCY must be positive")
 	}
+	grpcMaxBytes, err := config.Int("GRPC_MAX_MESSAGE_BYTES", 128*1024*1024)
+	if err != nil {
+		return nil, fmt.Errorf("invalid GRPC_MAX_MESSAGE_BYTES: %w", err)
+	}
+	if grpcMaxBytes <= 0 {
+		return nil, fmt.Errorf("GRPC_MAX_MESSAGE_BYTES must be positive")
+	}
 	transportMode := config.String("TRANSPORT_MODE", transport.ModeClientStreaming)
 	if !transport.IsSupportedMode(transportMode) {
 		return nil, fmt.Errorf("unsupported TRANSPORT_MODE %q", transportMode)
@@ -161,6 +179,7 @@ func loadConfig() (*transformerConfig, error) {
 		transportMode: transportMode,
 		workIters:     workIters,
 		concurrency:   concurrency,
+		grpcMaxBytes:  grpcMaxBytes,
 		rabbitMQ:      rabbitMQConfig,
 		nats:          natsConfig,
 		kafka:         kafkaConfig,
@@ -233,6 +252,31 @@ func (s *transformerServer) PushUnary(ctx context.Context, chunk *pb.DataChunk) 
 		RunId:              ack.GetRunId(),
 		Stage:              "transformer",
 		Sequence:           chunk.GetSequence(),
+		FinishedAtUnixNano: time.Now().UnixNano(),
+	}, nil
+}
+
+func (s *transformerServer) PushUnaryBatch(ctx context.Context, batch *pb.DataBatch) (*pb.UnaryBatchAck, error) {
+	if batch == nil || len(batch.GetChunks()) == 0 {
+		return &pb.UnaryBatchAck{Stage: "transformer"}, nil
+	}
+	s.metrics.unary.Inc()
+	for _, chunk := range batch.GetChunks() {
+		if chunk == nil {
+			continue
+		}
+		s.metrics.messages.Inc()
+		s.metrics.bytes.Add(float64(len(chunk.GetPayload())))
+		s.applyWork(chunk.GetPayload())
+	}
+	ack, err := s.sinkClient.PushUnaryBatch(ctx, batch)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UnaryBatchAck{
+		RunId:              ack.GetRunId(),
+		Stage:              "transformer",
+		Messages:           ack.GetMessages(),
 		FinishedAtUnixNano: time.Now().UnixNano(),
 	}, nil
 }

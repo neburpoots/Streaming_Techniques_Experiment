@@ -50,7 +50,6 @@ const (
 	natsConsumerPendingBytesLimit = 128 * 1024 * 1024
 	natsAckWait                   = 30 * time.Second
 	natsMaxDeliver                = 20
-	natsStreamMaxBytes            = 512 * 1024 * 1024
 )
 
 func NewNATSJetStreamPublisher(cfg NATSConfig, streamName string, subject string) (*NATSJetStreamPublisher, error) {
@@ -69,7 +68,7 @@ func NewNATSJetStreamPublisher(cfg NATSConfig, streamName string, subject string
 	if err != nil {
 		return nil, err
 	}
-	if err := ensureNATSStream(js, streamName, subject, cfg.StreamReplicas); err != nil {
+	if err := ensureNATSStream(js, streamName, subject, cfg.StreamReplicas, cfg.StreamMaxBytes); err != nil {
 		conn.Close()
 		return nil, err
 	}
@@ -81,7 +80,7 @@ func NewNATSJetStreamConsumer(cfg NATSConfig, streamName string, subject string,
 	if err != nil {
 		return nil, err
 	}
-	if err := ensureNATSStream(js, streamName, subject, cfg.StreamReplicas); err != nil {
+	if err := ensureNATSStream(js, streamName, subject, cfg.StreamReplicas, cfg.StreamMaxBytes); err != nil {
 		conn.Close()
 		return nil, err
 	}
@@ -284,7 +283,7 @@ func (s *natsAsyncPublishState) get() error {
 	return s.err
 }
 
-func ensureNATSStream(js nats.JetStreamContext, streamName string, subject string, replicas int) error {
+func ensureNATSStream(js nats.JetStreamContext, streamName string, subject string, replicas int, maxBytes int64) error {
 	if _, err := js.StreamInfo(streamName); err == nil {
 		return nil
 	} else if !errors.Is(err, nats.ErrStreamNotFound) {
@@ -299,7 +298,7 @@ func ensureNATSStream(js nats.JetStreamContext, streamName string, subject strin
 		Subjects:  []string{subject},
 		Storage:   nats.FileStorage,
 		Retention: nats.LimitsPolicy,
-		MaxBytes:  natsStreamMaxBytes,
+		MaxBytes:  maxBytes,
 		Replicas:  replicas,
 	})
 	if err != nil {

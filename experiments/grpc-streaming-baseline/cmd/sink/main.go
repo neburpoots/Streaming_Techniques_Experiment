@@ -31,6 +31,7 @@ type sinkConfig struct {
 	resultDir     string
 	processDelay  time.Duration
 	transportMode string
+	grpcMaxBytes  int
 	rabbitMQ      transport.RabbitMQConfig
 	nats          transport.NATSConfig
 	kafka         transport.KafkaConfig
@@ -149,7 +150,10 @@ func main() {
 		log.Fatalf("listen %s: %v", cfg.listenAddr, err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.MaxRecvMsgSize(cfg.grpcMaxBytes),
+		grpc.MaxSendMsgSize(cfg.grpcMaxBytes),
+	)
 	server := &sinkServer{
 		ctx:          ctx,
 		runs:         make(map[string]*runState),
@@ -183,6 +187,13 @@ func loadConfig() (*sinkConfig, error) {
 	if !transport.IsSupportedMode(transportMode) {
 		return nil, fmt.Errorf("unsupported TRANSPORT_MODE %q", transportMode)
 	}
+	grpcMaxBytes, err := config.Int("GRPC_MAX_MESSAGE_BYTES", 128*1024*1024)
+	if err != nil {
+		return nil, fmt.Errorf("invalid GRPC_MAX_MESSAGE_BYTES: %w", err)
+	}
+	if grpcMaxBytes <= 0 {
+		return nil, fmt.Errorf("GRPC_MAX_MESSAGE_BYTES must be positive")
+	}
 	rabbitMQConfig, err := transport.LoadRabbitMQConfig()
 	if err != nil {
 		return nil, err
@@ -196,6 +207,7 @@ func loadConfig() (*sinkConfig, error) {
 		resultDir:     config.String("RESULT_DIR", "/results"),
 		processDelay:  processDelay,
 		transportMode: transportMode,
+		grpcMaxBytes:  grpcMaxBytes,
 		rabbitMQ:      rabbitMQConfig,
 		nats:          natsConfig,
 		kafka:         kafkaConfig,
@@ -328,6 +340,42 @@ func (s *sinkServer) PushUnary(_ context.Context, chunk *pb.DataChunk) (*pb.Unar
 		RunId:              chunk.GetRunId(),
 		Stage:              "sink",
 		Sequence:           chunk.GetSequence(),
+		FinishedAtUnixNano: time.Now().UnixNano(),
+	}, nil
+}
+
+func (s *sinkServer) PushUnaryBatch(_ context.Context, batch *pb.DataBatch) (*pb.UnaryBatchAck, error) {
+	if batch == nil || len(batch.GetChunks()) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "batch must contain at least one DataChunk")
+	}
+	runID := batch.GetRunId()
+	if runID == "" {
+		runID = batch.GetChunks()[0].GetRunId()
+	}
+	if runID == "" {
+		return nil, status.Error(codes.InvalidArgument, "run_id is required in DataBatch")
+	}
+	s.metrics.unary.Inc()
+	var ingested uint64
+	for _, chunk := range batch.GetChunks() {
+		if chunk == nil {
+			continue
+		}
+		if chunk.GetRunId() == "" {
+			chunk.RunId = runID
+		}
+		if chunk.GetRunId() != runID {
+			return nil, status.Error(codes.InvalidArgument, "all DataBatch chunks must use the same run_id")
+		}
+		if err := s.ingest(chunk); err != nil {
+			return nil, err
+		}
+		ingested++
+	}
+	return &pb.UnaryBatchAck{
+		RunId:              runID,
+		Stage:              "sink",
+		Messages:           ingested,
 		FinishedAtUnixNano: time.Now().UnixNano(),
 	}, nil
 }

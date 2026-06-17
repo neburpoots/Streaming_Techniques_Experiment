@@ -301,6 +301,58 @@ func (x *DataChunk) GetPayload() []byte {
 	return nil
 }
 
+type DataBatch struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RunId         string                 `protobuf:"bytes,1,opt,name=run_id,json=runId,proto3" json:"run_id,omitempty"`
+	Chunks        []*DataChunk           `protobuf:"bytes,2,rep,name=chunks,proto3" json:"chunks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DataBatch) Reset() {
+	*x = DataBatch{}
+	mi := &file_experiment_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DataBatch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DataBatch) ProtoMessage() {}
+
+func (x *DataBatch) ProtoReflect() protoreflect.Message {
+	mi := &file_experiment_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DataBatch.ProtoReflect.Descriptor instead.
+func (*DataBatch) Descriptor() ([]byte, []int) {
+	return file_experiment_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *DataBatch) GetRunId() string {
+	if x != nil {
+		return x.RunId
+	}
+	return ""
+}
+
+func (x *DataBatch) GetChunks() []*DataChunk {
+	if x != nil {
+		return x.Chunks
+	}
+	return nil
+}
+
 type StreamAck struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	RunId              string                 `protobuf:"bytes,1,opt,name=run_id,json=runId,proto3" json:"run_id,omitempty"`
@@ -314,7 +366,7 @@ type StreamAck struct {
 
 func (x *StreamAck) Reset() {
 	*x = StreamAck{}
-	mi := &file_experiment_proto_msgTypes[4]
+	mi := &file_experiment_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -326,7 +378,7 @@ func (x *StreamAck) String() string {
 func (*StreamAck) ProtoMessage() {}
 
 func (x *StreamAck) ProtoReflect() protoreflect.Message {
-	mi := &file_experiment_proto_msgTypes[4]
+	mi := &file_experiment_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -339,7 +391,7 @@ func (x *StreamAck) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamAck.ProtoReflect.Descriptor instead.
 func (*StreamAck) Descriptor() ([]byte, []int) {
-	return file_experiment_proto_rawDescGZIP(), []int{4}
+	return file_experiment_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *StreamAck) GetRunId() string {
@@ -389,7 +441,7 @@ type UnaryAck struct {
 
 func (x *UnaryAck) Reset() {
 	*x = UnaryAck{}
-	mi := &file_experiment_proto_msgTypes[5]
+	mi := &file_experiment_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -401,7 +453,7 @@ func (x *UnaryAck) String() string {
 func (*UnaryAck) ProtoMessage() {}
 
 func (x *UnaryAck) ProtoReflect() protoreflect.Message {
-	mi := &file_experiment_proto_msgTypes[5]
+	mi := &file_experiment_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -414,7 +466,7 @@ func (x *UnaryAck) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnaryAck.ProtoReflect.Descriptor instead.
 func (*UnaryAck) Descriptor() ([]byte, []int) {
-	return file_experiment_proto_rawDescGZIP(), []int{5}
+	return file_experiment_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UnaryAck) GetRunId() string {
@@ -439,6 +491,74 @@ func (x *UnaryAck) GetSequence() uint64 {
 }
 
 func (x *UnaryAck) GetFinishedAtUnixNano() int64 {
+	if x != nil {
+		return x.FinishedAtUnixNano
+	}
+	return 0
+}
+
+type UnaryBatchAck struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	RunId              string                 `protobuf:"bytes,1,opt,name=run_id,json=runId,proto3" json:"run_id,omitempty"`
+	Stage              string                 `protobuf:"bytes,2,opt,name=stage,proto3" json:"stage,omitempty"`
+	Messages           uint64                 `protobuf:"varint,3,opt,name=messages,proto3" json:"messages,omitempty"`
+	FinishedAtUnixNano int64                  `protobuf:"varint,4,opt,name=finished_at_unix_nano,json=finishedAtUnixNano,proto3" json:"finished_at_unix_nano,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *UnaryBatchAck) Reset() {
+	*x = UnaryBatchAck{}
+	mi := &file_experiment_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UnaryBatchAck) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UnaryBatchAck) ProtoMessage() {}
+
+func (x *UnaryBatchAck) ProtoReflect() protoreflect.Message {
+	mi := &file_experiment_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UnaryBatchAck.ProtoReflect.Descriptor instead.
+func (*UnaryBatchAck) Descriptor() ([]byte, []int) {
+	return file_experiment_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UnaryBatchAck) GetRunId() string {
+	if x != nil {
+		return x.RunId
+	}
+	return ""
+}
+
+func (x *UnaryBatchAck) GetStage() string {
+	if x != nil {
+		return x.Stage
+	}
+	return ""
+}
+
+func (x *UnaryBatchAck) GetMessages() uint64 {
+	if x != nil {
+		return x.Messages
+	}
+	return 0
+}
+
+func (x *UnaryBatchAck) GetFinishedAtUnixNano() int64 {
 	if x != nil {
 		return x.FinishedAtUnixNano
 	}
@@ -473,7 +593,7 @@ type RunSummary struct {
 
 func (x *RunSummary) Reset() {
 	*x = RunSummary{}
-	mi := &file_experiment_proto_msgTypes[6]
+	mi := &file_experiment_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -485,7 +605,7 @@ func (x *RunSummary) String() string {
 func (*RunSummary) ProtoMessage() {}
 
 func (x *RunSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_experiment_proto_msgTypes[6]
+	mi := &file_experiment_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -498,7 +618,7 @@ func (x *RunSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RunSummary.ProtoReflect.Descriptor instead.
 func (*RunSummary) Descriptor() ([]byte, []int) {
-	return file_experiment_proto_rawDescGZIP(), []int{6}
+	return file_experiment_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *RunSummary) GetRunId() string {
@@ -668,7 +788,10 @@ const file_experiment_proto_rawDesc = "" +
 	"\bsequence\x18\x02 \x01(\x04R\bsequence\x12'\n" +
 	"\x0fproducer_worker\x18\x03 \x01(\x04R\x0eproducerWorker\x12/\n" +
 	"\x14created_at_unix_nano\x18\x04 \x01(\x03R\x11createdAtUnixNano\x12\x18\n" +
-	"\apayload\x18\x05 \x01(\fR\apayload\"\xb7\x01\n" +
+	"\apayload\x18\x05 \x01(\fR\apayload\"Q\n" +
+	"\tDataBatch\x12\x15\n" +
+	"\x06run_id\x18\x01 \x01(\tR\x05runId\x12-\n" +
+	"\x06chunks\x18\x02 \x03(\v2\x15.experiment.DataChunkR\x06chunks\"\xb7\x01\n" +
 	"\tStreamAck\x12\x15\n" +
 	"\x06run_id\x18\x01 \x01(\tR\x05runId\x12\x14\n" +
 	"\x05stage\x18\x02 \x01(\tR\x05stage\x12'\n" +
@@ -679,6 +802,11 @@ const file_experiment_proto_rawDesc = "" +
 	"\x06run_id\x18\x01 \x01(\tR\x05runId\x12\x14\n" +
 	"\x05stage\x18\x02 \x01(\tR\x05stage\x12\x1a\n" +
 	"\bsequence\x18\x03 \x01(\x04R\bsequence\x121\n" +
+	"\x15finished_at_unix_nano\x18\x04 \x01(\x03R\x12finishedAtUnixNano\"\x8b\x01\n" +
+	"\rUnaryBatchAck\x12\x15\n" +
+	"\x06run_id\x18\x01 \x01(\tR\x05runId\x12\x14\n" +
+	"\x05stage\x18\x02 \x01(\tR\x05stage\x12\x1a\n" +
+	"\bmessages\x18\x03 \x01(\x04R\bmessages\x121\n" +
 	"\x15finished_at_unix_nano\x18\x04 \x01(\x03R\x12finishedAtUnixNano\"\xf1\x06\n" +
 	"\n" +
 	"RunSummary\x12\x15\n" +
@@ -704,13 +832,15 @@ const file_experiment_proto_rawDesc = "" +
 	"\x0etransport_mode\x18\x11 \x01(\tR\rtransportMode\x121\n" +
 	"\x15mean_inter_arrival_ms\x18\x12 \x01(\x01R\x12meanInterArrivalMs\x12/\n" +
 	"\x14p95_inter_arrival_ms\x18\x13 \x01(\x01R\x11p95InterArrivalMs\x125\n" +
-	"\x17inter_arrival_jitter_ms\x18\x14 \x01(\x01R\x14interArrivalJitterMs2\x83\x01\n" +
+	"\x17inter_arrival_jitter_ms\x18\x14 \x01(\x01R\x14interArrivalJitterMs2\xc9\x01\n" +
 	"\vTransformer\x128\n" +
 	"\x04Push\x12\x15.experiment.DataChunk\x1a\x15.experiment.StreamAck\"\x00(\x01\x12:\n" +
-	"\tPushUnary\x12\x15.experiment.DataChunk\x1a\x14.experiment.UnaryAck\"\x002|\n" +
+	"\tPushUnary\x12\x15.experiment.DataChunk\x1a\x14.experiment.UnaryAck\"\x00\x12D\n" +
+	"\x0ePushUnaryBatch\x12\x15.experiment.DataBatch\x1a\x19.experiment.UnaryBatchAck\"\x002\xc2\x01\n" +
 	"\x04Sink\x128\n" +
 	"\x04Push\x12\x15.experiment.DataChunk\x1a\x15.experiment.StreamAck\"\x00(\x01\x12:\n" +
-	"\tPushUnary\x12\x15.experiment.DataChunk\x1a\x14.experiment.UnaryAck\"\x002\x9b\x01\n" +
+	"\tPushUnary\x12\x15.experiment.DataChunk\x1a\x14.experiment.UnaryAck\"\x00\x12D\n" +
+	"\x0ePushUnaryBatch\x12\x15.experiment.DataBatch\x1a\x19.experiment.UnaryBatchAck\"\x002\x9b\x01\n" +
 	"\x0fExperimentAdmin\x12G\n" +
 	"\vRegisterRun\x12\x15.experiment.RunConfig\x1a\x1f.experiment.RegisterRunResponse\"\x00\x12?\n" +
 	"\rGetRunSummary\x12\x14.experiment.RunQuery\x1a\x16.experiment.RunSummary\"\x00BYZWgithub.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/pb;pbb\x06proto3"
@@ -727,34 +857,41 @@ func file_experiment_proto_rawDescGZIP() []byte {
 	return file_experiment_proto_rawDescData
 }
 
-var file_experiment_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_experiment_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_experiment_proto_goTypes = []any{
 	(*RunConfig)(nil),           // 0: experiment.RunConfig
 	(*RegisterRunResponse)(nil), // 1: experiment.RegisterRunResponse
 	(*RunQuery)(nil),            // 2: experiment.RunQuery
 	(*DataChunk)(nil),           // 3: experiment.DataChunk
-	(*StreamAck)(nil),           // 4: experiment.StreamAck
-	(*UnaryAck)(nil),            // 5: experiment.UnaryAck
-	(*RunSummary)(nil),          // 6: experiment.RunSummary
+	(*DataBatch)(nil),           // 4: experiment.DataBatch
+	(*StreamAck)(nil),           // 5: experiment.StreamAck
+	(*UnaryAck)(nil),            // 6: experiment.UnaryAck
+	(*UnaryBatchAck)(nil),       // 7: experiment.UnaryBatchAck
+	(*RunSummary)(nil),          // 8: experiment.RunSummary
 }
 var file_experiment_proto_depIdxs = []int32{
-	3, // 0: experiment.Transformer.Push:input_type -> experiment.DataChunk
-	3, // 1: experiment.Transformer.PushUnary:input_type -> experiment.DataChunk
-	3, // 2: experiment.Sink.Push:input_type -> experiment.DataChunk
-	3, // 3: experiment.Sink.PushUnary:input_type -> experiment.DataChunk
-	0, // 4: experiment.ExperimentAdmin.RegisterRun:input_type -> experiment.RunConfig
-	2, // 5: experiment.ExperimentAdmin.GetRunSummary:input_type -> experiment.RunQuery
-	4, // 6: experiment.Transformer.Push:output_type -> experiment.StreamAck
-	5, // 7: experiment.Transformer.PushUnary:output_type -> experiment.UnaryAck
-	4, // 8: experiment.Sink.Push:output_type -> experiment.StreamAck
-	5, // 9: experiment.Sink.PushUnary:output_type -> experiment.UnaryAck
-	1, // 10: experiment.ExperimentAdmin.RegisterRun:output_type -> experiment.RegisterRunResponse
-	6, // 11: experiment.ExperimentAdmin.GetRunSummary:output_type -> experiment.RunSummary
-	6, // [6:12] is the sub-list for method output_type
-	0, // [0:6] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: experiment.DataBatch.chunks:type_name -> experiment.DataChunk
+	3, // 1: experiment.Transformer.Push:input_type -> experiment.DataChunk
+	3, // 2: experiment.Transformer.PushUnary:input_type -> experiment.DataChunk
+	4, // 3: experiment.Transformer.PushUnaryBatch:input_type -> experiment.DataBatch
+	3, // 4: experiment.Sink.Push:input_type -> experiment.DataChunk
+	3, // 5: experiment.Sink.PushUnary:input_type -> experiment.DataChunk
+	4, // 6: experiment.Sink.PushUnaryBatch:input_type -> experiment.DataBatch
+	0, // 7: experiment.ExperimentAdmin.RegisterRun:input_type -> experiment.RunConfig
+	2, // 8: experiment.ExperimentAdmin.GetRunSummary:input_type -> experiment.RunQuery
+	5, // 9: experiment.Transformer.Push:output_type -> experiment.StreamAck
+	6, // 10: experiment.Transformer.PushUnary:output_type -> experiment.UnaryAck
+	7, // 11: experiment.Transformer.PushUnaryBatch:output_type -> experiment.UnaryBatchAck
+	5, // 12: experiment.Sink.Push:output_type -> experiment.StreamAck
+	6, // 13: experiment.Sink.PushUnary:output_type -> experiment.UnaryAck
+	7, // 14: experiment.Sink.PushUnaryBatch:output_type -> experiment.UnaryBatchAck
+	1, // 15: experiment.ExperimentAdmin.RegisterRun:output_type -> experiment.RegisterRunResponse
+	8, // 16: experiment.ExperimentAdmin.GetRunSummary:output_type -> experiment.RunSummary
+	9, // [9:17] is the sub-list for method output_type
+	1, // [1:9] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_experiment_proto_init() }
@@ -768,7 +905,7 @@ func file_experiment_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_experiment_proto_rawDesc), len(file_experiment_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

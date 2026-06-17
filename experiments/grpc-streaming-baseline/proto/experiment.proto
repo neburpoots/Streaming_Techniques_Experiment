@@ -7,11 +7,13 @@ option go_package = "github.com/nebur/streaming-techniques-experiment/grpc-strea
 service Transformer {
   rpc Push(stream DataChunk) returns (StreamAck) {}
   rpc PushUnary(DataChunk) returns (UnaryAck) {}
+  rpc PushUnaryBatch(DataBatch) returns (UnaryBatchAck) {}
 }
 
 service Sink {
   rpc Push(stream DataChunk) returns (StreamAck) {}
   rpc PushUnary(DataChunk) returns (UnaryAck) {}
+  rpc PushUnaryBatch(DataBatch) returns (UnaryBatchAck) {}
 }
 
 service ExperimentAdmin {
@@ -48,6 +50,11 @@ message DataChunk {
   bytes payload = 5;
 }
 
+message DataBatch {
+  string run_id = 1;
+  repeated DataChunk chunks = 2;
+}
+
 message StreamAck {
   string run_id = 1;
   string stage = 2;
@@ -60,6 +67,13 @@ message UnaryAck {
   string run_id = 1;
   string stage = 2;
   uint64 sequence = 3;
+  int64 finished_at_unix_nano = 4;
+}
+
+message UnaryBatchAck {
+  string run_id = 1;
+  string stage = 2;
+  uint64 messages = 3;
   int64 finished_at_unix_nano = 4;
 }
 

@@ -1,0 +1,1161 @@
+RQ1 campaign start 2026-06-10T16:31:38+02:00
+Building container images...
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 ...
+
+#4 [auth] library/debian:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.7s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
+#6 resolve docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb 0.0s done
+#6 DONE 0.0s
+
+#7 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#7 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 40.72MB 0.5s done
+#8 DONE 0.5s
+
+#9 [builder 2/7] WORKDIR /src
+#9 CACHED
+
+#10 [builder 3/7] COPY go.mod go.sum ./
+#10 CACHED
+
+#11 [builder 4/7] RUN go mod download
+#11 CACHED
+
+#12 [builder 5/7] COPY . .
+#12 DONE 3.3s
+
+#13 [builder 6/7] RUN test -n "producer"
+#13 DONE 0.7s
+
+#14 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/producer
+#14 DONE 24.5s
+
+#15 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#15 CACHED
+
+#16 [stage-1 3/4] WORKDIR /app
+#16 CACHED
+
+#17 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#17 CACHED
+
+#18 exporting to image
+#18 exporting layers done
+#18 exporting manifest sha256:fb6b2d0ee9844cfe031dc72e6e79ab30e3e6139737c3d7835cce2970407419fa 0.0s done
+#18 exporting config sha256:b319cddb146d89288abb70e217b43ddfc0fa31290210dfddce54bd8435ae4701 0.0s done
+#18 exporting attestation manifest sha256:455ff19166bc34bcf5697c39eed956adbe0add8c34147426fb7406ace884e2f0 0.1s done
+#18 exporting manifest list sha256:19ce39c6c086edf3ba0d23ef78a7ef233300ddcee5dd99c7e767bac3d3274fdb
+#18 exporting manifest list sha256:19ce39c6c086edf3ba0d23ef78a7ef233300ddcee5dd99c7e767bac3d3274fdb 0.0s done
+#18 naming to docker.io/library/grpc-streaming-baseline-producer:latest done
+#18 unpacking to docker.io/library/grpc-streaming-baseline-producer:latest done
+#18 DONE 0.2s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#5 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.0s done
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
+#6 resolve docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 376.68kB 0.1s done
+#7 DONE 0.1s
+
+#8 [builder 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [builder 3/7] COPY go.mod go.sum ./
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 0.9s
+
+#12 [builder 6/7] RUN test -n "transformer"
+#12 DONE 0.4s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/transformer
+#13 DONE 20.6s
+
+#14 [stage-1 3/4] WORKDIR /app
+#14 CACHED
+
+#15 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:7c746e6bca900c5af89674d18194c16f96b1dd7f131fa5dba2d58158a43666e7 0.0s done
+#17 exporting config sha256:54f3f6a658172d20e5429abba06d5b9f7f0db95cd99a7364f1385da3fc184ba1
+#17 exporting config sha256:54f3f6a658172d20e5429abba06d5b9f7f0db95cd99a7364f1385da3fc184ba1 0.0s done
+#17 exporting attestation manifest sha256:184d6af5747be6b03c9a3677e896f54444debd8565660865876b148f1b9ba5e1 0.0s done
+#17 exporting manifest list sha256:1db5a60924e6f65fd3d744329cf4f7937a43994f51cc05195aa65f0b7e3da176 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-transformer:latest
+#17 naming to docker.io/library/grpc-streaming-baseline-transformer:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-transformer:latest done
+#17 DONE 0.2s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#5 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.1s done
+#5 DONE 0.1s
+
+#6 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
+#6 resolve docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb 0.1s done
+#6 DONE 0.1s
+
+#7 [internal] load build context
+#7 transferring context: 379.85kB 0.1s done
+#7 DONE 0.2s
+
+#8 [builder 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [builder 3/7] COPY go.mod go.sum ./
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 0.9s
+
+#12 [builder 6/7] RUN test -n "sink"
+#12 DONE 0.4s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/sink
+#13 DONE 22.4s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:ee33bde8e1fe41c04d4662cae433d15eded677b54784765e79d6efc6bf1307ac 0.0s done
+#17 exporting config sha256:afcb4f5bae7e432ef0208e50a113bdfb4acf75cc73ec359e54970d419aed0abb 0.0s done
+#17 exporting attestation manifest sha256:a4376c98c3e7105e29e5ab7cb30b7bc85481bfeb095fc9caefd511468f7f9fa9 0.1s done
+#17 exporting manifest list sha256:f754f4e97e8d6b822b4e72796fabb762103b4b9c56633b1918e9090590e53c16 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-sink:latest
+#17 naming to docker.io/library/grpc-streaming-baseline-sink:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-sink:latest done
+#17 DONE 0.2s
+Loading images into kind cluster grpc-stream-single...
+Image: "grpc-streaming-baseline-producer:latest" with ID "sha256:19ce39c6c086edf3ba0d23ef78a7ef233300ddcee5dd99c7e767bac3d3274fdb" not yet present on node "grpc-stream-single-control-plane", loading...
+Image: "grpc-streaming-baseline-transformer:latest" with ID "sha256:1db5a60924e6f65fd3d744329cf4f7937a43994f51cc05195aa65f0b7e3da176" not yet present on node "grpc-stream-single-control-plane", loading...
+Image: "grpc-streaming-baseline-sink:latest" with ID "sha256:f754f4e97e8d6b822b4e72796fabb762103b4b9c56633b1918e9090590e53c16" not yet present on node "grpc-stream-single-control-plane", loading...
+namespace/streaming-experiments created
+persistentvolumeclaim/experiment-results created
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config created
+configmap/grpc-stream-rabbitmq-config created
+configmap/grpc-streaming-baseline-config created
+service/grpc-stream-kafka created
+service/grpc-stream-nats created
+service/grpc-stream-rabbitmq created
+service/grpc-stream-sink created
+service/grpc-stream-transformer created
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink created
+deployment.apps/grpc-stream-transformer created
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 0 of 1 updated replicas are available...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 3, transport: all)
+═══ Repetition 1/3 ═══
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p256-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p256-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p256-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p256-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p256-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p256-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p256-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p256-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p256-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p256-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p256-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p256-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p1024-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p1024-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p1024-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p1024-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p1024-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p1024-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p1024-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p1024-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p1024-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p1024-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p1024-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p4096-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p4096-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p4096-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p4096-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p4096-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p4096-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p4096-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p4096-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p4096-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p4096-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p4096-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p16384-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p16384-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p16384-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p16384-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p16384-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p16384-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p16384-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p16384-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p16384-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p16384-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p16384-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p16384-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p262144-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p262144-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p262144-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p262144-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p262144-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p262144-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p262144-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p262144-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p262144-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-stream-p262144-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-stream-p262144-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-stream-p262144-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p256-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p256-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p256-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p256-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p256-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p256-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p256-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p256-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p256-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p256-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p256-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p256-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p1024-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p1024-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p1024-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p1024-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p1024-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p1024-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p1024-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p1024-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p1024-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p1024-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p1024-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p4096-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p4096-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p4096-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p4096-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p4096-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p4096-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p4096-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p4096-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p4096-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p4096-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p4096-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p16384-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p16384-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p16384-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p16384-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p16384-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p16384-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p16384-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p16384-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p16384-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p16384-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p16384-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p16384-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p262144-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p262144-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p262144-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p262144-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p262144-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p262144-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p262144-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p262144-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p262144-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-unary-p262144-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-unary-p262144-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-unary-p262144-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p256-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p256-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p256-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p256-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p256-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p256-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p256-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p256-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p256-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p256-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p256-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p256-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p1024-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p1024-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p1024-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p1024-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p1024-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p1024-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p1024-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p1024-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p1024-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p1024-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p1024-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p4096-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p4096-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p4096-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p4096-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p4096-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p4096-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p4096-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p4096-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p4096-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p4096-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p4096-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p4096-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p16384-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p16384-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p16384-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p16384-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p16384-c4-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p16384-c4-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p16384-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p16384-c8-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p16384-c8-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p16384-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p16384-c16-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p16384-c16-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p262144-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-synthetic-clean-bunary-p262144-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-synthetic-clean-bunary-p262144-c1-rep1
+━━━ Running: rq1-rerun-20260610-synthetic-clean-bunary-p262144-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...

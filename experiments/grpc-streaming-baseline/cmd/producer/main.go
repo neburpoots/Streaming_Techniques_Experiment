@@ -35,6 +35,8 @@ type producerConfig struct {
 	profile                   string
 	expectedTotalMessages     uint64
 	payloadBytes              int
+	batchedUnaryBatchSize     int
+	grpcMaxMessageBytes       int
 	datasetDir                string
 	datasetFiles              string
 	datasetRowsPerMessage     int
@@ -105,6 +107,8 @@ type producerResult struct {
 	Profile                   string          `json:"profile"`
 	ExpectedMessages          uint64          `json:"expected_messages"`
 	PayloadBytes              int             `json:"payload_bytes"`
+	BatchedUnaryBatchSize     int             `json:"batched_unary_batch_size,omitempty"`
+	GrpcMaxMessageBytes       int             `json:"grpc_max_message_bytes,omitempty"`
 	Concurrency               int             `json:"concurrency"`
 	TargetMessagesPerSecond   int             `json:"target_messages_per_second"`
 	TransformerWorkIterations uint64          `json:"transformer_work_iterations"`
@@ -140,13 +144,21 @@ func main() {
 		log.Fatalf("load workload source: %v", err)
 	}
 
-	producerConn, err := grpc.NewClient(cfg.transformerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	grpcOptions := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallSendMsgSize(cfg.grpcMaxMessageBytes),
+			grpc.MaxCallRecvMsgSize(cfg.grpcMaxMessageBytes),
+		),
+	}
+
+	producerConn, err := grpc.NewClient(cfg.transformerAddr, grpcOptions...)
 	if err != nil {
 		log.Fatalf("connect transformer: %v", err)
 	}
 	defer producerConn.Close()
 
-	adminConn, err := grpc.NewClient(cfg.sinkAdminAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	adminConn, err := grpc.NewClient(cfg.sinkAdminAddr, grpcOptions...)
 	if err != nil {
 		log.Fatalf("connect sink admin: %v", err)
 	}
@@ -199,6 +211,8 @@ func main() {
 		Profile:                   cfg.profile,
 		ExpectedMessages:          cfg.expectedTotalMessages,
 		PayloadBytes:              payloadSource.NominalPayloadBytes(),
+		BatchedUnaryBatchSize:     cfg.batchedUnaryBatchSize,
+		GrpcMaxMessageBytes:       cfg.grpcMaxMessageBytes,
 		Concurrency:               cfg.concurrency,
 		TargetMessagesPerSecond:   cfg.targetMessagesPerSecond,
 		TransformerWorkIterations: cfg.transformerWorkIterations,
@@ -235,6 +249,20 @@ func loadConfig() (*producerConfig, error) {
 	payloadBytes, err := config.Int("PAYLOAD_BYTES", 1024)
 	if err != nil {
 		return nil, err
+	}
+	batchedUnaryBatchSize, err := config.Int("BATCHED_UNARY_BATCH_SIZE", 100)
+	if err != nil {
+		return nil, err
+	}
+	if batchedUnaryBatchSize <= 0 {
+		return nil, fmt.Errorf("BATCHED_UNARY_BATCH_SIZE must be positive")
+	}
+	grpcMaxMessageBytes, err := config.Int("GRPC_MAX_MESSAGE_BYTES", 128*1024*1024)
+	if err != nil {
+		return nil, err
+	}
+	if grpcMaxMessageBytes <= 0 {
+		return nil, fmt.Errorf("GRPC_MAX_MESSAGE_BYTES must be positive")
 	}
 	datasetRowsPerMessage, err := config.Int("DATASET_ROWS_PER_MESSAGE", 1)
 	if err != nil {
@@ -301,6 +329,8 @@ func loadConfig() (*producerConfig, error) {
 		profile:                   config.String("PROFILE", "bulk"),
 		expectedTotalMessages:     expectedTotalMessages,
 		payloadBytes:              payloadBytes,
+		batchedUnaryBatchSize:     batchedUnaryBatchSize,
+		grpcMaxMessageBytes:       grpcMaxMessageBytes,
 		datasetDir:                config.String("DATASET_DIR", "/datasets"),
 		datasetFiles:              config.String("DATASET_FILES", ""),
 		datasetRowsPerMessage:     datasetRowsPerMessage,
@@ -353,6 +383,9 @@ func runTransport(ctx context.Context, client pb.TransformerClient, cfg *produce
 	case "unary":
 		count, err := sendBulkUnary(ctx, client, cfg, limiter, payloadSource, diagnostics)
 		return nil, count, err
+	case transport.ModeBatchedUnary:
+		count, err := sendBulkBatchedUnary(ctx, client, cfg, limiter, payloadSource, diagnostics)
+		return nil, count, err
 	case transport.ModeRabbitMQStreams:
 		acks, err := sendBulkPublished(ctx, cfg, limiter, payloadSource, diagnostics, openRabbitMQPublisher)
 		return acks, 0, err
@@ -365,6 +398,103 @@ func runTransport(ctx context.Context, client pb.TransformerClient, cfg *produce
 	default:
 		return nil, 0, fmt.Errorf("unsupported TRANSPORT_MODE %q", cfg.transportMode)
 	}
+}
+
+func sendBulkBatchedUnary(ctx context.Context, client pb.TransformerClient, cfg *producerConfig, limiter *rate.Limiter, payloadSource workload.Source, diagnostics *producerDiagnostics) (uint64, error) {
+	ackChan := make(chan uint64, cfg.concurrency)
+	errChan := make(chan error, cfg.concurrency)
+	var wg sync.WaitGroup
+
+	for worker := 0; worker < cfg.concurrency; worker++ {
+		worker := worker
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			var acknowledged uint64
+			batch := &pb.DataBatch{
+				RunId:  cfg.runID,
+				Chunks: make([]*pb.DataChunk, 0, cfg.batchedUnaryBatchSize),
+			}
+
+			flush := func() error {
+				if len(batch.GetChunks()) == 0 {
+					return nil
+				}
+				attempt := 0
+				recoveryStartedAt := time.Time{}
+				for {
+					ack, err := client.PushUnaryBatch(ctx, batch)
+					if err == nil {
+						if !recoveryStartedAt.IsZero() {
+							diagnostics.recordRecovery(time.Since(recoveryStartedAt))
+						}
+						acknowledged += ack.GetMessages()
+						batch = &pb.DataBatch{
+							RunId:  cfg.runID,
+							Chunks: make([]*pb.DataChunk, 0, cfg.batchedUnaryBatchSize),
+						}
+						return nil
+					}
+					if !canRetry(err, attempt, cfg.maxRetryAttempts) {
+						return fmt.Errorf("worker %d batched unary send: %w", worker, err)
+					}
+					if recoveryStartedAt.IsZero() {
+						recoveryStartedAt = time.Now()
+					}
+					diagnostics.recordRetry()
+					attempt++
+					if err := sleepWithContext(ctx, cfg.retryBackoff); err != nil {
+						return fmt.Errorf("worker %d batched unary retry wait: %w", worker, err)
+					}
+				}
+			}
+
+			for sequence := uint64(worker + 1); sequence <= cfg.expectedTotalMessages; sequence += uint64(cfg.concurrency) {
+				if limiter != nil {
+					if err := limiter.Wait(ctx); err != nil {
+						errChan <- fmt.Errorf("worker %d rate limit: %w", worker, err)
+						return
+					}
+				}
+				batch.Chunks = append(batch.Chunks, &pb.DataChunk{
+					RunId:             cfg.runID,
+					Sequence:          sequence,
+					ProducerWorker:    uint64(worker),
+					CreatedAtUnixNano: time.Now().UnixNano(),
+					Payload:           payloadSource.Payload(sequence),
+				})
+				if len(batch.GetChunks()) >= cfg.batchedUnaryBatchSize {
+					if err := flush(); err != nil {
+						errChan <- err
+						return
+					}
+				}
+			}
+
+			if err := flush(); err != nil {
+				errChan <- err
+				return
+			}
+			ackChan <- acknowledged
+		}()
+	}
+
+	wg.Wait()
+	close(ackChan)
+	close(errChan)
+
+	for err := range errChan {
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	var acknowledged uint64
+	for count := range ackChan {
+		acknowledged += count
+	}
+	return acknowledged, nil
 }
 
 type chunkPublisher interface {

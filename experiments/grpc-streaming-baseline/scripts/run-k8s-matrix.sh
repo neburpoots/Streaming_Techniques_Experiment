@@ -17,7 +17,7 @@ set -euo pipefail
 # Options:
 #   --overlay <name>    Kustomize overlay to use (default: resource-medium)
 #   --repeat <n>        Number of repetitions per case (default: 1)
-#   --transport <mode>  Transport filter: all, client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka
+#   --transport <mode>  Transport filter: all, client-streaming, unary, batched-unary, rabbitmq-streams, nats-jetstream, kafka
 #   --payload <bytes>   Payload-size filter for synthetic-clean
 #   --concurrency <n>   Concurrency filter for presets with concurrency sweeps
 #   --kind-cluster-name <name>
@@ -58,8 +58,15 @@ REPEAT_SUFFIX=""
 RUN_ID_PREFIX=""
 KIND_CLUSTER_NAME=""
 STRICT_RESOURCE_VALIDATION="${STRICT_RESOURCE_VALIDATION:-false}"
+# When true, a case that fails to produce artifacts is logged and skipped
+# instead of aborting the whole preset (one flaky cell must not kill a campaign).
+CONTINUE_ON_CASE_FAILURE="${CONTINUE_ON_CASE_FAILURE:-false}"
 PRODUCER_TIMEOUT_SECONDS="${PRODUCER_TIMEOUT_SECONDS:-420s}"
 EXPORT_TIMEOUT_SECONDS="${EXPORT_TIMEOUT_SECONDS:-900s}"
+BATCHED_UNARY_BATCH_SIZE="${BATCHED_UNARY_BATCH_SIZE:-100}"
+GRPC_MAX_MESSAGE_BYTES="${GRPC_MAX_MESSAGE_BYTES:-134217728}"
+SYNTHETIC_CLEAN_TOTAL_MESSAGES="${SYNTHETIC_CLEAN_TOTAL_MESSAGES:-20000}"
+NATS_STREAM_MIN_BYTES="${NATS_STREAM_MIN_BYTES:-536870912}"
 ACTIVE_STATS_PID=""
 ACTIVE_STATS_STOP_FILE=""
 FAILURE_PID=""
@@ -107,10 +114,10 @@ mkdir -p "${RESULTS_DIR}"
 
 validate_transport_filter() {
     case "${TRANSPORT_FILTER}" in
-        all|client-streaming|unary|rabbitmq-streams|nats-jetstream|kafka) ;;
+        all|client-streaming|unary|batched-unary|rabbitmq-streams|nats-jetstream|kafka) ;;
         *)
             echo "Invalid --transport value: ${TRANSPORT_FILTER}" >&2
-            echo "Expected one of: all, client-streaming, unary, rabbitmq-streams, nats-jetstream, kafka" >&2
+            echo "Expected one of: all, client-streaming, unary, batched-unary, rabbitmq-streams, nats-jetstream, kafka" >&2
             exit 1
             ;;
     esac
@@ -118,7 +125,7 @@ validate_transport_filter() {
 
 selected_transport_modes() {
     case "${TRANSPORT_FILTER}" in
-        all) echo "client-streaming unary rabbitmq-streams nats-jetstream kafka" ;;
+        all) echo "client-streaming unary batched-unary rabbitmq-streams nats-jetstream kafka" ;;
         *) echo "${TRANSPORT_FILTER}" ;;
     esac
 }
@@ -332,6 +339,27 @@ scale_brokers_for_transport() {
 }
 
 # ── ConfigMap patching ──
+nats_stream_max_bytes_for_case() {
+    local total_messages="$1"
+    local payload_bytes="$2"
+    local concurrency="$3"
+
+    if [[ -n "${NATS_STREAM_MAX_BYTES:-}" ]]; then
+        echo "${NATS_STREAM_MAX_BYTES}"
+        return
+    fi
+
+    local messages_per_worker=$(( (total_messages + concurrency - 1) / concurrency ))
+    local estimated_bytes=$(( messages_per_worker * payload_bytes ))
+    local cap_bytes=$(( estimated_bytes + (estimated_bytes / 2) ))
+
+    if (( cap_bytes < NATS_STREAM_MIN_BYTES )); then
+        cap_bytes="${NATS_STREAM_MIN_BYTES}"
+    fi
+
+    echo "${cap_bytes}"
+}
+
 patch_configmap() {
     local run_id="$1"
     local transport_mode="$2"
@@ -353,6 +381,8 @@ patch_configmap() {
     local dataset_repeat="${18:-1}"
     local summary_poll="${19:-250}"
     local max_summary_wait="${20:-120}"
+    local nats_stream_max_bytes
+    nats_stream_max_bytes="$(nats_stream_max_bytes_for_case "${total_messages}" "${payload_bytes}" "${concurrency}")"
 
     kubectl create configmap grpc-streaming-baseline-config \
         -n "${NAMESPACE}" \
@@ -362,6 +392,8 @@ patch_configmap() {
         --from-literal=PROFILE="${profile}" \
         --from-literal=TOTAL_MESSAGES="${total_messages}" \
         --from-literal=PAYLOAD_BYTES="${payload_bytes}" \
+        --from-literal=BATCHED_UNARY_BATCH_SIZE="${BATCHED_UNARY_BATCH_SIZE}" \
+        --from-literal=GRPC_MAX_MESSAGE_BYTES="${GRPC_MAX_MESSAGE_BYTES}" \
         --from-literal=DATASET_DIR="/datasets" \
         --from-literal=DATASET_FILES="${dataset_files}" \
         --from-literal=DATASET_ROWS_PER_MESSAGE="${dataset_rows_per_msg}" \
@@ -371,7 +403,7 @@ patch_configmap() {
         --from-literal=TRANSFORMER_WORK_ITERATIONS="${transformer_work}" \
         --from-literal=SINK_PROCESS_DELAY_MS="${sink_delay}" \
         --from-literal=SUMMARY_POLL_MILLISECONDS="${summary_poll}" \
-        --from-literal=MAX_SUMMARY_WAIT_SECONDS="${max_summary_wait}" \
+        --from-literal=MAX_SUMMARY_WAIT_SECONDS="${MAX_SUMMARY_WAIT_OVERRIDE:-${max_summary_wait}}" \
         --from-literal=MAX_RETRY_ATTEMPTS="${max_retry}" \
         --from-literal=RETRY_BACKOFF_MS="${retry_backoff}" \
         --from-literal=FAILURE_ACTION="${failure_action}" \
@@ -390,6 +422,7 @@ patch_configmap() {
         --from-literal=NATS_PRODUCER_TO_TRANSFORMER_SUBJECT="${NATS_PRODUCER_TO_TRANSFORMER_SUBJECT:-producer.to.transformer}" \
         --from-literal=NATS_TRANSFORMER_TO_SINK_SUBJECT="${NATS_TRANSFORMER_TO_SINK_SUBJECT:-transformer.to.sink}" \
         --from-literal=NATS_STREAM_REPLICAS="${NATS_STREAM_REPLICAS:-1}" \
+        --from-literal=NATS_STREAM_MAX_BYTES="${nats_stream_max_bytes}" \
         --from-literal=KAFKA_BROKERS="${KAFKA_BROKERS:-grpc-stream-kafka:9092}" \
         --from-literal=KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC="${KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC:-producer-to-transformer}" \
         --from-literal=KAFKA_TRANSFORMER_TO_SINK_TOPIC="${KAFKA_TRANSFORMER_TO_SINK_TOPIC:-transformer-to-sink}" \
@@ -548,7 +581,11 @@ restart_deployments() {
             wait_for_rabbitmq_ready
             ;;
         nats-jetstream)
-            rollout_restart grpc-stream-nats
+            kubectl delete pod -n "${NAMESPACE}" -l app=grpc-stream-nats \
+                --wait=true \
+                --timeout=120s \
+                >/dev/null 2>&1 || true
+            rollout_status grpc-stream-nats 120s
             wait_for_nats_ready
             ;;
         kafka)
@@ -820,6 +857,13 @@ run_case() {
     local dataset_repeat="${18:-1}"
     local effective_run_id="${RUN_ID_PREFIX}${run_id}${REPEAT_SUFFIX}"
 
+    # Time-boxed campaigns: once the deadline passes, skip remaining cases
+    # instead of starting new multi-minute runs.
+    if [[ -n "${CASE_DEADLINE_EPOCH:-}" ]] && (( $(date +%s) > CASE_DEADLINE_EPOCH )); then
+        echo "  Skipping case (campaign deadline passed): ${effective_run_id}"
+        return 0
+    fi
+
     echo "━━━ Running: ${effective_run_id} ━━━"
 
     # 1. Patch ConfigMap with this run's parameters
@@ -858,7 +902,7 @@ run_case() {
     done
 
     if [[ "${#prerun_roles[@]}" -gt 0 ]]; then
-        wait_for_stats_samples "${stats_file}" "${prerun_roles[@]}"
+        wait_for_stats_samples "${stats_file}" "${prerun_roles[@]}" || true
     fi
 
     # 5. Start failure injection if configured
@@ -894,6 +938,11 @@ run_case() {
     copy_results_from_pvc "${effective_run_id}"
 
     if ! assert_required_result_artifacts "${effective_run_id}"; then
+        if [[ "${CONTINUE_ON_CASE_FAILURE}" == "true" ]]; then
+            echo "  CASE FAILED (missing artifacts), continuing: ${effective_run_id}" >&2
+            delete_producer_job
+            return 0
+        fi
         echo "  Aborting because required result artifacts are missing" >&2
         return 1
     fi
@@ -921,7 +970,7 @@ run_synthetic_clean() {
             for conc in 1 4 8 16; do
                 matches_filter "${conc}" "${CONCURRENCY_FILTER}" || continue
                 run_case "synthetic-clean-${ts}-p${payload}-c${conc}" \
-                    "${transport_mode}" "synthetic" "bulk" "20000" "${payload}" "${conc}" "0"
+                    "${transport_mode}" "synthetic" "bulk" "${SYNTHETIC_CLEAN_TOTAL_MESSAGES}" "${payload}" "${conc}" "0"
             done
         done
     done
@@ -980,6 +1029,7 @@ transport_short() {
     case "$1" in
         client-streaming) echo "stream" ;;
         unary) echo "unary" ;;
+        batched-unary) echo "bunary" ;;
         rabbitmq-streams) echo "rmqs" ;;
         nats-jetstream) echo "nats" ;;
         kafka) echo "kafka" ;;
@@ -1041,7 +1091,9 @@ for ((r = 1; r <= REPEAT; r++)); do
         echo "═══ Repetition ${r}/${REPEAT} ═══"
         REPEAT_SUFFIX="-rep${r}"
     else
-        REPEAT_SUFFIX=""
+        # FORCED_REP_SUFFIX lets gap-fill runs reuse an existing rep label
+        # (e.g. "-rep1") so filled cells merge into a previous campaign.
+        REPEAT_SUFFIX="${FORCED_REP_SUFFIX:-}"
     fi
 
     case "${PRESET}" in

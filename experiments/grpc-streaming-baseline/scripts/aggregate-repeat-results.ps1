@@ -60,7 +60,31 @@ function Get-AggregatedValue {
     }
 
     $average = ($numericValues | Measure-Object -Average).Average
-    return [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, '{0}', $average)
+    $sorted = @($numericValues | Sort-Object)
+    $middle = [int][Math]::Floor($sorted.Count / 2)
+    if (($sorted.Count % 2) -eq 1) {
+        $median = $sorted[$middle]
+    }
+    else {
+        $median = ($sorted[$middle - 1] + $sorted[$middle]) / 2.0
+    }
+    return [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, '{0}', $median)
+}
+
+function Get-NumericValues {
+    param(
+        [System.Collections.IEnumerable]$Rows,
+        [string]$PropertyName
+    )
+
+    $numericValues = New-Object System.Collections.Generic.List[double]
+    foreach ($row in $Rows) {
+        $numeric = ConvertTo-NullableNumber -Value ([string]$row.$PropertyName)
+        if ($null -ne $numeric) {
+            $numericValues.Add($numeric)
+        }
+    }
+    return $numericValues
 }
 
 $resolvedSummaryPath = [System.IO.Path]::GetFullPath($SummaryPath)
@@ -88,6 +112,16 @@ $aggregatedRows = $rows |
         $aggregated = [ordered]@{}
         foreach ($propertyName in $propertyNames) {
             $aggregated[$propertyName] = Get-AggregatedValue -Rows $groupRows -PropertyName $propertyName
+            if ($propertyName -eq 'run_id') {
+                continue
+            }
+            $numericValues = Get-NumericValues -Rows $groupRows -PropertyName $propertyName
+            if ($numericValues.Count -gt 0 -and $numericValues.Count -eq ($groupRows | Measure-Object).Count) {
+                $min = ($numericValues | Measure-Object -Minimum).Minimum
+                $max = ($numericValues | Measure-Object -Maximum).Maximum
+                $aggregated["${propertyName}_min"] = [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, '{0}', $min)
+                $aggregated["${propertyName}_max"] = [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, '{0}', $max)
+            }
         }
         $aggregated['repeat_count'] = [string]$groupRows.Count
         [PSCustomObject]$aggregated

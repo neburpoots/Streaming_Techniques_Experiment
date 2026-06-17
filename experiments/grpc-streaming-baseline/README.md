@@ -6,10 +6,10 @@ This folder is an isolated first experiment for research question one. It is int
 
 This setup is a good starting point if the goal is to answer the first phase of the research in a defensible way:
 
-- it keeps the first comparison narrow: gRPC client streaming versus unary gRPC;
+- it keeps the first comparison narrow enough to reason about: direct gRPC mappings, a batched unary gRPC control, and brokered alternatives;
 - it uses a small but meaningful three-stage topology: Producer -> Transformer -> Sink;
 - it keeps application logic intentionally lightweight so the measured differences are primarily communication effects;
-- it already supports the experimental factors that matter most for the first baseline: message size, total volume, concurrency, synthetic CPU work in the middle stage, artificial sink slowdowns, and broker-based comparisons through RabbitMQ Streams, NATS JetStream, and Kafka.
+- it already supports the experimental factors that matter most for the first baseline: message size, total volume, concurrency, synthetic CPU work in the middle stage, artificial sink slowdowns, batched unary requests, and broker-based comparisons through RabbitMQ Streams, NATS JetStream, and Kafka.
 
 ## Metrics used consistently
 
@@ -59,10 +59,11 @@ The DYNAMOS CSVs are still useful later as a replay-style workload once the base
 
 For restart-and-recovery scenarios, the sink also records per-message arrival timing in a companion analysis file so the export step can derive end-to-end recovery metrics from the same observation point for every transport.
 
-The same three-stage topology can now be run in five transport modes:
+The same three-stage topology can now be run in six transport modes:
 
 - `client-streaming`: one client stream per producer worker;
 - `unary`: one request per message across the same topology.
+- `batched-unary`: one unary request carries a bounded batch of logical messages; sink metrics still count logical messages, not RPC calls.
 - `rabbitmq-streams`: producer -> RabbitMQ Streams -> transformer -> RabbitMQ Streams -> sink.
 - `nats-jetstream`: producer -> JetStream stream -> transformer -> JetStream stream -> sink, using pull consumers with explicit acknowledgements.
 - `kafka`: producer -> Kafka topic -> transformer -> Kafka topic -> sink, using run-scoped topics and consumer groups.
@@ -72,8 +73,8 @@ The same three-stage topology can now be run in five transport modes:
 Do not start with every possible factor crossed at once. Start with a narrow baseline matrix:
 
 1. Fix topology to the three-service chain.
-2. Run `client-streaming`, `unary`, `rabbitmq-streams`, `nats-jetstream`, and `kafka` over the exact same workload.
-3. Sweep `PAYLOAD_BYTES`: for example `256`, `1024`, `4096`, `16384`.
+2. Run `client-streaming`, `unary`, `batched-unary`, `rabbitmq-streams`, `nats-jetstream`, and `kafka` over the exact same workload.
+3. Sweep `PAYLOAD_BYTES`: for example `256`, `1024`, `4096`, and `16384`.
 4. Sweep `CONCURRENCY`: for example `1`, `4`, `8`, `16`.
 5. Keep `TOTAL_MESSAGES` fixed per run, for example `50000`.
 6. Keep `TRANSFORMER_WORK_ITERATIONS=0` and `SINK_PROCESS_DELAY_MS=0` for the first clean transport baseline.
@@ -120,6 +121,19 @@ Unary comparison run:
 ```bash
 RUN_ID=bulk-unary-4k-c8 \
 TRANSPORT_MODE=unary \
+TOTAL_MESSAGES=50000 \
+PAYLOAD_BYTES=4096 \
+CONCURRENCY=8 \
+TARGET_MESSAGES_PER_SECOND=0 \
+./scripts/run-local.sh
+```
+
+Batched unary comparison run:
+
+```bash
+RUN_ID=bulk-batched-unary-4k-c8 \
+TRANSPORT_MODE=batched-unary \
+BATCHED_UNARY_BATCH_SIZE=100 \
 TOTAL_MESSAGES=50000 \
 PAYLOAD_BYTES=4096 \
 CONCURRENCY=8 \
@@ -199,9 +213,9 @@ The recovery-oriented CSV columns intentionally separate producer-side and end-t
 
 ## Matrix runs and CSV export
 
-The local PowerShell matrix runner now executes all five transport modes per preset: `client-streaming`, `unary`, `rabbitmq-streams`, `nats-jetstream`, and `kafka`.
+The local PowerShell matrix runner now executes all six transport modes per preset: `client-streaming`, `unary`, `batched-unary`, `rabbitmq-streams`, `nats-jetstream`, and `kafka`.
 
-For the thesis-style comparable benchmark set, prefer the Kubernetes runner because it applies the same scenario presets across all three transports while also collecting pod-level resource measurements.
+For the thesis-style comparable benchmark set, prefer the Kubernetes runner because it applies the same scenario presets across the enabled transports while also collecting pod-level resource measurements.
 
 Run the preset synthetic matrix:
 
@@ -235,7 +249,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
 	-Preset synthetic-recovery
 ```
 
-Run the smaller CSV replay matrix:
+Optionally run the smaller CSV replay matrix as a local sanity check. This preset is not part of the current thesis evidence unless a comparable result set is generated and reported.
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
@@ -243,15 +257,16 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File \
 	-Preset csv-replay-check
 ```
 
-Run the comparable five-transport Kubernetes presets:
+Run the comparable Kubernetes presets:
 
 ```bash
 ./scripts/run-k8s-matrix.sh synthetic-clean --overlay resource-medium --repeat 3 --skip-load
 ./scripts/run-k8s-matrix.sh synthetic-continuous --overlay resource-medium --repeat 3 --skip-load
 ./scripts/run-k8s-matrix.sh synthetic-backpressure --overlay resource-medium --repeat 3 --skip-load
 ./scripts/run-k8s-matrix.sh synthetic-recovery --overlay resource-medium --repeat 3 --skip-load
-./scripts/run-k8s-matrix.sh csv-replay-check --overlay resource-medium --repeat 3 --skip-load
 ```
+
+The reported concept-thesis corpus used five transports before `batched-unary` and the 256 KiB payload tier were added. The final rerun should use the updated `all` transport set and three repetitions per cell.
 
 If you are running on `kind` instead of the `docker-desktop` cluster, omit `--skip-load` so the freshly built images are loaded into the cluster.
 

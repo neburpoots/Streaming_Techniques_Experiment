@@ -29,6 +29,11 @@ spec:
                 configMapKeyRef:
                   name: grpc-streaming-baseline-config
                   key: TRANSPORT_MODE
+            - name: GRPC_MAX_MESSAGE_BYTES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: GRPC_MAX_MESSAGE_BYTES
             - name: SINK_PROCESS_DELAY_MS
               valueFrom:
                 configMapKeyRef:
@@ -94,6 +99,16 @@ spec:
                 configMapKeyRef:
                   name: grpc-streaming-baseline-config
                   key: NATS_TRANSFORMER_TO_SINK_SUBJECT
+            - name: NATS_STREAM_REPLICAS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_STREAM_REPLICAS
+            - name: NATS_STREAM_MAX_BYTES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_STREAM_MAX_BYTES
             - name: KAFKA_BROKERS
               valueFrom:
                 configMapKeyRef:

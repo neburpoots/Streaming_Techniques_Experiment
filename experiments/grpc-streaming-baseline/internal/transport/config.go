@@ -11,6 +11,7 @@ import (
 const (
 	ModeClientStreaming = "client-streaming"
 	ModeUnary           = "unary"
+	ModeBatchedUnary    = "batched-unary"
 	ModeRabbitMQStreams = "rabbitmq-streams"
 	ModeNATSJetStream   = "nats-jetstream"
 	ModeKafka           = "kafka"
@@ -33,6 +34,7 @@ type NATSConfig struct {
 	ProducerToTransformerSubject string
 	TransformerToSinkSubject     string
 	StreamReplicas               int
+	StreamMaxBytes               int64
 }
 
 type KafkaConfig struct {
@@ -44,7 +46,7 @@ type KafkaConfig struct {
 }
 
 func SupportedModes() []string {
-	return []string{ModeClientStreaming, ModeUnary, ModeRabbitMQStreams, ModeNATSJetStream, ModeKafka}
+	return []string{ModeClientStreaming, ModeUnary, ModeBatchedUnary, ModeRabbitMQStreams, ModeNATSJetStream, ModeKafka}
 }
 
 func IsSupportedMode(mode string) bool {
@@ -62,6 +64,8 @@ func ShortName(mode string) string {
 		return "stream"
 	case ModeUnary:
 		return "unary"
+	case ModeBatchedUnary:
+		return "bunary"
 	case ModeRabbitMQStreams:
 		return "rmqs"
 	case ModeNATSJetStream:
@@ -105,11 +109,16 @@ func LoadNATSConfig() NATSConfig {
 	if err != nil || streamReplicas <= 0 {
 		streamReplicas = 1
 	}
+	streamMaxBytes, err := config.Uint64("NATS_STREAM_MAX_BYTES", 1024*1024*1024)
+	if err != nil || streamMaxBytes == 0 {
+		streamMaxBytes = 1024 * 1024 * 1024
+	}
 	return NATSConfig{
 		URL:                          config.String("NATS_URL", "nats://nats:4222"),
 		ProducerToTransformerSubject: config.String("NATS_PRODUCER_TO_TRANSFORMER_SUBJECT", "producer.to.transformer"),
 		TransformerToSinkSubject:     config.String("NATS_TRANSFORMER_TO_SINK_SUBJECT", "transformer.to.sink"),
 		StreamReplicas:               streamReplicas,
+		StreamMaxBytes:               int64(streamMaxBytes),
 	}
 }
 

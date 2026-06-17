@@ -1,6 +1,6 @@
 # RQ1 Benchmark Design
 
-This benchmark design is kept as the thesis RQ1 baseline and extended to five transport modes: unary gRPC, client-streaming gRPC, RabbitMQ Streams, NATS JetStream, and Kafka.
+This benchmark design is kept as the thesis RQ1 baseline and extended to six transport modes: per-message unary gRPC, batched unary gRPC, client-streaming gRPC, RabbitMQ Streams, NATS JetStream, and Kafka.
 
 ## Methodological Position
 
@@ -20,8 +20,9 @@ The thesis contribution is the DYNAMOS-specific operationalization: the same thr
 - Keep the same three service roles and deterministic transformer work.
 - Partition by worker/flow so per-flow ordering is meaningful.
 - Use run-scoped broker streams/topics to avoid cross-run offset contamination.
-- Use explicit acknowledgements where the broker supports them.
+- Use explicit consumer acknowledgements where the broker supports them, while keeping producer publishing asynchronous or batched where that is the intended fast path.
 - Collect the same sink-side correctness and timing metrics for every mode.
+- Count logical messages at the sink for every transport, including batched unary, so throughput is not inflated by changing the number of RPC calls.
 
 ## Final Scenario Set
 
@@ -31,13 +32,15 @@ The thesis contribution is the DYNAMOS-specific operationalization: the same thr
 | Synthetic continuous | Delivery rhythm under a stable target rate | achieved msg/s, p95 latency, mean/p95 inter-arrival, jitter, CPU, memory |
 | Synthetic slow consumer | Backpressure and overload handling | throughput loss, p95/p99 latency growth, jitter, backlog-like delay, duplicates, ordering violations |
 | Synthetic forced recovery | Failure visibility and restart behaviour | completion ratio, loss, duplicates, ordering violations, time to first post-failure message, end-to-end recovery time, backlog drain time, recovery-window p95 latency, throughput debt |
-| CSV replay check | Realistic DYNAMOS-shaped payload sanity check | same clean-bulk metrics, with payloads derived from copied DYNAMOS CSV rows |
+
+The harness still contains a CSV replay mode for local sanity checks with copied DYNAMOS rows. It is not part of the current thesis evidence unless a comparable result set is generated and reported.
 
 ## Interpretation Rules
 
 Do not rank transports by a single metric. The useful answer to RQ1 is a trade-off map:
 
 - direct gRPC modes should be judged on low overhead, latency, coupling, and application-managed recovery;
+- batched unary should be interpreted as the realistic request-response control for DYNAMOS-sized chunks, not as the same thing as one unary RPC per message;
 - brokered modes should be judged on decoupling, replay/ack semantics, backlog handling, duplicate behaviour, and broker resource cost;
 - scenario-specific metrics should explain why a mechanism differs, not only that it differs.
 

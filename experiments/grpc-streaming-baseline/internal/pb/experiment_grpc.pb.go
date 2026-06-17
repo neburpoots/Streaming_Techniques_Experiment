@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Transformer_Push_FullMethodName      = "/experiment.Transformer/Push"
-	Transformer_PushUnary_FullMethodName = "/experiment.Transformer/PushUnary"
+	Transformer_Push_FullMethodName           = "/experiment.Transformer/Push"
+	Transformer_PushUnary_FullMethodName      = "/experiment.Transformer/PushUnary"
+	Transformer_PushUnaryBatch_FullMethodName = "/experiment.Transformer/PushUnaryBatch"
 )
 
 // TransformerClient is the client API for Transformer service.
@@ -29,6 +30,7 @@ const (
 type TransformerClient interface {
 	Push(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[DataChunk, StreamAck], error)
 	PushUnary(ctx context.Context, in *DataChunk, opts ...grpc.CallOption) (*UnaryAck, error)
+	PushUnaryBatch(ctx context.Context, in *DataBatch, opts ...grpc.CallOption) (*UnaryBatchAck, error)
 }
 
 type transformerClient struct {
@@ -62,12 +64,23 @@ func (c *transformerClient) PushUnary(ctx context.Context, in *DataChunk, opts .
 	return out, nil
 }
 
+func (c *transformerClient) PushUnaryBatch(ctx context.Context, in *DataBatch, opts ...grpc.CallOption) (*UnaryBatchAck, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UnaryBatchAck)
+	err := c.cc.Invoke(ctx, Transformer_PushUnaryBatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TransformerServer is the server API for Transformer service.
 // All implementations must embed UnimplementedTransformerServer
 // for forward compatibility.
 type TransformerServer interface {
 	Push(grpc.ClientStreamingServer[DataChunk, StreamAck]) error
 	PushUnary(context.Context, *DataChunk) (*UnaryAck, error)
+	PushUnaryBatch(context.Context, *DataBatch) (*UnaryBatchAck, error)
 	mustEmbedUnimplementedTransformerServer()
 }
 
@@ -83,6 +96,9 @@ func (UnimplementedTransformerServer) Push(grpc.ClientStreamingServer[DataChunk,
 }
 func (UnimplementedTransformerServer) PushUnary(context.Context, *DataChunk) (*UnaryAck, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PushUnary not implemented")
+}
+func (UnimplementedTransformerServer) PushUnaryBatch(context.Context, *DataBatch) (*UnaryBatchAck, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PushUnaryBatch not implemented")
 }
 func (UnimplementedTransformerServer) mustEmbedUnimplementedTransformerServer() {}
 func (UnimplementedTransformerServer) testEmbeddedByValue()                     {}
@@ -130,6 +146,24 @@ func _Transformer_PushUnary_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Transformer_PushUnaryBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DataBatch)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransformerServer).PushUnaryBatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Transformer_PushUnaryBatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransformerServer).PushUnaryBatch(ctx, req.(*DataBatch))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Transformer_ServiceDesc is the grpc.ServiceDesc for Transformer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -140,6 +174,10 @@ var Transformer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PushUnary",
 			Handler:    _Transformer_PushUnary_Handler,
+		},
+		{
+			MethodName: "PushUnaryBatch",
+			Handler:    _Transformer_PushUnaryBatch_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -153,8 +191,9 @@ var Transformer_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Sink_Push_FullMethodName      = "/experiment.Sink/Push"
-	Sink_PushUnary_FullMethodName = "/experiment.Sink/PushUnary"
+	Sink_Push_FullMethodName           = "/experiment.Sink/Push"
+	Sink_PushUnary_FullMethodName      = "/experiment.Sink/PushUnary"
+	Sink_PushUnaryBatch_FullMethodName = "/experiment.Sink/PushUnaryBatch"
 )
 
 // SinkClient is the client API for Sink service.
@@ -163,6 +202,7 @@ const (
 type SinkClient interface {
 	Push(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[DataChunk, StreamAck], error)
 	PushUnary(ctx context.Context, in *DataChunk, opts ...grpc.CallOption) (*UnaryAck, error)
+	PushUnaryBatch(ctx context.Context, in *DataBatch, opts ...grpc.CallOption) (*UnaryBatchAck, error)
 }
 
 type sinkClient struct {
@@ -196,12 +236,23 @@ func (c *sinkClient) PushUnary(ctx context.Context, in *DataChunk, opts ...grpc.
 	return out, nil
 }
 
+func (c *sinkClient) PushUnaryBatch(ctx context.Context, in *DataBatch, opts ...grpc.CallOption) (*UnaryBatchAck, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UnaryBatchAck)
+	err := c.cc.Invoke(ctx, Sink_PushUnaryBatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SinkServer is the server API for Sink service.
 // All implementations must embed UnimplementedSinkServer
 // for forward compatibility.
 type SinkServer interface {
 	Push(grpc.ClientStreamingServer[DataChunk, StreamAck]) error
 	PushUnary(context.Context, *DataChunk) (*UnaryAck, error)
+	PushUnaryBatch(context.Context, *DataBatch) (*UnaryBatchAck, error)
 	mustEmbedUnimplementedSinkServer()
 }
 
@@ -217,6 +268,9 @@ func (UnimplementedSinkServer) Push(grpc.ClientStreamingServer[DataChunk, Stream
 }
 func (UnimplementedSinkServer) PushUnary(context.Context, *DataChunk) (*UnaryAck, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PushUnary not implemented")
+}
+func (UnimplementedSinkServer) PushUnaryBatch(context.Context, *DataBatch) (*UnaryBatchAck, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PushUnaryBatch not implemented")
 }
 func (UnimplementedSinkServer) mustEmbedUnimplementedSinkServer() {}
 func (UnimplementedSinkServer) testEmbeddedByValue()              {}
@@ -264,6 +318,24 @@ func _Sink_PushUnary_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Sink_PushUnaryBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DataBatch)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SinkServer).PushUnaryBatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Sink_PushUnaryBatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SinkServer).PushUnaryBatch(ctx, req.(*DataBatch))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Sink_ServiceDesc is the grpc.ServiceDesc for Sink service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -274,6 +346,10 @@ var Sink_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PushUnary",
 			Handler:    _Sink_PushUnary_Handler,
+		},
+		{
+			MethodName: "PushUnaryBatch",
+			Handler:    _Sink_PushUnaryBatch_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

@@ -15,15 +15,15 @@ import (
 )
 
 type RabbitMQStreamPublisher struct {
-	streamName  string
-	env         *stream.Environment
-	producer    *stream.Producer
-	confirmMu   sync.Mutex
-	confirmErr  error
-	pendingAcks map[int64]chan error
-	pendingZero chan struct{}
+	streamName   string
+	env          *stream.Environment
+	producer     *stream.Producer
+	confirmMu    sync.Mutex
+	confirmErr   error
+	pendingAcks  map[int64]chan error
+	pendingZero  chan struct{}
 	confirmSlots chan struct{}
-	confirmDone chan struct{}
+	confirmDone  chan struct{}
 }
 
 type RabbitMQStreamConsumer struct {
@@ -73,13 +73,13 @@ func NewRabbitMQStreamPublisher(cfg RabbitMQConfig, streamName string) (*RabbitM
 	}
 
 	publisher := &RabbitMQStreamPublisher{
-		streamName:  streamName,
-		env:         env,
-		producer:    producer,
-		pendingAcks: make(map[int64]chan error),
-		pendingZero: closedSignal(),
+		streamName:   streamName,
+		env:          env,
+		producer:     producer,
+		pendingAcks:  make(map[int64]chan error),
+		pendingZero:  closedSignal(),
 		confirmSlots: make(chan struct{}, rabbitMQMaxPendingConfirms),
-		confirmDone: make(chan struct{}),
+		confirmDone:  make(chan struct{}),
 	}
 
 	go publisher.trackConfirmations(producer.NotifyPublishConfirmation())

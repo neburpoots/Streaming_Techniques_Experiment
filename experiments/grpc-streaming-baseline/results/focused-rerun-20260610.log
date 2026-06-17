@@ -1,0 +1,678 @@
+@@@ Focused rerun started 2026-06-10T21:26:11+02:00
+@@@ STEP [0m] P1a clean nats p262144 c1 (smoke, build+load)
+Building container images...
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#6 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.1s done
+#6 DONE 0.1s
+
+#7 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
+#7 resolve docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
+#7 resolve docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb 0.1s done
+#7 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 455.69kB 0.1s done
+#5 DONE 0.2s
+
+#8 [builder 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [builder 3/7] COPY go.mod go.sum ./
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 2.2s
+
+#12 [builder 6/7] RUN test -n "producer"
+#12 DONE 0.4s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/producer
+#13 DONE 21.9s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:d9bb5c1b26a8bde8b9ae528116faf50aba35c759a1273e3593848e02e89998fc done
+#17 exporting config sha256:21eeaae7e7c30084436111d4dcfb9c35ed4dd4e81deabf12995449eaa9d9596a done
+#17 exporting attestation manifest sha256:5a813d3ed02c7717d3ec7cd836025f14f1d802046d3f65951e8dc8bda6a8d836
+#17 exporting attestation manifest sha256:5a813d3ed02c7717d3ec7cd836025f14f1d802046d3f65951e8dc8bda6a8d836 0.1s done
+#17 exporting manifest list sha256:f216998a300783943dcfd121f677f62c3c8ad2263bdaad0fce1d6974f0847a48 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-producer:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-producer:latest
+#17 unpacking to docker.io/library/grpc-streaming-baseline-producer:latest 0.0s done
+#17 DONE 0.2s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
+#6 resolve docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb 0.1s done
+#6 DONE 0.1s
+
+#7 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#7 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.1s done
+#7 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 458.07kB 0.2s done
+#5 DONE 0.3s
+
+#8 [builder 3/7] COPY go.mod go.sum ./
+#8 CACHED
+
+#9 [builder 2/7] WORKDIR /src
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 1.7s
+
+#12 [builder 6/7] RUN test -n "transformer"
+#12 DONE 0.5s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/transformer
+#13 DONE 29.3s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 DONE 0.2s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 1.4s done
+#17 exporting manifest sha256:9183275028a243b359adc34bbb60d3acf7da56c1a9041edf47461745ef9c98cd
+#17 exporting manifest sha256:9183275028a243b359adc34bbb60d3acf7da56c1a9041edf47461745ef9c98cd 0.0s done
+#17 exporting config sha256:f775268eb00c10ea90a45bea1c8f772cb1b92e7187ef430652046b3c8a24bd55 0.0s done
+#17 exporting attestation manifest sha256:995dec68ae53224dcf202d12cf7f6a53119bc5b0ec47aface818996a02f8778a
+#17 exporting attestation manifest sha256:995dec68ae53224dcf202d12cf7f6a53119bc5b0ec47aface818996a02f8778a 0.1s done
+#17 exporting manifest list sha256:27d74c816903da595531ff38cfe8f376b57ec99c76fa51256ee2758fb7015913
+#17 exporting manifest list sha256:27d74c816903da595531ff38cfe8f376b57ec99c76fa51256ee2758fb7015913 0.0s done
+#17 naming to docker.io/library/grpc-streaming-baseline-transformer:latest done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-transformer:latest
+#17 unpacking to docker.io/library/grpc-streaming-baseline-transformer:latest 0.2s done
+#17 DONE 2.0s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.25.0-bookworm
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.6s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
+#6 resolve docker.io/library/debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb 0.1s done
+#6 DONE 0.1s
+
+#7 [builder 1/7] FROM docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#7 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a
+#7 resolve docker.io/library/golang:1.25.0-bookworm@sha256:81dc45d05a7444ead8c92a389621fafabc8e40f8fd1a19d7e5df14e61e98bc1a 0.1s done
+#7 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 461.13kB 0.2s done
+#5 DONE 0.3s
+
+#8 [builder 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [builder 3/7] COPY go.mod go.sum ./
+#9 CACHED
+
+#10 [builder 4/7] RUN go mod download
+#10 CACHED
+
+#11 [builder 5/7] COPY . .
+#11 DONE 2.0s
+
+#12 [builder 6/7] RUN test -n "sink"
+#12 DONE 0.5s
+
+#13 [builder 7/7] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./cmd/sink
+#13 DONE 27.8s
+
+#14 [stage-1 2/4] RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-1 3/4] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 4/4] COPY --from=builder /out/app /usr/local/bin/app
+#16 DONE 0.1s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 1.3s done
+#17 exporting manifest sha256:7eb2ecc1f075d2798329638c9217730f1ef03ef9e82e8cdc7e523ce93dc24443 0.0s done
+#17 exporting config sha256:4a5d369915bd33adb7ffe60abf66ba473eee491a55f430b4c41d586738be3276 0.0s done
+#17 exporting attestation manifest sha256:5a44732278c7d9bab4b94cb41b30bee3da08dfbf791cffc58ae20aebf608a861
+#17 exporting attestation manifest sha256:5a44732278c7d9bab4b94cb41b30bee3da08dfbf791cffc58ae20aebf608a861 0.1s done
+#17 exporting manifest list sha256:4cc0281234172e3737a97d3b04c2d61095b2c7a83dbe2c0a92cecd2c77a8c844
+#17 exporting manifest list sha256:4cc0281234172e3737a97d3b04c2d61095b2c7a83dbe2c0a92cecd2c77a8c844 0.1s done
+#17 naming to docker.io/library/grpc-streaming-baseline-sink:latest 0.0s done
+#17 unpacking to docker.io/library/grpc-streaming-baseline-sink:latest
+#17 unpacking to docker.io/library/grpc-streaming-baseline-sink:latest 0.2s done
+#17 DONE 1.8s
+Loading images into kind cluster grpc-stream-single...
+Image: "grpc-streaming-baseline-producer:latest" with ID "sha256:f216998a300783943dcfd121f677f62c3c8ad2263bdaad0fce1d6974f0847a48" not yet present on node "grpc-stream-single-control-plane", loading...
+Image: "grpc-streaming-baseline-transformer:latest" with ID "sha256:27d74c816903da595531ff38cfe8f376b57ec99c76fa51256ee2758fb7015913" not yet present on node "grpc-stream-single-control-plane", loading...
+Image: "grpc-streaming-baseline-sink:latest" with ID "sha256:4cc0281234172e3737a97d3b04c2d61095b2c7a83dbe2c0a92cecd2c77a8c844" not yet present on node "grpc-stream-single-control-plane", loading...
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 1, transport: nats-jetstream)
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c1-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c1-rep1-sink-analysis.json
+  Done: rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c1-rep1
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-clean-summary.csv
+Finished preset: synthetic-clean
+@@@ SMOKE PASSED: NATS 256 KiB fix works
+@@@ STEP [4m] P1b clean nats p262144 c4
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 1, transport: nats-jetstream)
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/06/10 19:33:33 wait for sink summary: timed out waiting for sink summary after 2m0s
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c4-rep1-producer-result.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c4-rep1-sink-summary.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c4-rep1-sink-analysis.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c4-rep1-producer-result.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c4-rep1-sink-summary.json
+  CASE FAILED (missing artifacts), continuing: rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c4-rep1
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-clean-summary.csv
+Finished preset: synthetic-clean
+@@@ STEP [20m] P1b clean nats p262144 c8
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 1, transport: nats-jetstream)
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/06/10 19:47:07 run nats-jetstream workload: worker 5 open nats-jetstream publisher: create nats stream "producer_to_transformer_rq1_rerun_20260610_fixed_synthetic_clean_nats_p262144_c8_rep1_worker_05" for subject "producer.to.transformer.rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c8-rep1.worker.05": nats: insufficient storage resources available
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c8-rep1-producer-result.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c8-rep1-sink-summary.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c8-rep1-sink-analysis.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c8-rep1-producer-result.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c8-rep1-sink-summary.json
+  CASE FAILED (missing artifacts), continuing: rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c8-rep1
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-clean-summary.csv
+Finished preset: synthetic-clean
+@@@ STEP [35m] P1b clean nats p262144 c16
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-clean (overlay: resource-medium-single-2g, repeat: 1, transport: nats-jetstream)
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c16-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/06/10 20:02:36 run nats-jetstream workload: worker 12 open nats-jetstream publisher: create nats stream "producer_to_transformer_rq1_rerun_20260610_fixed_synthetic_clean_nats_p262144_c16_rep1_worker_12" for subject "producer.to.transformer.rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c16-rep1.worker.12": nats: insufficient storage resources available
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c16-rep1-producer-result.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c16-rep1-sink-summary.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c16-rep1-sink-analysis.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c16-rep1-producer-result.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c16-rep1-sink-summary.json
+  CASE FAILED (missing artifacts), continuing: rq1-rerun-20260610-fixed-synthetic-clean-nats-p262144-c16-rep1
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-clean-summary.csv
+Finished preset: synthetic-clean
+@@@ SKIP [51m >= 50m] P2 clean kafka all payloads/concurrency
+@@@ STEP [51m] P3a continuous nats rep1
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-continuous (overlay: resource-medium-single-2g, repeat: 1, transport: nats-jetstream)
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c4-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/06/10 20:18:00 run nats-jetstream workload: worker 3 open nats-jetstream publisher: create nats stream "producer_to_transformer_rq1_rerun_20260610_fixed_synthetic_continuous_nats_p1024_c4_rep1_worker_03" for subject "producer.to.transformer.rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c4-rep1.worker.03": nats: insufficient storage resources available
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c4-rep1-producer-result.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c4-rep1-sink-summary.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c4-rep1-sink-analysis.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c4-rep1-producer-result.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c4-rep1-sink-summary.json
+  CASE FAILED (missing artifacts), continuing: rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c4-rep1
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/06/10 20:25:41 run nats-jetstream workload: worker 1 open nats-jetstream publisher: create nats stream "producer_to_transformer_rq1_rerun_20260610_fixed_synthetic_continuous_nats_p1024_c8_rep1_worker_01" for subject "producer.to.transformer.rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c8-rep1.worker.01": nats: insufficient storage resources available
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c8-rep1-producer-result.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c8-rep1-sink-summary.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c8-rep1-sink-analysis.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c8-rep1-producer-result.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c8-rep1-sink-summary.json
+  CASE FAILED (missing artifacts), continuing: rq1-rerun-20260610-fixed-synthetic-continuous-nats-p1024-c8-rep1
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-continuous-summary.csv
+Warning: 1 row(s) in rq1-rerun-20260610-fixed-synthetic-continuous-summary.csv have incomplete resource samples.
+Finished preset: synthetic-continuous
+@@@ SKIP [66m >= 64m] P3b continuous kafka rep1
+@@@ STEP [66m] P4 backpressure all transports rep1
+namespace/streaming-experiments unchanged
+persistentvolumeclaim/experiment-results unchanged
+Cleaning up broker workloads before applying overlay...
+namespace/streaming-experiments unchanged
+configmap/grpc-stream-nats-config unchanged
+configmap/grpc-stream-rabbitmq-config unchanged
+configmap/grpc-streaming-baseline-config configured
+service/grpc-stream-kafka unchanged
+service/grpc-stream-nats unchanged
+service/grpc-stream-rabbitmq unchanged
+service/grpc-stream-sink unchanged
+service/grpc-stream-transformer unchanged
+persistentvolumeclaim/experiment-results unchanged
+deployment.apps/grpc-stream-kafka created
+deployment.apps/grpc-stream-nats created
+deployment.apps/grpc-stream-rabbitmq created
+deployment.apps/grpc-stream-sink unchanged
+deployment.apps/grpc-stream-transformer unchanged
+job.batch/grpc-stream-producer created
+  Waiting for sink and transformer to be ready...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+Starting preset: synthetic-backpressure (overlay: resource-medium-single-2g, repeat: 1, transport: all)
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-backpressure-stream-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for rq1-rerun-20260610-fixed-synthetic-backpressure-stream-p1024-c8-rep1 (missing: producer )
+  Done: rq1-rerun-20260610-fixed-synthetic-backpressure-stream-p1024-c8-rep1
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-backpressure-unary-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for rq1-rerun-20260610-fixed-synthetic-backpressure-unary-p1024-c8-rep1 (missing: producer )
+  Done: rq1-rerun-20260610-fixed-synthetic-backpressure-unary-p1024-c8-rep1
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-backpressure-bunary-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+deployment "grpc-stream-transformer" successfully rolled out
+job.batch/grpc-stream-producer created
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for rq1-rerun-20260610-fixed-synthetic-backpressure-bunary-p1024-c8-rep1 (missing: producer )
+  Done: rq1-rerun-20260610-fixed-synthetic-backpressure-bunary-p1024-c8-rep1
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-backpressure-rmqs-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-rabbitmq restarted
+  Waiting for RabbitMQ to be ready...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-rabbitmq" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for RabbitMQ to be ready...
+deployment "grpc-stream-rabbitmq" successfully rolled out
+job.batch/grpc-stream-producer created
+  Warning: metrics-server did not report producer pod metrics during the run startup window
+  Waiting for producer job to complete...
+job.batch/grpc-stream-producer condition met
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from member names
+  Warning: incomplete resource samples for rq1-rerun-20260610-fixed-synthetic-backpressure-rmqs-p1024-c8-rep1 (missing: producer )
+  Done: rq1-rerun-20260610-fixed-synthetic-backpressure-rmqs-p1024-c8-rep1
+━━━ Running: rq1-rerun-20260610-fixed-synthetic-backpressure-nats-p1024-c8-rep1 ━━━
+configmap/grpc-streaming-baseline-config configured
+deployment.apps/grpc-stream-nats restarted
+  Waiting for NATS to be ready...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-nats" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-nats" successfully rolled out
+deployment.apps/grpc-stream-sink restarted
+deployment.apps/grpc-stream-transformer restarted
+  Waiting for sink and transformer to be ready...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-sink" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-sink" successfully rolled out
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "grpc-stream-transformer" rollout to finish: 1 old replicas are pending termination...
+deployment "grpc-stream-transformer" successfully rolled out
+  Waiting for NATS to be ready...
+deployment "grpc-stream-nats" successfully rolled out
+job.batch/grpc-stream-producer created
+  Waiting for producer job to complete...
+  Warning: Producer job did not complete within timeout
+2026/06/10 20:37:40 run nats-jetstream workload: worker 3 open nats-jetstream publisher: create nats stream "producer_to_transformer_rq1_rerun_20260610_fixed_synthetic_backpressure_nats_p1024_c8_rep1_worker_03" for subject "producer.to.transformer.rq1-rerun-20260610-fixed-synthetic-backpressure-nats-p1024-c8-rep1.worker.03": nats: insufficient storage resources available
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-backpressure-nats-p1024-c8-rep1-producer-result.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-backpressure-nats-p1024-c8-rep1-sink-summary.json
+  Warning: missing result artifact /results/rq1-rerun-20260610-fixed-synthetic-backpressure-nats-p1024-c8-rep1-sink-analysis.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-backpressure-nats-p1024-c8-rep1-producer-result.json
+  Warning: missing result artifact /home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-rerun-20260610-fixed-synthetic-backpressure-nats-p1024-c8-rep1-sink-summary.json
+  CASE FAILED (missing artifacts), continuing: rq1-rerun-20260610-fixed-synthetic-backpressure-nats-p1024-c8-rep1
+  Skipping case (campaign deadline passed): rq1-rerun-20260610-fixed-synthetic-backpressure-kafka-p1024-c8-rep1
+Exporting summary CSV...
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-backpressure-summary.csv
+Warning: 4 row(s) in rq1-rerun-20260610-fixed-synthetic-backpressure-summary.csv have incomplete resource samples.
+Finished preset: synthetic-backpressure
+@@@ SKIP [78m >= 74m] P5a clean rmqs p1024 c8 rep2
+@@@ SKIP [78m >= 75m] P5b clean rmqs p256 c16 rep2
+@@@ SKIP [78m >= 76m] P5c clean stream p256 c8 rep2
+@@@ SKIP [78m >= 78m] P6 clean bunary rep2 all cells
+@@@ SKIP [78m >= 76m] P7 clean client-streaming p262144 rep2
+@@@ SKIP [78m >= 76m] P7 clean unary p262144 rep2
+@@@ SKIP [78m >= 76m] P7 clean rabbitmq-streams p262144 rep2
+@@@ SKIP [78m >= 77m] P8 continuous all rep2
+@@@ SKIP [78m >= 78m] P9 backpressure all rep2
+@@@ Exporting rq1-rerun-20260610-fixed-synthetic-clean summary
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-clean-summary.csv
+Wrote aggregated summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-clean-summary-aggregated.csv
+@@@ Exporting rq1-rerun-20260610-fixed-synthetic-continuous summary
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-continuous-summary.csv
+Wrote aggregated summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-continuous-summary-aggregated.csv
+@@@ Exporting rq1-rerun-20260610-fixed-synthetic-backpressure summary
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-backpressure-summary.csv
+Wrote aggregated summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-backpressure-summary-aggregated.csv
+@@@ Exporting rq1-rerun-20260610-fixed-synthetic-recovery summary
+Wrote result summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-recovery-summary.csv
+Wrote aggregated summary to \\wsl.localhost\Ubuntu\home\nebur\Streaming_Techniques_Experiment\experiments\grpc-streaming-baseline\results\rq1-rerun-20260610-fixed-synthetic-recovery-summary-aggregated.csv
+@@@ Focused rerun finished 2026-06-10T22:50:57+02:00 (elapsed 84m)

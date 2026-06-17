@@ -21,6 +21,8 @@ function New-RunCase {
         [string]$Profile,
         [string]$TotalMessages,
         [string]$PayloadBytes,
+        [string]$BatchedUnaryBatchSize = '100',
+        [string]$GrpcMaxMessageBytes = '134217728',
         [string]$Concurrency,
         [string]$TargetMessagesPerSecond,
         [string]$TransformerWorkIterations = '0',
@@ -44,6 +46,8 @@ function New-RunCase {
         profile = $Profile
         total_messages = $TotalMessages
         payload_bytes = $PayloadBytes
+        batched_unary_batch_size = $BatchedUnaryBatchSize
+        grpc_max_message_bytes = $GrpcMaxMessageBytes
         concurrency = $Concurrency
         target_messages_per_second = $TargetMessagesPerSecond
         transformer_work_iterations = $TransformerWorkIterations
@@ -67,12 +71,13 @@ function Get-MatrixCases {
     switch ($PresetName) {
         'synthetic-clean' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'batched-unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 foreach ($payloadBytes in @(256, 1024, 4096, 16384)) {
                     foreach ($concurrency in @(1, 4, 8, 16)) {
                         $transportShort = switch ($transportMode) {
                             'client-streaming' { 'stream' }
                             'unary' { 'unary' }
+                            'batched-unary' { 'bunary' }
                             'rabbitmq-streams' { 'rmqs' }
                             'nats-jetstream' { 'nats' }
                             'kafka' { 'kafka' }
@@ -93,12 +98,13 @@ function Get-MatrixCases {
         }
         'csv-replay-check' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'batched-unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 foreach ($rowsPerMessage in @(25, 100)) {
                     foreach ($concurrency in @(1, 8)) {
                         $transportShort = switch ($transportMode) {
                             'client-streaming' { 'stream' }
                             'unary' { 'unary' }
+                            'batched-unary' { 'bunary' }
                             'rabbitmq-streams' { 'rmqs' }
                             'nats-jetstream' { 'nats' }
                             'kafka' { 'kafka' }
@@ -122,11 +128,12 @@ function Get-MatrixCases {
         }
         'synthetic-continuous' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'batched-unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 foreach ($concurrency in @(4, 8)) {
                     $transportShort = switch ($transportMode) {
                         'client-streaming' { 'stream' }
                         'unary' { 'unary' }
+                        'batched-unary' { 'bunary' }
                         'rabbitmq-streams' { 'rmqs' }
                         'nats-jetstream' { 'nats' }
                         'kafka' { 'kafka' }
@@ -146,10 +153,11 @@ function Get-MatrixCases {
         }
         'synthetic-backpressure' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'batched-unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 $transportShort = switch ($transportMode) {
                     'client-streaming' { 'stream' }
                     'unary' { 'unary' }
+                    'batched-unary' { 'bunary' }
                     'rabbitmq-streams' { 'rmqs' }
                     'nats-jetstream' { 'nats' }
                     'kafka' { 'kafka' }
@@ -169,10 +177,11 @@ function Get-MatrixCases {
         }
         'synthetic-recovery' {
             $cases = @()
-            foreach ($transportMode in @('client-streaming', 'unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
+            foreach ($transportMode in @('client-streaming', 'unary', 'batched-unary', 'rabbitmq-streams', 'nats-jetstream', 'kafka')) {
                 $transportShort = switch ($transportMode) {
                     'client-streaming' { 'stream' }
                     'unary' { 'unary' }
+                    'batched-unary' { 'bunary' }
                     'rabbitmq-streams' { 'rmqs' }
                     'nats-jetstream' { 'nats' }
                     'kafka' { 'kafka' }
@@ -273,6 +282,18 @@ function Start-FailureInjection {
     } -ArgumentList $Case.failure_action, $Case.failure_target, $delaySeconds, $ComposeRoot
 }
 
+function Get-ComposeServicesForTransport {
+    param([string]$TransportMode)
+
+    $services = @('sink', 'transformer')
+    switch ($TransportMode) {
+        'rabbitmq-streams' { $services += 'rabbitmq' }
+        'nats-jetstream' { $services += 'nats' }
+        'kafka' { $services += 'kafka' }
+    }
+    return $services
+}
+
 function Invoke-RunCase {
     param([pscustomobject]$Case)
 
@@ -288,6 +309,8 @@ function Invoke-RunCase {
         $env:PROFILE = $Case.profile
         $env:TOTAL_MESSAGES = $Case.total_messages
         $env:PAYLOAD_BYTES = $Case.payload_bytes
+        $env:BATCHED_UNARY_BATCH_SIZE = $Case.batched_unary_batch_size
+        $env:GRPC_MAX_MESSAGE_BYTES = $Case.grpc_max_message_bytes
         $env:CONCURRENCY = $Case.concurrency
         $env:TARGET_MESSAGES_PER_SECOND = $Case.target_messages_per_second
         $env:TRANSFORMER_WORK_ITERATIONS = $Case.transformer_work_iterations
@@ -303,7 +326,8 @@ function Invoke-RunCase {
         $env:FAILURE_TARGET = $Case.failure_target
         $env:FAILURE_AFTER_SECONDS = $Case.failure_after_seconds
 
-        docker compose up -d sink transformer rabbitmq | Out-Null
+        $composeServices = Get-ComposeServicesForTransport -TransportMode $Case.transport_mode
+        docker compose up -d @composeServices | Out-Null
         Wait-ForHealth -TransportMode $Case.transport_mode
 
         $statsJob = Start-DockerStatsSampling -OutputPath $statsPath -StopFile $stopFile

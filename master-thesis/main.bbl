@@ -70,6 +70,32 @@ G.~Coviello, K.~Rao, C.~G.~D. Vita, G.~Mellone, and S.~Chakradhar, ``Dataxc:
   pipelines,'' in \emph{2022 IEEE Intl Conf on Dependable, Autonomic and Secure
   Computing (DASC) / PiCom / CBDCom / CyberSciTech}, 2022.
 
+\bibitem{karimov2018benchmarking}
+J.~Karimov, T.~Rabl, A.~Katsifodimos, R.~Samarev, H.~Heiskanen, and V.~Markl,
+  ``Benchmarking distributed stream data processing systems,'' in
+  \emph{Proceedings of the IEEE 34th International Conference on Data
+  Engineering (ICDE)}.\hskip 1em plus 0.5em minus 0.4em\relax IEEE, 2018, pp.
+  1519--1530.
+
+\bibitem{Henning2021ScalabilityMetrics}
+S.~Henning and W.~Hasselbring, ``How to measure scalability of distributed
+  stream processing engines?'' in \emph{Companion of the ACM/SPEC International
+  Conference on Performance Engineering (ICPE '21)}.\hskip 1em plus 0.5em minus
+  0.4em\relax ACM, 2021, pp. 85--88.
+
+\bibitem{systematicstreaming}
+S.~Ris, J.~Araujo, and D.~Beserra, ``A systemic mapping of methods and tools
+  for performance analysis of data streaming with containerized microservices
+  architecture,'' in \emph{2023 18th Iberian Conference on Information Systems
+  and Technologies (CISTI)}, 2023, pp. 1--6.
+
+\bibitem{ciftci2025ipcmechanisms}
+B.~\c{C}ift\c{c}i and B.~\c{C}ilo\u{g}lugil, ``A review of comparative studies
+  on performance evaluation of communication mechanisms for microservices,'' in
+  \emph{Computational Science and Its Applications -- ICCSA 2025}, ser. Lecture
+  Notes in Computer Science.\hskip 1em plus 0.5em minus 0.4em\relax Springer
+  Nature Switzerland AG, 2025, vol. 15650, pp. 98--113.
+
 \bibitem{figueira2024selfadaptive}
 J.~Figueira and C.~Coutinho, ``Developing self-adaptive microservices,''
   \emph{Procedia Computer Science}, vol. 232, pp. 264--273, 2024.
@@ -126,12 +152,6 @@ V.~L{\"a}htev{\"a}noja, ``Communication methods and protocols between
   \url{https://urn.fi/URN:NBN:fi:aalto-202106207501}
 \BIBentrySTDinterwordspacing
 
-\bibitem{systematicstreaming}
-S.~Ris, J.~Araujo, and D.~Beserra, ``A systemic mapping of methods and tools
-  for performance analysis of data streaming with containerized microservices
-  architecture,'' in \emph{2023 18th Iberian Conference on Information Systems
-  and Technologies (CISTI)}, 2023, pp. 1--6.
-
 \bibitem{grpc2024coreconcepts}
 \BIBentryALTinterwordspacing
 {gRPC Authors}. (2024) Core concepts, architecture and lifecycle. Last modified
@@ -152,13 +172,6 @@ P.~Dobbelaere and K.~Sheykh~Esmaili, ``Kafka versus rabbitmq,'' 2017, arXiv
 \bibitem{mohammad2025kafkapatterns}
 M.~Mohammad, ``Analysis of design patterns and benchmark practices in apache
   kafka event-streaming systems,'' 2025, arXiv preprint.
-
-\bibitem{ciftci2025ipcmechanisms}
-B.~\c{C}ift\c{c}i and B.~\c{C}ilo\u{g}lugil, ``A review of comparative studies
-  on performance evaluation of communication mechanisms for microservices,'' in
-  \emph{Computational Science and Its Applications -- ICCSA 2025}, ser. Lecture
-  Notes in Computer Science.\hskip 1em plus 0.5em minus 0.4em\relax Springer
-  Nature Switzerland AG, 2025, vol. 15650, pp. 98--113.
 
 \bibitem{sharvari2019messaging}
 T.~Sharvari and K.~Sowmya~Nag, ``A study on modern messaging systems: Kafka,
@@ -188,36 +201,30 @@ T.~Sharvari and K.~Sowmya~Nag, ``A study on modern messaging systems: Kafka,
   \url{https://docs.nats.io/nats-concepts/jetstream}
 \BIBentrySTDinterwordspacing
 
-\bibitem{karimov2018benchmarking}
-J.~Karimov, T.~Rabl, A.~Katsifodimos, R.~Samarev, H.~Heiskanen, and V.~Markl,
-  ``Benchmarking distributed stream data processing systems,'' in
-  \emph{Proceedings of the IEEE 34th International Conference on Data
-  Engineering (ICDE)}.\hskip 1em plus 0.5em minus 0.4em\relax IEEE, 2018, pp.
-  1519--1530.
-
-\bibitem{Henning2021ScalabilityMetrics}
-S.~Henning and W.~Hasselbring, ``How to measure scalability of distributed
-  stream processing engines?'' in \emph{Companion of the ACM/SPEC International
-  Conference on Performance Engineering (ICPE '21)}.\hskip 1em plus 0.5em minus
-  0.4em\relax ACM, 2021, pp. 85--88.
-
-\bibitem{jongejans2025scattered}
-J.~Jongejans, A.~Koufakis, and A.~Oprescu, ``Vertical federated learning on
-  scattered directive: Enforcing policies on {VFL} workflows,'' in
-  \emph{Proceedings of the 2025 IEEE International Conference on Big Data
-  (BigData)}, 2025, pp. 267--274.
+\bibitem{vogel2024faultRecovery}
+A.~Vogel, S.~Henning, E.~Perez-Wohlfeil, O.~Ertl, and R.~Rabiser, ``A
+  comprehensive benchmarking analysis of fault recovery in stream processing
+  frameworks,'' in \emph{Proceedings of the 18th ACM International Conference
+  on Distributed and Event-Based Systems (DEBS '24)}.\hskip 1em plus 0.5em
+  minus 0.4em\relax ACM, 2024, pp. 171--182.
 
 \bibitem{dynamosMainCommit2026}
 {DYNAMOS Contributors}, ``{DYNAMOS} source repository, main branch, commit
-  747912e,''
-  \url{https://github.com/neburpoots/DYNAMOS/tree/747912e975c358ba14d7df28f6adaad4b20323c1},
-  2026, accessed: 2026-05-25.
+  a2d9531,''
+  \url{https://github.com/neburpoots/DYNAMOS/tree/a2d953166c369260e6014f41bd988ee3ae45592d},
+  2026, accessed: 2026-06-09.
 
 \bibitem{dynamosStreamingCommit2026}
 ------, ``{DYNAMOS} streaming implementations prototype,
   feature/streaming-implementations branch, commit 923b018,''
   \url{https://github.com/neburpoots/DYNAMOS/tree/923b018e622e30ed6141a3e9c925417ce9150e5d},
   2026, accessed: 2026-05-25.
+
+\bibitem{jongejans2025scattered}
+J.~Jongejans, A.~Koufakis, and A.~Oprescu, ``Vertical federated learning on
+  scattered directive: Enforcing policies on {VFL} workflows,'' in
+  \emph{Proceedings of the 2025 IEEE International Conference on Big Data
+  (BigData)}, 2025, pp. 267--274.
 
 \bibitem{scatteredDirectiveRepo2026}
 {DYNAMOS-UVA}, ``Scattered directive source repository,''
