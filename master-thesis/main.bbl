@@ -29,8 +29,9 @@ J.~Stutterheim, ``Dynamos: Dynamically adaptive microservice-based os: A
 \bibitem{stutterheim2023icsa}
 J.~Stutterheim, A.~Mifsud, and A.~Oprescu, ``Dynamos: Dynamic microservice
   composition for data-exchange systems, lessons learned,'' in
-  \emph{Proceedings of the IEEE International Conference on Software
-  Architecture (ICSA)}, 2023.
+  \emph{Proceedings of the 2024 IEEE 21st International Conference on Software
+  Architecture Companion (ICSA-C)}.\hskip 1em plus 0.5em minus 0.4em\relax
+  IEEE, 2024, pp. 8--15.
 
 \bibitem{starck2023streaminglb}
 \BIBentryALTinterwordspacing
@@ -191,13 +192,13 @@ T.~Sharvari and K.~Sowmya~Nag, ``A study on modern messaging systems: Kafka,
 
 \bibitem{nats2026reqreply}
 \BIBentryALTinterwordspacing
-------. (2026) Request-reply. [Online]. Available:
+{The NATS Authors}. (2026) Request-reply. [Online]. Available:
   \url{https://docs.nats.io/nats-concepts/core-nats/reqreply}
 \BIBentrySTDinterwordspacing
 
 \bibitem{nats2026jetstream}
 \BIBentryALTinterwordspacing
-------. (2026) Jetstream. [Online]. Available:
+{The NATS Authors}. (2026) Jetstream. [Online]. Available:
   \url{https://docs.nats.io/nats-concepts/jetstream}
 \BIBentrySTDinterwordspacing
 
@@ -215,7 +216,7 @@ A.~Vogel, S.~Henning, E.~Perez-Wohlfeil, O.~Ertl, and R.~Rabiser, ``A
   2026, accessed: 2026-06-09.
 
 \bibitem{dynamosStreamingCommit2026}
-------, ``{DYNAMOS} streaming implementations prototype,
+{DYNAMOS Contributors}, ``{DYNAMOS} streaming implementations prototype,
   feature/streaming-implementations branch, commit 923b018,''
   \url{https://github.com/neburpoots/DYNAMOS/tree/923b018e622e30ed6141a3e9c925417ce9150e5d},
   2026, accessed: 2026-05-25.

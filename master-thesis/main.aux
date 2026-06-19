@@ -1,6 +1,7 @@
 \relax 
 \providecommand \babel@aux [2]{\global \let \babel@toc \@gobbletwo }
 \@nameuse{bbl@beforestart}
+\citation{IEEEtran:BSTcontrol}
 \citation{stutterheim2023thesis,stutterheim2023icsa}
 \citation{stutterheim2023thesis}
 \babel@aux{british}{}
@@ -55,14 +56,14 @@
 \citation{karimov2018benchmarking,Henning2021ScalabilityMetrics}
 \citation{coviello2022dataxc,systematicstreaming}
 \citation{coviello2022dataxc,systematicstreaming,ciftci2025ipcmechanisms}
+\citation{karimov2018benchmarking,systematicstreaming,ciftci2025ipcmechanisms,vogel2024faultRecovery}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}NATS with JetStream persistence}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Benchmark Design}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}1}Methodological positioning and scope}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}2}Common testbed and fairness constraints}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}3}Evaluation dimensions}{5}{}\protected@file@percent }
-\citation{karimov2018benchmarking,systematicstreaming,ciftci2025ipcmechanisms,vogel2024faultRecovery}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}4}Scenario set and scenario-to-property mapping}{5}{}\protected@file@percent }
 \citation{sharvari2019messaging,ciftci2025ipcmechanisms}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}4}Scenario set and scenario-to-property mapping}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}5}Experimental factors}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}6}Result presentation and appendix boundary}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Results}{6}{}\protected@file@percent }
@@ -72,97 +73,66 @@
 \newlabel{tab:phase1-scenario-map}{{I}{7}{}{table.1}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}2}Comparison scope}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}3}Clean bulk-transfer matrix}{7}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Single-node synthetic-clean summary from the completed five-transport corpus, averaged across all payload sizes and concurrency levels.}}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Single-node synthetic-clean summary across six transports, averaged over five repetitions, four payload sizes, and four concurrency levels.}}{8}{}\protected@file@percent }
 \newlabel{tab:grpc-preliminary-results}{{II}{8}{}{table.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Single-node synthetic bulk-transfer throughput by message size, averaged across concurrency levels 1, 4, 8, and 16.}}{8}{}\protected@file@percent }
-\newlabel{tab:grpc-per-size}{{III}{8}{}{table.3}{}}
-\newlabel{sec:rq1-rerun}{{\mbox  {III-F}4}{8}{}{subsubsection.3.6.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}4}Extended rerun: batched unary and the 256~KiB tier}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Extended rerun, first repetition: single-node synthetic-clean throughput (msg/s) by message size, averaged across concurrency 1, 4, 8, and 16. Batched unary carries 100 records per request. The NATS 256~KiB cell is concurrency~1 only; dashes mark cells that had not completed when this version was finalized.}}{8}{}\protected@file@percent }
-\newlabel{tab:grpc-rerun-matrix}{{IV}{8}{}{table.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Continuous steady-rate scenario: single-node results (1\,KiB payload, 1{,}000 msg/s target, one repetition per cell). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}}{9}{}\protected@file@percent }
-\newlabel{tab:grpc-continuous-results}{{V}{9}{}{table.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}5}Continuous steady-rate scenario}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}6}Backpressure scenario}{9}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Backpressure scenario: single-node results (1\,KiB, concurrency 8, 4{,}000 msg/s target, 2\,ms sink delay, one repetition per transport). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}}{9}{}\protected@file@percent }
-\newlabel{tab:grpc-backpressure-results}{{VI}{9}{}{table.6}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}7}Recovery scenario}{9}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Recovery scenario: single-node results (4\,KiB, concurrency 8, 2{,}000 msg/s, transformer restart at 3\,s). One repetition per transport. Throughput values are in msg/s; time, latency, and drain values are in milliseconds. Sustained recovery is the first five complete one-second buckets inside the configured target band, with no fallback to backlog drain. Dashes indicate that the value was not observed in the run or that no messages arrived in that phase/window.}}{10}{}\protected@file@percent }
-\newlabel{tab:grpc-recovery-results}{{VII}{10}{}{table.7}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}8}Discussion}{10}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Threats to Validity}{10}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Continuous steady-rate scenario: single-node results averaged over five repetitions (1\,KiB payload, 1{,}000 msg/s target). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}}{8}{}\protected@file@percent }
+\newlabel{tab:grpc-continuous-results}{{III}{8}{}{table.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}4}Continuous steady-rate scenario}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}5}Backpressure scenario}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Backpressure scenario: single-node results averaged over five repetitions (1\,KiB, concurrency 8, 4{,}000 msg/s target, 2\,ms sink delay). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}}{8}{}\protected@file@percent }
+\newlabel{tab:grpc-backpressure-results}{{IV}{8}{}{table.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}6}Recovery scenario}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Recovery scenario: single-node results averaged over five repetitions (4\,KiB, concurrency 8, 2{,}000 msg/s, transformer restart at 3\,s). Throughput values are in msg/s; time, latency, and drain values are in milliseconds. Sustained recovery is the first five complete one-second buckets at or above 80\% of target. Dashes indicate that the value was not observed.}}{9}{}\protected@file@percent }
+\newlabel{tab:grpc-recovery-results}{{V}{9}{}{table.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}7}Discussion}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Threats to Validity}{9}{}\protected@file@percent }
 \citation{stutterheim2023thesis}
 \citation{dynamosMainCommit2026}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Streaming Integration in DYNAMOS}{11}{}\protected@file@percent }
-\newlabel{sec:dynamos-rq2}{{IV}{11}{}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Motivation}{11}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}DYNAMOS execution path}{11}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Common chunk model}{11}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Implemented variants}{11}{}\protected@file@percent }
 \citation{dynamosStreamingCommit2026}
 \citation{grpc2024coreconcepts}
 \citation{rabbitmq2026streams}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces DYNAMOS bulk retrieval path used for RQ2. The implementation changes the bulk data path after policy approval. Chunking starts at the SQL query service and must be preserved through the generated job, agent path, and gateway response to avoid rebuilding one complete result table before the client sees progress.}}{12}{}\protected@file@percent }
-\newlabel{fig:dynamos-rq2-path}{{1}{12}{}{figure.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces DYNAMOS implementation variants and the architectural boundary changed by each variant.}}{12}{}\protected@file@percent }
-\newlabel{tab:dynamos-rq2-variants}{{VIII}{12}{}{table.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}RQ2 answer}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Evaluation of DYNAMOS Streaming Implementations}{13}{}\protected@file@percent }
-\newlabel{sec:dynamos-rq3}{{V}{13}{}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Benchmark method}{13}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Median completion latency for DYNAMOS bulk retrieval. All cells completed 10/10 valid repetitions.}}{13}{}\protected@file@percent }
-\newlabel{tab:dynamos-rq3-latency}{{IX}{13}{}{table.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Completion latency}{13}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Additional scenario checks}{13}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Median completion time for the local DYNAMOS bulk retrieval benchmark. Chunking is the dominant improvement: all chunk-aware variants scale better than classic unary as the returned row count grows.}}{14}{}\protected@file@percent }
-\newlabel{fig:dynamos-rq3-latency}{{2}{14}{}{figure.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Focused DYNAMOS scenario checks beyond the primary single-provider \texttt  {dataThroughTtp} benchmark. The extra chunked-variant cells use three repetitions; the classic cells use the cleaned 10-repetition baseline.}}{14}{}\protected@file@percent }
-\newlabel{tab:dynamos-rq3-scenarios}{{X}{14}{}{table.10}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XI}{\ignorespaces Time-to-first-result and partial result behaviour. Classic unary has no partial results, so first result equals completion.}}{14}{}\protected@file@percent }
-\newlabel{tab:dynamos-rq3-first}{{XI}{14}{}{table.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Time to first result}{14}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Resource usage}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Streaming Integration in DYNAMOS}{10}{}\protected@file@percent }
+\newlabel{sec:dynamos-rq2}{{IV}{10}{}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Motivation}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}DYNAMOS execution path}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Common chunk model}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Implemented variants}{10}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces DYNAMOS bulk retrieval path used for RQ2. The implementation changes the bulk data path after policy approval. Chunking starts at the SQL query service and must be preserved through the generated job, agent path, and gateway response to avoid rebuilding one complete result table before the client sees progress.}}{11}{}\protected@file@percent }
+\newlabel{fig:dynamos-rq2-path}{{1}{11}{}{figure.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces DYNAMOS implementation variants and the architectural boundary changed by each variant.}}{11}{}\protected@file@percent }
+\newlabel{tab:dynamos-rq2-variants}{{VI}{11}{}{table.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}RQ2 answer}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Evaluation of DYNAMOS Streaming Implementations}{11}{}\protected@file@percent }
+\newlabel{sec:dynamos-rq3}{{V}{11}{}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Benchmark method}{11}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Average completion latency for DYNAMOS bulk retrieval. All cells completed 10/10 valid repetitions.}}{12}{}\protected@file@percent }
+\newlabel{tab:dynamos-rq3-latency}{{VII}{12}{}{table.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Completion latency}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Additional scenario checks}{12}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Time to first result}{12}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Average completion time for the local DYNAMOS bulk retrieval benchmark. Chunking is the dominant improvement: all chunk-aware variants scale better than classic unary as the returned row count grows.}}{13}{}\protected@file@percent }
+\newlabel{fig:dynamos-rq3-latency}{{2}{13}{}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Focused DYNAMOS scenario checks beyond the primary single-provider \texttt  {dataThroughTtp} benchmark.}}{13}{}\protected@file@percent }
+\newlabel{tab:dynamos-rq3-scenarios}{{VIII}{13}{}{table.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Time-to-first-result and partial result behaviour. Classic unary has no partial results, so first result equals completion.}}{13}{}\protected@file@percent }
+\newlabel{tab:dynamos-rq3-first}{{IX}{13}{}{table.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Peak sampled resource usage during DYNAMOS bulk retrieval. CPU is peak total millicores; memory is peak total MiB across sampled Kubernetes namespaces.}}{13}{}\protected@file@percent }
+\newlabel{tab:dynamos-rq3-resources}{{X}{13}{}{table.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Resource usage}{13}{}\protected@file@percent }
 \citation{starck2023streaminglb}
-\@writefile{lot}{\contentsline {table}{\numberline {XII}{\ignorespaces Peak sampled resource usage during DYNAMOS bulk retrieval. CPU is peak total millicores; memory is peak total MiB across sampled Kubernetes namespaces.}}{15}{}\protected@file@percent }
-\newlabel{tab:dynamos-rq3-resources}{{XII}{15}{}{table.12}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Peak sampled memory at 250k rows. Chunk-aware variants avoid the largest full-result buffer and keep memory below the classic unary baseline.}}{15}{}\protected@file@percent }
-\newlabel{fig:dynamos-rq3-memory}{{3}{15}{}{figure.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-F}}Failure modes and robustness}{15}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-G}}Discussion and RQ3 answer}{15}{}\protected@file@percent }
 \citation{jongejans2025scattered,scatteredDirectiveRepo2026}
 \citation{baldin2019fabric,fabricPortal2026}
-\@writefile{lot}{\contentsline {table}{\numberline {XIII}{\ignorespaces Failure modes observed or accounted for during the DYNAMOS benchmark work.}}{16}{}\protected@file@percent }
-\newlabel{tab:dynamos-rq3-failure-modes}{{XIII}{16}{}{table.13}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-H}}Threats to validity}{16}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Future Work}{16}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{16}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  A: Benchmark Preset Definitions}{17}{}\protected@file@percent }
-\newlabel{app:presets}{{A}{17}{}{section.Appendix.A}{}}
-\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  B: Full Run Matrix}{17}{}\protected@file@percent }
-\newlabel{app:run-matrix}{{B}{17}{}{section.Appendix.B}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XIV}{\ignorespaces Benchmark presets used in the current transport study.}}{17}{}\protected@file@percent }
-\newlabel{tab:appendix-presets}{{XIV}{17}{}{table.14}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XV}{\ignorespaces Execution scope of the current benchmark corpus.}}{17}{}\protected@file@percent }
-\newlabel{tab:appendix-run-scope}{{XV}{17}{}{table.15}{}}
-\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  C: Detailed Clean-Matrix Results}{17}{}\protected@file@percent }
-\newlabel{app:clean-matrix-details}{{C}{17}{}{section.Appendix.C}{}}
-\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  D: Resource Utilisation Details}{17}{}\protected@file@percent }
-\newlabel{app:resource-details}{{D}{17}{}{section.Appendix.D}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-F}}Failure modes and robustness}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-G}}Discussion and RQ3 answer}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-H}}Threats to validity}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Future Work}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{15}{}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{stutterheim2023thesis}{1}
 \bibcite{stutterheim2023icsa}{2}
 \bibcite{starck2023streaminglb}{3}
 \bibcite{sodankoor2026grpcbench}{4}
-\@writefile{lot}{\contentsline {table}{\numberline {XVI}{\ignorespaces Detailed synthetic-clean message throughput (msg/s) by payload size and concurrency.}}{18}{}\protected@file@percent }
-\newlabel{tab:appendix-clean-throughput}{{XVI}{18}{}{table.16}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XVII}{\ignorespaces Detailed synthetic-clean data throughput (MiB/s) by payload size and concurrency.}}{18}{}\protected@file@percent }
-\newlabel{tab:appendix-clean-mib}{{XVII}{18}{}{table.17}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XVIII}{\ignorespaces Detailed synthetic-clean $p_{95}$ latency (ms) by payload size and concurrency.}}{18}{}\protected@file@percent }
-\newlabel{tab:appendix-clean-p95}{{XVIII}{18}{}{table.18}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XIX}{\ignorespaces Detailed synthetic-clean $p_{99}$ latency (ms) by payload size and concurrency.}}{18}{}\protected@file@percent }
-\newlabel{tab:appendix-clean-p99}{{XIX}{18}{}{table.19}{}}
-\@writefile{toc}{\contentsline {section}{References}{18}{}\protected@file@percent }
 \bibcite{ibrahim2026brokers}{5}
 \bibcite{nuikka2021cloudnative}{6}
 \bibcite{coviello2022dataxc}{7}
@@ -193,12 +163,37 @@
 \bibcite{dynamosStreamingCommit2026}{32}
 \bibcite{jongejans2025scattered}{33}
 \bibcite{scatteredDirectiveRepo2026}{34}
-\@writefile{lot}{\contentsline {table}{\numberline {XX}{\ignorespaces Continuous scenario CPU usage by role (avg./peak \%).}}{19}{}\protected@file@percent }
-\newlabel{tab:appendix-continuous-cpu}{{XX}{19}{}{table.20}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XXI}{\ignorespaces Recovery scenario CPU usage by role (avg./peak \%).}}{19}{}\protected@file@percent }
-\newlabel{tab:appendix-recovery-cpu}{{XXI}{19}{}{table.21}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XXII}{\ignorespaces Recovery scenario memory usage by role (avg./peak MiB).}}{19}{}\protected@file@percent }
-\newlabel{tab:appendix-recovery-memory}{{XXII}{19}{}{table.22}{}}
 \bibcite{baldin2019fabric}{35}
 \bibcite{fabricPortal2026}{36}
-\gdef \@abspage@last{20}
+\@writefile{toc}{\contentsline {section}{References}{16}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  A: Benchmark Preset Definitions}{17}{}\protected@file@percent }
+\newlabel{app:presets}{{A}{17}{}{section.Appendix.A}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XI}{\ignorespaces Benchmark presets used in the current transport study.}}{17}{}\protected@file@percent }
+\newlabel{tab:appendix-presets}{{XI}{17}{}{table.11}{}}
+\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  B: Full Run Matrix}{17}{}\protected@file@percent }
+\newlabel{app:run-matrix}{{B}{17}{}{section.Appendix.B}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XII}{\ignorespaces Execution scope of the current benchmark corpus.}}{17}{}\protected@file@percent }
+\newlabel{tab:appendix-run-scope}{{XII}{17}{}{table.12}{}}
+\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  C: DYNAMOS Failure-Mode Notes}{17}{}\protected@file@percent }
+\newlabel{app:dynamos-failure-modes}{{C}{17}{}{section.Appendix.C}{}}
+\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  D: Detailed Clean-Matrix Results}{17}{}\protected@file@percent }
+\newlabel{app:clean-matrix-details}{{D}{17}{}{section.Appendix.D}{}}
+\@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  E: Resource Utilisation Details}{17}{}\protected@file@percent }
+\newlabel{app:resource-details}{{E}{17}{}{section.Appendix.E}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XIII}{\ignorespaces Failure modes observed or accounted for during the DYNAMOS benchmark work.}}{18}{}\protected@file@percent }
+\newlabel{tab:dynamos-rq3-failure-modes}{{XIII}{18}{}{table.13}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XIV}{\ignorespaces Synthetic bulk-transfer throughput by message size, averaged over five repetitions and concurrency levels 1, 4, 8, and 16.}}{18}{}\protected@file@percent }
+\newlabel{tab:grpc-per-size}{{XIV}{18}{}{table.14}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XV}{\ignorespaces Detailed synthetic-clean message throughput (msg/s) by payload size and concurrency, averaged over five repetitions.}}{18}{}\protected@file@percent }
+\newlabel{tab:appendix-clean-throughput}{{XV}{18}{}{table.15}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XVI}{\ignorespaces Detailed synthetic-clean data throughput (MiB/s) by payload size and concurrency, averaged over five repetitions.}}{18}{}\protected@file@percent }
+\newlabel{tab:appendix-clean-mib}{{XVI}{18}{}{table.16}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XVII}{\ignorespaces Detailed synthetic-clean $p_{95}$ latency (ms) by payload size and concurrency, averaged over five repetitions.}}{18}{}\protected@file@percent }
+\newlabel{tab:appendix-clean-p95}{{XVII}{18}{}{table.17}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XVIII}{\ignorespaces Continuous scenario CPU usage by role (avg./peak \%).}}{19}{}\protected@file@percent }
+\newlabel{tab:appendix-continuous-cpu}{{XVIII}{19}{}{table.18}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XIX}{\ignorespaces Recovery scenario CPU usage by role (avg./peak \%).}}{19}{}\protected@file@percent }
+\newlabel{tab:appendix-recovery-cpu}{{XIX}{19}{}{table.19}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XX}{\ignorespaces Recovery scenario memory usage by role (avg./peak MiB).}}{19}{}\protected@file@percent }
+\newlabel{tab:appendix-recovery-memory}{{XX}{19}{}{table.20}{}}
+\gdef \@abspage@last{19}
