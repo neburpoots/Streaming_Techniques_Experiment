@@ -1,0 +1,101 @@
+\section{Streaming Integration in DYNAMOS}
+\label{sec:dynamos-rq2}
+
+This section addresses RQ2 by moving from a generic transport benchmark to an implementation inside DYNAMOS. The question is no longer only which communication mechanism is fast. The implementation must also preserve DYNAMOS' policy approval path, generated job model, sidecar-mediated communication, and isolation between data stewards.
+
+\subsection{Motivation}
+
+The original DYNAMOS implementation already identifies large message transfer as a limitation. The DYNAMOS thesis notes that the default maximum size of a gRPC method is around 4 MB, corresponding to approximately 30{,}000 records in the original experiments, and that the current gRPC implementation uses unary RPCs: one request and one response \cite{stutterheim2023thesis}. The same discussion observes that increasing the message size is theoretically possible but memory-heavy, and explicitly names streaming as the unfinished solution. This makes large-result transfer an appropriate point at which to evaluate streaming techniques inside DYNAMOS rather than only in a synthetic pipeline.
+
+The implementation target is deliberately different from the average-query example commonly used in DYNAMOS demonstrations. An average query is a reduction workload: it may scan many records but returns one scalar result. That tests computation near the data source, but it does not test whether DYNAMOS can transport many aligned rows. Bulk retrieval therefore stresses the part of DYNAMOS that is most affected by full-response buffering. It is also a useful precursor to later distributed learning scenarios, but this thesis first validates whether the core DYNAMOS data path can move large row sets incrementally.
+
+\subsection{DYNAMOS execution path}
+
+DYNAMOS separates the control path from the data path. A client request first passes through the gateway, policy evaluation, orchestration, and the relevant agents. Only after that approval and composition step are generated job pods used to execute the request. For the \texttt{dataThroughTtp} archetype, the data provider job retrieves rows, the Trusted Third Party (TTP) or SURF-side job performs the compute-provider part of the chain, and the response eventually returns through the agent and gateway path.
+
+\begin{figure*}[!t]
+    \centering
+    \scriptsize
+    \begin{tikzpicture}[
+        node distance=0.62cm and 0.52cm,
+        box/.style={draw, rounded corners=1.5pt, align=center, minimum height=0.66cm, inner sep=3pt},
+        wide/.style={box, minimum width=1.55cm},
+        arrow/.style={-{Latex[length=2mm]}, thick},
+        note/.style={align=center, font=\scriptsize, text width=3.2cm}
+    ]
+        \node[wide] (client) {Benchmark\\client};
+        \node[wide, right=of client] (gateway) {API\\gateway};
+        \node[wide, right=of gateway] (policy) {Policy and\\orchestration};
+        \node[wide, right=of policy] (surf) {TTP/SURF\\agent};
+        \node[wide, right=of surf] (uva) {UVA\\agent};
+
+        \node[box, below=1.12cm of uva, minimum width=1.35cm] (sql) {SQL\\query};
+        \node[box, right=0.50cm of sql, minimum width=1.35cm] (aggregate) {Aggregate};
+        \node[box, right=0.50cm of aggregate, minimum width=1.35cm] (algorithm) {Algorithm};
+        \node[box, below=0.62cm of aggregate, minimum width=1.45cm] (sidecar) {Sidecar};
+        \node[draw, dashed, rounded corners=2pt, fit=(sql)(aggregate)(algorithm)(sidecar), inner sep=0.28cm, label={[font=\scriptsize]above:generated ephemeral job pod}] (pod) {};
+        \draw[arrow] (client) -- (gateway);
+        \draw[arrow] (gateway) -- (policy);
+        \draw[arrow] (policy) -- (surf);
+        \draw[arrow] (surf) -- (uva);
+        \draw[arrow] (uva) -- (pod);
+        \draw[arrow] (sql) -- (aggregate);
+        \draw[arrow] (aggregate) -- (algorithm);
+        \draw[arrow] (algorithm) |- (sidecar);
+        \draw[arrow] (sidecar.west) .. controls +(-2.25cm,0) and +(-1.45cm,-1.00cm) .. (uva.south);
+        \draw[arrow] (uva) to[bend left=16] (surf);
+        \draw[arrow] (surf) to[bend left=18] (gateway);
+        \draw[arrow] (gateway) to[bend left=18] (client);
+
+        \node[note, above=0.36cm of uva] {agent boundary:\\normal AMQP chunks or\\RabbitMQ Streams};
+    \end{tikzpicture}
+    \caption{DYNAMOS bulk retrieval path used for RQ2. The implementation changes the bulk data path after policy approval. Chunking starts at the SQL query service and must be preserved through the generated job, agent path, and gateway response to avoid rebuilding one complete result table before the client sees progress.}
+    \label{fig:dynamos-rq2-path}
+\end{figure*}
+
+Figure~\ref{fig:dynamos-rq2-path} shows the boundary that matters for the implementation. In the original path, a large result can be rebuilt several times before the client sees anything: inside the SQL response, inside the generated service chain, inside the agent response, and again at the gateway. The streaming implementation therefore treats chunk preservation as the central requirement. A transport is only useful for this workload if the first rows can leave the provider path before the final rows have been read and serialized.
+
+The implementation should not be a special case for one benchmark request. DYNAMOS supports multiple archetypes and multiple data providers, so a chunk-aware path must keep existing request shapes valid. The primary evaluation uses \texttt{dataThroughTtp} with one provider to isolate the large-result bottleneck. RQ3 then adds focused checks for \texttt{computeToData} and for \texttt{dataThroughTtp} with two providers, because those scenarios exercise different parts of the generated job and aggregation path.
+
+\subsection{Common chunk model}
+
+All chunked variants use the same logical stream model. The SQL query service reads the bulk result in fixed row batches. Each batch carries stream metadata: provider identity, correlation identifier, sequence number, row count, partial or final status, and ordered column names. The ordered-column metadata is important because Go protobuf structs can otherwise expose map fields in nondeterministic order, which would make equal results appear different across transports.
+
+The aggregate and algorithm stages preserve chunk boundaries for non-average bulk workloads. They do not merge all incoming rows into one table unless the request explicitly uses the classic unary baseline. The gateway exposes chunk progress to the benchmark client through NDJSON \texttt{providerResult} events, with partial events before the final event. This keeps the external response shape compatible with the existing gateway while making progress visible.
+
+Policy enforcement is not moved into the stream. DYNAMOS still evaluates the request before execution, constructs the permitted job path, and then lets that generated path process the approved data exchange. The current implementation therefore preserves the original policy decision point. It does not claim per-chunk policy revocation during a running stream.
+
+\subsection{Implemented variants}
+
+Four paths are compared in the thesis. The first is the original DYNAMOS style and the other three are chunk-aware implementations. This distinction matters because the RabbitMQ Streams path still needs chunking before it reaches the broker. If the generated job first built one giant result and only then wrote it into RabbitMQ Streams, the client would not receive an earlier first result and the memory problem would largely remain.
+
+\begin{table*}[!t]
+    \centering
+    \footnotesize
+    \caption{DYNAMOS implementation variants and the architectural boundary changed by each variant.}
+    \label{tab:dynamos-rq2-variants}
+    \setlength{\tabcolsep}{4pt}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{p{0.16\textwidth}p{0.18\textwidth}p{0.18\textwidth}p{0.22\textwidth}p{0.24\textwidth}}
+        \toprule
+        Variant & In-pod service chain & Agent boundary & Buffering behaviour & Architectural purpose \\
+        \midrule
+        Classic unary & Unary gRPC, full response & Classic RabbitMQ message path & Complete result is buffered into one logical response & Baseline closest to original DYNAMOS once the gRPC size ceiling is raised. \\
+        Chunked unary & Repeated unary calls carrying row chunks & Classic RabbitMQ carries separate chunk messages & Chunks stay separate through aggregate, algorithm, agent, and gateway & Smallest architectural change; preserves the message-driven style. \\
+        Intra-job gRPC streaming & Long-lived \texttt{SendDataStream} through the generated service chain & Classic RabbitMQ carries separate chunk messages & Chunks stream inside the pod and remain chunks after leaving it & Tests native gRPC streaming where DYNAMOS already uses local gRPC. \\
+        RabbitMQ Streams at agent boundary & Chunked unary path inside the generated job & RabbitMQ stream records replace classic queue messages for chunk transfer & Local chunks are written as broker stream records and reassembled downstream & Tests stream-log semantics for distributed inter-agent transfer. \\
+        \bottomrule
+    \end{tabular}}
+\end{table*}
+
+The classic unary baseline uses the original DYNAMOS \texttt{main} branch at commit \texttt{a2d9531} \cite{dynamosMainCommit2026}. For the benchmark, its gRPC and message-size limits are configured high enough to complete the tested row counts. This avoids treating the historical 4 MB ceiling as the result. Classic unary remains intentionally full-buffered, because that is the behaviour the streaming implementations are meant to improve. The multi-provider classic baseline also includes a minimal aggregation correction so the first provider is not appended twice during result merging. This correction makes the baseline result valid; it does not add streaming behaviour.
+
+The three chunked paths use the streaming implementation branch at commit \texttt{923b018} \cite{dynamosStreamingCommit2026}. Chunked unary is the least disruptive path. It keeps unary calls and the existing agent style, but it sends many smaller result messages instead of one large result. Intra-job gRPC streaming replaces repeated unary calls inside the generated service chain with one stream. That matches gRPC's native streaming model \cite{grpc2024coreconcepts}, but it couples sender and receiver lifetimes more tightly. RabbitMQ Streams changes the agent boundary. It keeps the chunked local path, then uses RabbitMQ's append-only stream abstraction for chunk transfer between agents \cite{rabbitmq2026streams}.
+
+These variants are not three independent full-stack streaming systems. They are interventions at different parts of the same DYNAMOS path. The local performance improvement of the RabbitMQ Streams variant is therefore not caused by RabbitMQ Streams alone. It is caused by the common chunk-aware data path, with RabbitMQ Streams adding a different broker representation at the agent boundary.
+
+\subsection{RQ2 answer}
+
+Streaming can be integrated into DYNAMOS by changing the bulk data path after policy approval while leaving the control path intact. The implementation introduces an explicit chunk model at the SQL query service, preserves those chunks through aggregate and algorithm services, carries them through the agent boundary, and exposes partial result events to the client. This keeps dynamic service composition and policy-driven orchestration in place, while removing the need to repeatedly materialize one complete result table before progress is visible. Compatibility with \texttt{computeToData} and multi-provider \texttt{dataThroughTtp} is treated as part of the implementation requirement rather than as an optional benchmark extension.
+
+The best architectural choice is boundary-specific. Chunked unary is the best current local default because it gives chunking without changing the DYNAMOS execution model very much. Intra-job gRPC streaming is useful where both endpoints are already in the generated pod and a direct stream is acceptable. RabbitMQ Streams is more relevant at the inter-agent boundary, especially for future distributed deployments where retained streams, replay, and independent consumers may matter more than local latency.

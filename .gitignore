@@ -1,0 +1,45 @@
+# Local assistant/editor state
+.claude/
+.agents/
+.codex/
+.vscode/
+
+# Dependencies and virtual environments
+node_modules/
+**/node_modules/
+.venv/
+venv/
+env/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Build outputs and logs
+*.log
+*.tmp
+*.out
+*.err
+tmp/
+
+# LaTeX build byproducts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.nav
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*~
+*.swp

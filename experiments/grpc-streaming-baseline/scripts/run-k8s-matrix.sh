@@ -423,6 +423,10 @@ patch_configmap() {
         --from-literal=NATS_TRANSFORMER_TO_SINK_SUBJECT="${NATS_TRANSFORMER_TO_SINK_SUBJECT:-transformer.to.sink}" \
         --from-literal=NATS_STREAM_REPLICAS="${NATS_STREAM_REPLICAS:-1}" \
         --from-literal=NATS_STREAM_MAX_BYTES="${nats_stream_max_bytes}" \
+        --from-literal=NATS_ACK_WAIT_MS="${NATS_ACK_WAIT_MS:-120000}" \
+        --from-literal=NATS_MAX_ACK_PENDING="${NATS_MAX_ACK_PENDING:-4096}" \
+        --from-literal=NATS_FETCH_BATCH_SIZE="${NATS_FETCH_BATCH_SIZE:-64}" \
+        --from-literal=NATS_FETCH_MAX_WAIT_MS="${NATS_FETCH_MAX_WAIT_MS:-500}" \
         --from-literal=KAFKA_BROKERS="${KAFKA_BROKERS:-grpc-stream-kafka:9092}" \
         --from-literal=KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC="${KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC:-producer-to-transformer}" \
         --from-literal=KAFKA_TRANSFORMER_TO_SINK_TOPIC="${KAFKA_TRANSFORMER_TO_SINK_TOPIC:-transformer-to-sink}" \
@@ -790,7 +794,7 @@ copy_results_from_pvc() {
     fi
 
     # Copy result files matching this run
-    for suffix in producer-result.json sink-summary.json sink-analysis.json; do
+    for suffix in producer-result.json sink-summary.json sink-analysis.json nats-delivery-diagnostics.json transformer-nats-delivery-diagnostics.json; do
         local remote_path="/results/${run_id}-${suffix}"
         local local_path="${RESULTS_DIR}/${run_id}-${suffix}"
         local copied=false

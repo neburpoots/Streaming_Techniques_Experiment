@@ -49,23 +49,40 @@ type sinkMetrics struct {
 }
 
 type runState struct {
-	config             *pb.RunConfig
-	consumerCancel     context.CancelFunc
-	registeredAt       time.Time
-	startedAt          time.Time
-	finishedAt         time.Time
-	lastArrivalAt      time.Time
-	completed          bool
-	messagesReceived   uint64
-	bytesReceived      uint64
-	duplicates         uint64
-	orderingViolations uint64
-	latenciesMillis    []float64
-	interArrivalMillis []float64
-	seenSequences      map[uint64]struct{}
-	lastByWorker       map[uint64]uint64
-	summary            *pb.RunSummary
-	analysis           *sinkAnalysisFile
+	config                     *pb.RunConfig
+	consumerCancel             context.CancelFunc
+	registeredAt               time.Time
+	startedAt                  time.Time
+	finishedAt                 time.Time
+	lastArrivalAt              time.Time
+	completed                  bool
+	messagesReceived           uint64
+	bytesReceived              uint64
+	duplicates                 uint64
+	orderingViolations         uint64
+	latenciesMillis            []float64
+	interArrivalMillis         []float64
+	seenSequences              map[uint64]struct{}
+	lastByWorker               map[uint64]uint64
+	natsDeliveriesObserved     uint64
+	natsRedeliveredDeliveries  uint64
+	natsRedeliveryAttempts     uint64
+	natsMaxNumDelivered        uint64
+	natsDeliveryMetadataErrors uint64
+	summary                    *pb.RunSummary
+	analysis                   *sinkAnalysisFile
+}
+
+type natsDeliveryDiagnosticsFile struct {
+	RunID                 string `json:"run_id"`
+	TransportMode         string `json:"transport_mode"`
+	DeliveriesObserved    uint64 `json:"deliveries_observed"`
+	RedeliveredDeliveries uint64 `json:"redelivered_deliveries"`
+	RedeliveryAttempts    uint64 `json:"redelivery_attempts"`
+	MaxNumDelivered       uint64 `json:"max_num_delivered"`
+	MetadataErrors        uint64 `json:"metadata_errors"`
+	LogicalDuplicates     uint64 `json:"logical_duplicates"`
+	OrderingViolations    uint64 `json:"ordering_violations"`
 }
 
 type sinkServer struct {
@@ -381,6 +398,14 @@ func (s *sinkServer) PushUnaryBatch(_ context.Context, batch *pb.DataBatch) (*pb
 }
 
 func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
+	return s.ingestWithNATSDiagnostics(chunk, nil)
+}
+
+func (s *sinkServer) ingestNATS(chunk *pb.DataChunk, delivery *transport.NATSJetStreamDelivery) error {
+	return s.ingestWithNATSDiagnostics(chunk, delivery)
+}
+
+func (s *sinkServer) ingestWithNATSDiagnostics(chunk *pb.DataChunk, delivery *transport.NATSJetStreamDelivery) error {
 	now := time.Now()
 
 	s.mu.Lock()
@@ -393,6 +418,21 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 		state.startedAt = now
 		if state.analysis != nil {
 			state.analysis.StartedAtUnixNano = now.UnixNano()
+		}
+	}
+	if delivery != nil {
+		state.natsDeliveriesObserved++
+		metadata, err := delivery.Metadata()
+		if err != nil {
+			state.natsDeliveryMetadataErrors++
+		} else {
+			if metadata.NumDelivered > state.natsMaxNumDelivered {
+				state.natsMaxNumDelivered = metadata.NumDelivered
+			}
+			if metadata.NumDelivered > 1 {
+				state.natsRedeliveredDeliveries++
+				state.natsRedeliveryAttempts += metadata.NumDelivered - 1
+			}
 		}
 	}
 	if !state.lastArrivalAt.IsZero() {
@@ -454,6 +494,11 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 				log.Printf("write sink analysis: %v", err)
 			}
 		}
+		if state.config.GetTransportMode() == transport.ModeNATSJetStream {
+			if err := app.WriteJSON(s.resultDir, fmt.Sprintf("%s-nats-delivery-diagnostics.json", chunk.GetRunId()), buildNATSDeliveryDiagnostics(chunk.GetRunId(), state)); err != nil {
+				log.Printf("write nats delivery diagnostics: %v", err)
+			}
+		}
 	}
 	s.mu.Unlock()
 
@@ -465,6 +510,27 @@ func (s *sinkServer) ingest(chunk *pb.DataChunk) error {
 		time.Sleep(s.processDelay)
 	}
 	return nil
+}
+
+func buildNATSDeliveryDiagnostics(runID string, state *runState) *natsDeliveryDiagnosticsFile {
+	transportMode := ""
+	if state != nil && state.config != nil {
+		transportMode = state.config.GetTransportMode()
+	}
+	if state == nil {
+		return &natsDeliveryDiagnosticsFile{RunID: runID, TransportMode: transportMode}
+	}
+	return &natsDeliveryDiagnosticsFile{
+		RunID:                 runID,
+		TransportMode:         transportMode,
+		DeliveriesObserved:    state.natsDeliveriesObserved,
+		RedeliveredDeliveries: state.natsRedeliveredDeliveries,
+		RedeliveryAttempts:    state.natsRedeliveryAttempts,
+		MaxNumDelivered:       state.natsMaxNumDelivered,
+		MetadataErrors:        state.natsDeliveryMetadataErrors,
+		LogicalDuplicates:     state.duplicates,
+		OrderingViolations:    state.orderingViolations,
+	}
 }
 
 func buildSummary(runID string, state *runState) *pb.RunSummary {

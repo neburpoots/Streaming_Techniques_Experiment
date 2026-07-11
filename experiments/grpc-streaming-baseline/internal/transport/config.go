@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/config"
 )
@@ -15,6 +16,13 @@ const (
 	ModeRabbitMQStreams = "rabbitmq-streams"
 	ModeNATSJetStream   = "nats-jetstream"
 	ModeKafka           = "kafka"
+)
+
+const (
+	DefaultNATSAckWait        = 120 * time.Second
+	DefaultNATSMaxAckPending  = 4096
+	DefaultNATSFetchBatchSize = 64
+	DefaultNATSFetchMaxWait   = 500 * time.Millisecond
 )
 
 type RabbitMQConfig struct {
@@ -35,6 +43,10 @@ type NATSConfig struct {
 	TransformerToSinkSubject     string
 	StreamReplicas               int
 	StreamMaxBytes               int64
+	AckWait                      time.Duration
+	MaxAckPending                int
+	FetchBatchSize               int
+	FetchMaxWait                 time.Duration
 }
 
 type KafkaConfig struct {
@@ -113,12 +125,32 @@ func LoadNATSConfig() NATSConfig {
 	if err != nil || streamMaxBytes == 0 {
 		streamMaxBytes = 1024 * 1024 * 1024
 	}
+	ackWait, err := config.DurationMillis("NATS_ACK_WAIT_MS", DefaultNATSAckWait)
+	if err != nil || ackWait <= 0 {
+		ackWait = DefaultNATSAckWait
+	}
+	maxAckPending, err := config.Int("NATS_MAX_ACK_PENDING", DefaultNATSMaxAckPending)
+	if err != nil || maxAckPending <= 0 {
+		maxAckPending = DefaultNATSMaxAckPending
+	}
+	fetchBatchSize, err := config.Int("NATS_FETCH_BATCH_SIZE", DefaultNATSFetchBatchSize)
+	if err != nil || fetchBatchSize <= 0 {
+		fetchBatchSize = DefaultNATSFetchBatchSize
+	}
+	fetchMaxWait, err := config.DurationMillis("NATS_FETCH_MAX_WAIT_MS", DefaultNATSFetchMaxWait)
+	if err != nil || fetchMaxWait <= 0 {
+		fetchMaxWait = DefaultNATSFetchMaxWait
+	}
 	return NATSConfig{
 		URL:                          config.String("NATS_URL", "nats://nats:4222"),
 		ProducerToTransformerSubject: config.String("NATS_PRODUCER_TO_TRANSFORMER_SUBJECT", "producer.to.transformer"),
 		TransformerToSinkSubject:     config.String("NATS_TRANSFORMER_TO_SINK_SUBJECT", "transformer.to.sink"),
 		StreamReplicas:               streamReplicas,
 		StreamMaxBytes:               int64(streamMaxBytes),
+		AckWait:                      ackWait,
+		MaxAckPending:                maxAckPending,
+		FetchBatchSize:               fetchBatchSize,
+		FetchMaxWait:                 fetchMaxWait,
 	}
 }
 

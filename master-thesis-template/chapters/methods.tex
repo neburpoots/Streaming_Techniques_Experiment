@@ -1,0 +1,169 @@
+\chapter{Methods}\label{ch:methods}
+
+This chapter describes the research design used to answer the research questions. The thesis combines a literature-backed technology comparison, a controlled transport benchmark, and an implementation-and-evaluation cycle inside DYNAMOS. The purpose is not only to measure which transport is fastest in isolation, but also to determine which communication model fits policy-aware generated workflows.
+
+\section{Research Design}
+
+The research unfolds in three phases, each aligned with one sub-research question. RQ1 is addressed through a literature-backed comparison and a controlled Kubernetes benchmark of candidate transport mappings. RQ2 is addressed by designing and implementing chunk-aware data paths inside DYNAMOS while preserving its existing policy and orchestration path. RQ3 is addressed through an in-system DYNAMOS benchmark that compares the implemented variants against the classic unary baseline under realistic bulk retrieval workloads.
+
+\section{Transport Benchmark Design}\label{sec:transport-method}
+
+\subsection{Methodological positioning and scope}
+
+The benchmark design adapts recurring evaluation principles to the specific constraints of DYNAMOS rather than copying a single prior protocol. The controlled multi-stage pipeline follows the style of prior streaming-pipeline evaluations such as DataXc \cite{coviello2022dataxc}; identical business logic across mechanisms follows comparative benchmarking practice for distributed systems, where Karimov et al.~\cite{karimov2018benchmarking} require the same workload definitions and measurement points across systems under test, and Henning and Hasselbring~\cite{Henning2021ScalabilityMetrics} define scalability as the rate of throughput growth per added resource unit. The emphasis on throughput, latency, concurrency, resource pressure, and recovery reflects recurring evaluation dimensions in streaming and IPC (Inter-process communication) studies \cite{systematicstreaming,ciftci2025ipcmechanisms}.
+
+The aim is not to identify a universally best mechanism, but to narrow the design space for DYNAMOS by asking which communication model best fits large, ordered, and concurrent inter-service transfer under realistic operational constraints. The completed corpus evaluates six transport mappings against the same pipeline, the same payload definitions, and the same correctness criteria, and the results are interpreted in terms of DYNAMOS integration. The sixth mapping is batched unary gRPC, in which one unary request carries multiple logical records. The chapter body keeps the main comparison compact: the completed single-node clean matrix, three focused operational scenarios, and the resulting architectural interpretation. Full preset definitions and detailed per-case tables remain in the appendix.
+
+\subsection{Common testbed}
+
+All candidate mechanisms were evaluated in the same Go-based microservice chain deployed on Kubernetes: \emph{Producer} $\rightarrow$ \emph{Transformer} $\rightarrow$ \emph{Sink}. The services ran in a dedicated namespace using the same manifests, the same payload schema, and the same transformation logic. Resource budgets were controlled through Kustomize overlays so that the comparison remained centered on the communication layer rather than on application-level differences \cite{karimov2018benchmarking,Henning2021ScalabilityMetrics}.
+
+The transport mappings were also kept as close as possible to one another. Client-streaming, per-message unary, and batched unary gRPC provide the direct service-to-service reference points. Kafka preserves per-flow ordering through keyed partitioning. RabbitMQ uses streams rather than classic queues. NATS uses JetStream with asynchronous publishing and explicit consumer acknowledgements. The brokered mappings were tuned for batched or asynchronous sending rather than for one blocking publish acknowledgement per record, so the comparison remains centered on transport behaviour rather than on intentionally slow acknowledgement patterns. Batched unary keeps the same logical messages as the other transports, but groups them into bounded unary requests so that the sink still measures logical records rather than RPC calls.
+
+The service logic remained intentionally lightweight. The producer emitted synthetic or replayed records, the transformer applied a deterministic operation, and the sink recorded latency, pacing, and correctness summaries. That kept the benchmark focused on transfer behaviour, buffering, and recovery rather than on domain-specific computation \cite{coviello2022dataxc,systematicstreaming}.
+
+\subsection{Fairness considerations}\label{sec:fairness}
+
+Direct and brokered transports are not symmetric, and the comparison is only meaningful if those asymmetries are explicit. Four points define what the comparison does and does not equalise. First, brokered mappings pay an extra network hop and broker-side persistence by design; this is not an experimental artifact but the cost of the durability and decoupling being evaluated, so the results are interpreted as a comparison between architectural classes rather than a race between equivalent implementations. Second, no broker pays replication cost: all brokers run single-node with replication factor one, so none is penalised for redundancy the others do not provide. Third, publish configurations were chosen to avoid strawman setups: all brokered mappings use asynchronous or batched publishing rather than one blocking acknowledgement per record, and the NATS consumer configuration was corrected after early runs showed acknowledgement-window artifacts. Fourth, everything else is held constant: the same services, payload schema, transformation logic, namespace, resource overlays, and measurement points apply to every mapping. Broker persistence and retention settings are documented in Appendix~\ref{app:presets}. Given these constraints, band-level conclusions (direct versus brokered) are robust, while small differences between individual brokers are treated as configuration-sensitive rather than decisive.
+
+\subsection{Evaluation dimensions}
+
+The literature consistently treats streaming evaluation as a multi-dimensional problem rather than a single throughput race \cite{coviello2022dataxc,systematicstreaming,ciftci2025ipcmechanisms}. This study follows that structure. Five dimensions matter most here: transfer efficiency, latency and pacing stability, overload behaviour, recovery correctness, and operational cost. A transport that leads the clean matrix but degrades badly under backpressure or restart is not automatically the best fit for DYNAMOS. The benchmark therefore keeps those dimensions visible throughout the chapter.
+
+\subsection{Scenario set and scenario-to-property mapping}
+
+The completed RQ1 study uses four scenario families: a clean bulk-transfer matrix, a steady-rate continuous scenario, a slow-consumer backpressure scenario, and a forced-restart recovery scenario. This scenario set is not presented as a new benchmark methodology. It adapts recurring concerns from stream-processing and microservice evaluation literature, namely sustained transfer, latency stability, overload response, recovery after interruption, and correctness under at-least-once delivery \cite{karimov2018benchmarking,systematicstreaming,ciftci2025ipcmechanisms,vogel2024faultRecovery}.
+
+The recovery scenario in particular follows the fault-injection design of Vogel et al.~\cite{vogel2024faultRecovery}, who benchmark fault recovery in stream processing frameworks by killing a worker mid-run and observing a fixed post-failure window. The recovery metrics defined in \Cref{ch:transport-benchmark} operationalise their measurement dimensions at the transport level: time to first post-failure message corresponds to recovery latency, the sustained-throughput criterion corresponds to throughput restoration, recovery debt and backlog drain correspond to accumulated lag and catch-up time, and post-failure duplicate and ordering counts validate delivery guarantees under at-least-once semantics. The only thesis-specific choices are parameterisations of these established measures, and their values are justified in Table~\ref{tab:parameter-rationale}. These properties are relevant to DYNAMOS because generated workflows may transfer large intermediate data, may contain stages with unequal processing rates, and may be restarted or redeployed as part of normal Kubernetes operation.
+
+\begin{table}[!htbp]
+    \centering
+    \footnotesize
+    \caption{Scenario-to-property mapping used in the RQ1 benchmark.}
+    \label{tab:phase1-scenario-map}
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{p{0.17\textwidth}p{0.22\textwidth}p{0.49\textwidth}}
+        \toprule
+        Scenario & Primary property & Why it matters for DYNAMOS \\
+        \midrule
+        Clean bulk transfer & Protocol overhead, sustained throughput, multi-hop transfer efficiency & Large dataset exchange should remain efficient when data moves incrementally through a composed service chain. \\
+        Continuous steady-rate flow & Latency stability, inter-arrival regularity, pacing precision & Long-lived flows matter when downstream services depend on a predictable delivery rhythm. \\
+        Slow-consumer backpressure & Queue build-up, overload propagation, throttling versus delay accumulation & DYNAMOS pipelines can contain stages with unequal service rates, so overload handling must remain interpretable. \\
+        Forced-restart recovery & Reconnect behaviour, duplicates, ordering preservation, recovery time & Ephemeral microservices and restarts are normal in Kubernetes-style deployments. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Experimental factors}
+
+The main independent variables are payload size, concurrency, target rate where applicable, sink slowdown in the backpressure case, and explicit failure injection in the recovery case. Concurrency denotes the number of parallel logical workers inside one benchmark run, not the number of producer Kubernetes jobs. In brokered modes, corresponding transformer and sink workers consume the worker-specific streams, subjects, or partitions. Resource budgets are held constant through Kubernetes overlays so that performance differences reflect the transport mapping rather than an uneven infrastructure allocation. This keeps the experiment matrix broad enough to expose real tradeoffs without turning the chapter into an exhaustive lab log \cite{sharvari2019messaging,ciftci2025ipcmechanisms}.
+
+\begin{table}[!htbp]
+    \centering
+    \scriptsize
+    \caption{Rationale for the main experimental parameter values.}
+    \label{tab:parameter-rationale}
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabularx}{\textwidth}{p{0.19\textwidth}p{0.21\textwidth}X}
+        \toprule
+        Parameter & Values & Rationale \\
+        \midrule
+        Synthetic payload size & 256 B, 1 KiB, 4 KiB, 16 KiB & Covers small metadata-like messages through larger serialised records without turning RQ1 into a file-transfer benchmark. The range exposes framing and broker overhead before the DYNAMOS-specific benchmark tests larger real chunks. \\
+        Synthetic concurrency & 1, 4, 8, 16 logical workers & Probes single-flow overhead and moderate parallelism on the local eight-core benchmark host. Values above 16 would mainly stress the local node scheduler rather than the transport choice. \\
+        Continuous target rate & 1{,}000 msg/s & Creates a steady flow that all transports can plausibly sustain, so the comparison emphasises pacing, tail latency, and jitter rather than failure to reach an unrealistic target. \\
+        Backpressure target and sink delay & 4{,}000 msg/s with 2 ms sink delay & Intentionally overloads the sink so queue growth, throttling, and latency accumulation become visible. \\
+        Recovery restart & Transformer restart after 3 s, fixed 10 s recovery window & Injects failure after initial warm-up while leaving enough post-failure time to compare first message, sustained recovery, duplicates, ordering, and backlog drain. \\
+        Sustained-recovery threshold & 80\% of target over 5 consecutive 1 s buckets & Requires stable restored progress rather than one lucky message. The threshold is a parameterisation of throughput restoration \cite{vogel2024faultRecovery}; the transport ordering in the recovery table is driven by order-of-magnitude differences and does not hinge on the exact percentage. \\
+        DYNAMOS row counts & 50k, 100k, 250k rows & Exercises result sizes below, around, and well above the historical large-message pain point while remaining practical for repeated local Kubernetes runs. \\
+        DYNAMOS chunk size & 5{,}000 rows & Avoids per-row messaging overhead while keeping chunks small enough for partial progress. One 50k-run chunk serialised to about 273.7 KiB, larger than the final RQ1 payload range. \\
+        Repetitions & 5 transport reps, 10 DYNAMOS reps & Balances run time with enough repetition to catch Kubernetes and broker variability. The thesis reports means and discusses visible spread where it affects interpretation. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Result presentation and appendix boundary}
+
+The main text reports one clean-summary table, one compact size-wise clean breakdown, and three focused scenario tables for continuous flow, backpressure, and recovery. Detailed per-case clean-matrix tables remain in Appendix~\ref{app:clean-matrix-details}. Resource metrics are used only where the sampling scope is the same across the compared cells. Broker-specific resource traces from exploratory runs are kept as supporting context rather than as a primary ranking signal. 
+
+\section{DYNAMOS Benchmark Method}\label{sec:dynamos-method}
+
+The primary benchmark uses the \texttt{dataThroughTtp} archetype with a single data provider, \texttt{UVA}. The request still follows the TTP/SURF compute-provider path defined by the archetype, but the data fanout is intentionally limited to one provider so that the experiment isolates large-result transfer rather than multi-provider coordination.
+
+Each request executes a bulk projection query over the large \texttt{PersonenLarge} and \texttt{AanstellingenLarge} tables and joins them on \texttt{Unieknr}. The result is limited to 50{,}000, 100{,}000, or 250{,}000 rows. The chunked variants use 5{,}000 rows per SQL chunk, which gives 10, 20, and 50 total chunks respectively. This value is an experimental configuration rather than a claimed optimum: it is large enough to avoid turning the benchmark into a per-row messaging test and small enough to expose partial progress. In the saved 50k-row bulk output, one 5{,}000-row chunk serialised as a DYNAMOS protobuf \texttt{MicroserviceCommunication} is approximately 280{,}255 bytes, or 273.7~KiB. That is larger than the final RQ1 synthetic payload range, so RQ3 is treated as the authoritative evidence for realistic DYNAMOS chunk sizes.
+
+Four implementations are compared. Classic unary is taken from the original DYNAMOS \texttt{main} branch at commit \texttt{a2d9531}. The chunked unary, intra-job gRPC streaming, and RabbitMQ Streams variants are taken from the streaming implementation branch at commit \texttt{923b018}. Every primary \texttt{dataThroughTtp} cell uses 10 warm repetitions. Runs are accepted only when row counts match the expected limit and canonical content hashes validate the returned content. For chunked variants, the benchmark also requires partial result events before completion.
+
+Two focused scenario checks are added after the primary benchmark. The first changes the archetype to \texttt{computeToData}. The second keeps \texttt{dataThroughTtp} but uses two data providers, \texttt{UVA,VU}. These checks test whether chunk preservation remains compatible when the generated job topology and aggregation path differ from the primary single-provider TTP case.
+
+Resource usage is sampled from Kubernetes once per second across the relevant DYNAMOS namespaces and summarised as peak total CPU millicores and peak total memory in MiB. These sampled peaks are useful for comparing memory pressure, but they may underestimate short instantaneous spikes between samples. The measured request window starts immediately before the benchmark client submits the HTTP request and ends when the final response or final NDJSON event is observed. This means policy handling, orchestration, generated job creation, pod startup, data transfer, and response serialisation are inside the measured window for both classic and chunked variants. The classic unary baseline required generated \texttt{surf}, \texttt{uva}, and \texttt{vu} jobs to be cleaned between repetitions. That cleanup happens before and after a measured request, not inside the request timing. Without it, later repetitions could return fast 502 or empty-provider responses because stale generated jobs were still present. The cleaned baseline is therefore the comparison used here.
+
+\section{Validation and Reproducibility}\label{sec:validation-reproducibility}
+
+Throughout all phases, the research prioritises reproducibility and transparency. The transport benchmark controls everything except the communication mechanism under test: the same Go-based services, payload schema, transformation logic, Kubernetes namespace, and resource overlays are reused across transport mappings. The DYNAMOS benchmark likewise compares implementations over the same archetype, query shape, row limits, validation criteria, and measurement window.
+
+Synthetic workloads are used rather than unpredictable production traffic. This makes experiments repeatable and allows payload size, concurrency, target rate, sink delay, and failure injection to be controlled. All reported primary transport results use five repetitions, while the primary DYNAMOS bulk retrieval cells use ten valid repetitions. Runs are accepted only when correctness checks pass, including expected row counts and content hashes in the DYNAMOS benchmark.
+
+The metrics align with established distributed-systems evaluation practice: throughput, data throughput, latency percentiles, pacing, duplicates, ordering violations, recovery behaviour, CPU, and memory. The thesis reports arithmetic means rather than medians because the means include the long-tail runs that occur in local Kubernetes deployments and are therefore the more conservative summary; observed spread and outliers are discussed in the text where they affect interpretation, and per-case ranges are reported for the largest DYNAMOS workloads. Configuration details and extended tables are kept in the appendices so the main chapters remain readable without hiding the evidence needed for reproducibility.
+
+\section{Experimental Environment}\label{sec:experimental-environment}
+
+The local benchmark host used an Intel Core i7-9700K CPU with 8 physical cores and 8 logical processors, and 31.9 GiB RAM. The operating environment was Windows with WSL2 Ubuntu 24.04.3, kernel \texttt{6.6.87.2-microsoft-standard-WSL2}. Kubernetes execution was driven through the repository's kind/kubectl scripts for the \texttt{grpc-stream-single} single-node cluster; the recorded client tooling used Docker Desktop client 29.1.3 and \texttt{kubectl} client v1.34.1.
+
+\begin{table}[!htbp]
+    \centering
+    \scriptsize
+    \caption{Primary software versions and sources used for reproducibility.}
+    \label{tab:environment-provenance}
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabularx}{\textwidth}{p{0.25\textwidth}X}
+        \toprule
+        Item & Value \\
+        \midrule
+        Benchmark repository & \cite{streamingTechniquesExperiment2026} \\
+        DYNAMOS baseline & Main branch commit \texttt{a2d9531} \cite{dynamosMainCommit2026} \\
+        DYNAMOS streaming branch & \texttt{feature/streaming-implementations} commit \texttt{923b018} \cite{dynamosStreamingCommit2026} \\
+        Go module and libraries & Go 1.25.0, gRPC-Go v1.75.1, \texttt{nats.go} v1.51.0, \texttt{rabbitmq-stream-go-client} v1.8.0, \texttt{kafka-go} v0.4.51 \\
+        Broker container images & \texttt{rabbitmq:3-management}, \texttt{nats:2.10-alpine}, \texttt{apache/kafka:3.9.1} \\
+        RQ1 scripts and results & \texttt{experiments/grpc-streaming-baseline/scripts/run-k8s-matrix.sh} and \texttt{experiments/grpc-streaming-baseline/results/} \\
+        Kubernetes overlays & \texttt{experiments/grpc-streaming-baseline/k8s/overlays/}, especially the single-node medium resource overlay \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Ethical Considerations}\label{sec:ethics}
+
+This section evaluates potential ethical concerns and describes plans to address them. The main areas of ethical concern identified are evaluated below.
+
+\paragraph{Human research participants and new data collection.}
+This research does not involve human participants, surveys, interviews, or the collection of new data from people. All evaluation is conducted using synthetic workloads and controlled experimental data generated specifically for performance testing.
+
+\paragraph{Existing datasets about people.}
+The research does not use, analyse, or combine existing datasets containing personal information. Performance experiments rely entirely on artificially generated data with no relation to real individuals or organisations.
+
+\paragraph{AI technologies and algorithms.}
+While DYNAMOS is a system that could be used to orchestrate AI workloads, this thesis does not design, develop, or deploy AI technologies or machine learning algorithms. The focus is on communication mechanisms in distributed systems, not on AI-specific capabilities.
+
+\paragraph{Cyber security and online privacy.}
+The research addresses communication patterns in distributed systems, which has indirect relevance to security and privacy. However, the thesis does not involve penetration testing, vulnerability research, or deployment in production environments handling sensitive data. All experiments are conducted in isolated development and testing environments under the control of the CCI research group.
+
+The streaming integration preserves DYNAMOS's existing policy enforcement mechanisms, which are designed to maintain compliance with data-sharing agreements. While the thesis examines how policy enforcement interacts with streaming communication, it does not weaken or bypass existing security controls.
+
+\paragraph{Dual-use technology.}
+DYNAMOS is designed as infrastructure for policy-compliant data exchange in research and organisational contexts. The streaming extensions developed in this thesis are general-purpose communication improvements that enhance scalability and performance. While any communication infrastructure could theoretically be repurposed, the research does not create capabilities specifically designed for surveillance, intrusion, social manipulation, or military applications. The focus remains on improving data-sharing middleware for legitimate scientific and organisational use cases.
+
+\subsection{Ethical safeguards and compliance}
+
+Based on the above assessment, this research falls into a low-risk category with respect to the identified ethical concern areas. Nevertheless, the following safeguards were maintained:
+
+\begin{itemize}
+  \item All experimental deployments used synthetic data with no relation to real individuals or organisations
+  \item Performance testing was conducted in isolated environments that do not interact with production systems or real user data
+  \item Source code and architectural documentation were reviewed to ensure no unintended vulnerabilities were introduced through the streaming integration
+  \item Any deployment recommendations explicitly address the need to maintain existing policy enforcement and security controls
+\end{itemize}
+
+\subsection{Consultation and approval}
+
+If unexpected ethical concerns arise during the research, for example, if collaboration with external organisations introduces access to real data, the Ethical Review Committee will be consulted immediately via the RMS portal for Faculty of Science.
+
+No data collection, deployment in production environments, or experimentation with real user data will occur without prior ethical assessment and approval from the appropriate committees.

@@ -63,6 +63,7 @@ func bridgeNATSWorker(ctx context.Context, server *transformerServer, cfg *trans
 			return err
 		}
 
+		server.recordNATSInputDelivery(chunk, delivery)
 		server.applyWork(chunk.GetPayload())
 		if err := publisher.PublishChunk(ctx, chunk); err != nil {
 			return fmt.Errorf("publish worker %d sequence %d to %s: %w", worker, chunk.GetSequence(), outputSubject, err)

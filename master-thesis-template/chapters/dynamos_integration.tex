@@ -1,0 +1,150 @@
+\chapter{DYNAMOS Integration}\label{ch:dynamos-integration}
+
+This chapter addresses RQ2 by moving from a generic transport benchmark to an implementation inside DYNAMOS. The question is no longer only which communication mechanism is fast. The implementation must also preserve DYNAMOS' policy approval path, generated job model, sidecar-mediated communication, and isolation between data stewards.
+
+\section{Motivation}
+
+The original DYNAMOS implementation already identifies large message transfer as a limitation. Stutterheim~\cite{stutterheim2023thesis} notes that the default maximum size of a gRPC method is around 4 MB, corresponding to approximately 30{,}000 records in the original experiments, and that the current gRPC implementation uses unary RPCs: one request and one response. The same discussion observes that increasing the message size is theoretically possible but memory-heavy, and explicitly names streaming as the unfinished solution. This makes large-result transfer an appropriate point at which to evaluate streaming techniques inside DYNAMOS rather than only in a synthetic pipeline.
+
+The implementation target is deliberately different from the average-query example commonly used in DYNAMOS demonstrations. An average query is a reduction workload: it may scan many records but returns one scalar result. That tests computation near the data source, but it does not test whether DYNAMOS can transport many aligned rows. Bulk retrieval therefore stresses the part of DYNAMOS that is most affected by full-response buffering. It is also a useful precursor to later distributed learning scenarios, but this thesis first validates whether the core DYNAMOS data path can move large row sets incrementally.
+
+\section{Execution Path}
+
+DYNAMOS separates the control path from the data path. A client request first passes through the gateway, policy evaluation, orchestration, and the relevant agents. Only after that approval and composition step are generated job pods used to execute the request. For the \texttt{dataThroughTtp} archetype, the data provider job retrieves rows, the Trusted Third Party (TTP) or SURF-side job performs the compute-provider part of the chain, and the response eventually returns through the agent and gateway path.
+
+\begin{figure}[!htbp]
+    \centering
+    \scriptsize
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=0.62cm and 0.52cm,
+        box/.style={draw, rounded corners=1.5pt, align=center, minimum height=0.66cm, inner sep=3pt},
+        wide/.style={box, minimum width=1.55cm},
+        arrow/.style={-{Latex[length=2mm]}, thick},
+        note/.style={align=center, font=\scriptsize, text width=3.2cm}
+    ]
+        \node[wide] (client) {Benchmark\\client};
+        \node[wide, right=of client] (gateway) {API\\gateway};
+        \node[wide, right=of gateway] (policy) {Policy and\\orchestration};
+        \node[wide, right=of policy] (surf) {TTP/SURF\\agent};
+        \node[wide, right=of surf] (uva) {UVA\\agent};
+
+        \node[box, below=1.12cm of uva, minimum width=1.35cm] (sql) {SQL\\query};
+        \node[box, right=0.50cm of sql, minimum width=1.35cm] (aggregate) {Aggregate};
+        \node[box, right=0.50cm of aggregate, minimum width=1.35cm] (algorithm) {Algorithm};
+        \node[box, below=0.62cm of aggregate, minimum width=1.45cm] (sidecar) {Sidecar};
+        \node[draw, dashed, rounded corners=2pt, fit=(sql)(aggregate)(algorithm)(sidecar), inner sep=0.28cm, label={[font=\scriptsize]above:generated ephemeral job pod}] (pod) {};
+
+        \draw[arrow] (client) -- (gateway);
+        \draw[arrow] (gateway) -- (policy);
+        \draw[arrow] (policy) -- (surf);
+        \draw[arrow] (surf) -- (uva);
+        \draw[arrow] (uva) -- (pod);
+        \draw[arrow] (sql) -- (aggregate);
+        \draw[arrow] (aggregate) -- (algorithm);
+        \draw[arrow] (algorithm) |- (sidecar);
+        \draw[arrow] (sidecar.west) .. controls +(-2.25cm,0) and +(-1.45cm,-1.00cm) .. (uva.south);
+        \draw[arrow] (uva) to[bend left=16] (surf);
+        \draw[arrow] (surf) to[bend left=18] (gateway);
+        \draw[arrow] (gateway) to[bend left=18] (client);
+
+        \node[note, above=0.36cm of uva] {agent boundary:\\normal AMQP chunks or\\RabbitMQ Streams};
+    \end{tikzpicture}
+    }
+    \caption{DYNAMOS bulk retrieval path used for RQ2. The implementation changes the bulk data path after policy approval. Chunking starts at the SQL query service and must be preserved through the generated job, agent path, and gateway response to avoid rebuilding one complete result table before the client sees progress.}
+    \label{fig:dynamos-rq2-path}
+\end{figure}
+
+Figure~\ref{fig:dynamos-rq2-path} shows the boundary that matters for the implementation. In the original path, a large result can be rebuilt several times before the client sees anything: inside the SQL response, inside the generated service chain, inside the agent response, and again at the gateway. The streaming implementation therefore treats chunk preservation as the central requirement. A transport is only useful for this workload if the first rows can leave the provider path before the final rows have been read and serialised.
+
+The implementation should not be a special case for one benchmark request. DYNAMOS supports multiple archetypes and multiple data providers, so a chunk-aware path must keep existing request shapes valid. The primary evaluation uses \texttt{dataThroughTtp} with one provider to isolate the large-result bottleneck. RQ3 then adds focused checks for \texttt{computeToData} and for \texttt{dataThroughTtp} with two providers, because those scenarios exercise different parts of the generated job and aggregation path.
+
+\section{Common Chunk Model}
+
+All chunked variants use the same logical stream model. The SQL query service reads the bulk result in fixed row batches. Each batch carries stream metadata: provider identity, correlation identifier, sequence number, row count, partial or final status, and ordered column names. Listing~\ref{lst:chunk-metadata} shows the logical chunk envelope carried by every chunked message, independent of the transport that moves it. The ordered-column metadata is important because Go protobuf structs can otherwise expose map fields in nondeterministic order, which would make equal results appear different across transports.
+
+% TODO(Ruben): verify field names against proto-files/ on streaming branch commit 923b018 before submission.
+\begin{figure}[!htbp]
+\begin{verbatim}
+// Chunk envelope carried with every partial result
+// (streaming branch, commit 923b018)
+provider          string   // data steward that produced the chunk
+correlation_id    string   // ties all chunks of one approved request
+sequence_number   int32    // per-provider chunk order, starting at 1
+row_count         int32    // rows in this chunk
+is_final          bool     // last chunk of this provider's stream
+column_order      []string // deterministic column ordering
+\end{verbatim}
+\caption{Logical chunk metadata shared by all chunk-aware variants. The same envelope travels as repeated unary calls, gRPC stream messages, or RabbitMQ stream records depending on the variant.}
+\label{lst:chunk-metadata}
+\end{figure}
+
+The aggregate and algorithm stages preserve chunk boundaries for non-average bulk workloads. They do not merge all incoming rows into one table unless the request explicitly uses the classic unary baseline. The gateway exposes chunk progress to the benchmark client through NDJSON \texttt{providerResult} events, with partial events before the final event. This keeps the external response shape compatible with the existing gateway while making progress visible.
+
+\section{Policy and Orchestration Implications}\label{sec:policy-implications}
+
+The streaming integration changes the data path, not the policy control path. In usage-control terms~\cite{park2004ucon}, DYNAMOS implements pre-decision enforcement: the request is evaluated once, before execution, and the approved generated job is the unit of execution. The implemented chunked variants keep exactly that model. This is not a weakening relative to the original system, because classic unary transfer is enforced at the same single decision point; a result delivered under chunking reflects the agreement at request time, exactly as before. The implementation does not claim that policies are re-evaluated for every chunk or that compliance is continuously monitored during transfer.
+
+Within that unchanged enforcement model, chunking still changes what enforcement \emph{can} do. Three points on the design spectrum are worth distinguishing:
+
+\begin{enumerate}
+  \item \textbf{Request-time approval (implemented).} One policy decision authorises the whole transfer. Revocation during transfer is nevertheless already possible at job granularity: the generated job is a Kubernetes resource, and deleting it terminates the data path. Classic unary transfer cannot be interrupted meaningfully at all; the client receives either the complete result or nothing.
+  \item \textbf{Chunk-boundary re-validation (feasible extension).} Because the data path now consists of discrete, sequence-numbered chunks, every chunk boundary is a natural enforcement point. A cheap validity check against the current agreement version before forwarding each chunk would bound the staleness of an agreement change to a single chunk, without a full policy evaluation per chunk. If an agreement changes mid-transfer, the already delivered prefix is well-defined and auditable through the sequence and provider metadata of Listing~\ref{lst:chunk-metadata}.
+  \item \textbf{Continuous authorisation (out of scope).} Full usage-control-style ongoing enforcement~\cite{park2004ucon,hariri2023uconplus}, for example lease- or capability-based transfer rights that expire unless renewed by the policy engine, would require integrating policy evaluation into the data plane and is treated as future work.
+\end{enumerate}
+
+The important observation is that chunk preservation creates the mid-stream enforcement points that neither classic unary transfer nor an opaque long-lived stream provides. With a full-buffered response there is nothing to interrupt or audit until delivery is complete; with an opaque stream a revocation leaves the delivered state undefined. With chunks, a policy change can take effect at the next chunk boundary and leaves an auditable, well-defined delivered prefix. The implemented system stops at point (1), but the mechanism required for point (2) is already in place.
+
+The main orchestration implication is that streaming makes progress observable before completion. That helps diagnose long-running exchanges and enables clients to process data incrementally. What a stronger compliance model must still define, beyond the scope of this thesis, is the semantics of revocation: how policy changes interrupt active generated jobs, and whether already delivered chunks remain usable by the consumer after revocation.
+
+\section{Implemented Variants}
+
+Four paths are compared in the thesis. The first is the original DYNAMOS style and the other three are chunk-aware implementations. This distinction matters because the RabbitMQ Streams path still needs chunking before it reaches the broker. If the generated job first built one giant result and only then wrote it into RabbitMQ Streams, the client would not receive an earlier first result and the memory problem would largely remain.
+
+\begin{table}[!htbp]
+    \centering
+    \footnotesize
+    \caption{DYNAMOS implementation variants and the architectural boundary changed by each variant.}
+    \label{tab:dynamos-rq2-variants}
+    \setlength{\tabcolsep}{4pt}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{p{0.16\textwidth}p{0.18\textwidth}p{0.18\textwidth}p{0.22\textwidth}p{0.24\textwidth}}
+        \toprule
+        Variant & In-pod service chain & Agent boundary & Buffering behaviour & Architectural purpose \\
+        \midrule
+        Classic unary & Unary gRPC, full response & Classic RabbitMQ message path & Complete result is buffered into one logical response & Baseline closest to original DYNAMOS once the gRPC size ceiling is raised. \\
+        Chunked unary & Repeated unary calls carrying row chunks & Classic RabbitMQ carries separate chunk messages & Chunks stay separate through aggregate, algorithm, agent, and gateway & Smallest architectural change; preserves the message-driven style. \\
+        Intra-job gRPC streaming & Long-lived \texttt{SendDataStream} through the generated service chain & Classic RabbitMQ carries separate chunk messages & Chunks stream inside the pod and remain chunks after leaving it & Tests native gRPC streaming where DYNAMOS already uses local gRPC. \\
+        RabbitMQ Streams at agent boundary & Chunked unary path inside the generated job & RabbitMQ stream records replace classic queue messages for chunk transfer & Local chunks are written as broker stream records and reassembled downstream & Tests stream-log semantics for distributed inter-agent transfer. \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+The classic unary baseline uses the original DYNAMOS \texttt{main} branch at commit \texttt{a2d9531} \cite{dynamosMainCommit2026}. For the benchmark, its gRPC and message-size limits are configured high enough to complete the tested row counts. This avoids treating the historical 4 MB ceiling as the result. Classic unary remains intentionally full-buffered, because that is the behaviour the streaming implementations are meant to improve. The multi-provider classic baseline also includes a minimal aggregation correction so the first provider is not appended twice during result merging. This correction makes the baseline result valid; it does not add streaming behaviour.
+
+The three chunked paths use the streaming implementation branch at commit \texttt{923b018} \cite{dynamosStreamingCommit2026}. Chunked unary is the least disruptive path. It keeps unary calls and the existing agent style, but it sends many smaller result messages instead of one large result. Intra-job gRPC streaming replaces repeated unary calls inside the generated service chain with one stream. That matches gRPC's native streaming model \cite{grpc2024coreconcepts}, but it couples sender and receiver lifetimes more tightly. RabbitMQ Streams changes the agent boundary. It keeps the chunked local path, then uses RabbitMQ's append-only stream abstraction for chunk transfer between agents \cite{rabbitmq2026streams}.
+
+These variants are not three independent full-stack streaming systems. They are interventions at different parts of the same DYNAMOS path. The local performance improvement of the RabbitMQ Streams variant is therefore not caused by RabbitMQ Streams alone. It is caused by the common chunk-aware data path, with RabbitMQ Streams adding a different broker representation at the agent boundary.
+
+% TODO(Ruben): verify the per-service checkmarks against the diff of 923b018 vs a2d9531 before submission.
+\begin{table}[!htbp]
+    \centering
+    \footnotesize
+    \caption{DYNAMOS services modified on the streaming implementation branch (commit \texttt{923b018}) relative to \texttt{main} (commit \texttt{a2d9531}). The policy enforcer and orchestrator are untouched: the control path is preserved by construction.}
+    \label{tab:services-modified}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{lllc}
+        \toprule
+        Service & Language & Role in the chunked path & Modified \\
+        \midrule
+        \texttt{sql-query} & Python & Reads bulk results in row batches; creates chunk envelopes & Yes \\
+        \texttt{sql-aggregate} & Go & Forwards chunks without merging for bulk workloads & Yes \\
+        \texttt{sql-algorithm} & Go & Chunk-aware pass-through for bulk workloads & Yes \\
+        \texttt{sidecar} & Go & Carries chunk messages; gRPC stream endpoint (intra-job variant) & Yes \\
+        \texttt{agent} & Go & Chunk transfer at the agent boundary; RabbitMQ Streams variant & Yes \\
+        \texttt{api-gateway} & Go & Emits partial \texttt{providerResult} NDJSON events & Yes \\
+        \texttt{orchestrator} & Go & Generated job composition & No \\
+        \texttt{policy-enforcer} & Go & Policy evaluation and approval & No \\
+        \bottomrule
+    \end{tabular}
+\end{table}

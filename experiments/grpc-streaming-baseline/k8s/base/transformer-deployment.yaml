@@ -27,6 +27,13 @@ spec:
               value: ":50051"
             - name: METRICS_ADDR
               value: ":9101"
+            - name: RESULT_DIR
+              value: /results
+            - name: TOTAL_MESSAGES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: TOTAL_MESSAGES
             - name: CONCURRENCY
               valueFrom:
                 configMapKeyRef:
@@ -119,6 +126,26 @@ spec:
                 configMapKeyRef:
                   name: grpc-streaming-baseline-config
                   key: NATS_STREAM_MAX_BYTES
+            - name: NATS_ACK_WAIT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_ACK_WAIT_MS
+            - name: NATS_MAX_ACK_PENDING
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_MAX_ACK_PENDING
+            - name: NATS_FETCH_BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_FETCH_BATCH_SIZE
+            - name: NATS_FETCH_MAX_WAIT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: NATS_FETCH_MAX_WAIT_MS
             - name: KAFKA_BROKERS
               valueFrom:
                 configMapKeyRef:
@@ -139,6 +166,9 @@ spec:
               name: grpc
             - containerPort: 9101
               name: metrics
+          volumeMounts:
+            - name: results
+              mountPath: /results
           resources:
             requests:
               cpu: 250m
@@ -146,3 +176,7 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+      volumes:
+        - name: results
+          persistentVolumeClaim:
+            claimName: experiment-results

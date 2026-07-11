@@ -53,7 +53,7 @@ func (s *sinkServer) consumeNATSRunWorker(ctx context.Context, runID string, wor
 		if err != nil {
 			return err
 		}
-		if err := s.ingest(chunk); err != nil {
+		if err := s.ingestNATS(chunk, delivery); err != nil {
 			return fmt.Errorf("ingest worker %d sequence %d from %s: %w", worker, chunk.GetSequence(), subject, err)
 		}
 		if err := delivery.Commit(); err != nil {

@@ -1,0 +1,65 @@
+\chapter{Background}\label{ch:background}
+
+This chapter introduces the technical context needed to understand the thesis. It first describes policy-aware data exchange systems as the broader class of systems studied here, then introduces DYNAMOS as the case-study system, and finally summarises the candidate communication mechanisms evaluated in the benchmark.
+
+\section{Policy-Aware Data Exchange Systems}
+
+Policy-aware data exchange systems coordinate data movement or computation between parties that do not share a single administrative domain. Their policies may specify who may access data, where computation may run, which party may see intermediate results, and which component is trusted to coordinate the exchange. This makes the communication layer part of the compliance story: a transfer mechanism must preserve clear execution boundaries, not only deliver bytes quickly.
+
+Many such systems can be described through data-sharing archetypes. These archetypes identify where data is located, where computation executes, and which party controls the exchange. Compute-to-Data keeps computation near the provider, while Data-through-a-Trusted-Third-Party uses an intermediary to coordinate or process the exchange. These archetypes are often implemented as bounded jobs, but the archetype definitions do not inherently require all data to be materialised as one response. As long as control and trust boundaries remain explicit, an approved exchange can also be executed incrementally.
+
+\section{DYNAMOS as Case Study}
+
+Stutterheim~\cite{stutterheim2023thesis} and Stutterheim et al.~\cite{stutterheim2023icsa} describe DYNAMOS as a dynamically adaptive microservice-based middleware for data exchange systems. DYNAMOS translates a policy-approved request into a generated microservice chain. Agents and sidecars mediate communication between administrative domains, while short-lived generated jobs execute the selected data-sharing archetype.
+
+DYNAMOS is a useful case study because it combines three concerns that are usually studied separately. First, it has a policy-controlled orchestration path that decides which exchange is allowed. Second, it creates ephemeral execution units rather than relying on one static pipeline. Third, it can move large intermediate results through several services and agent boundaries. These properties make streaming integration more demanding than adding a stream API to a fixed producer-consumer pair.
+
+The Data-through-TTP archetype is the main validation path in this thesis. In that archetype, a trusted intermediary coordinates data exchange between parties and enforces the approved execution shape. Conceptually, this resembles brokered or intermediary-mediated communication in streaming microservice architectures. Coviello et al.~\cite{coviello2022dataxc}, for example, evaluate real-time streaming analytics pipelines in which an intermediary communication layer enables flexible many-to-many communication. DataXc does not address policy-driven data sovereignty, but it supports the idea that intermediary-mediated streaming can be technically practical.
+
+\section{Candidate Communication Mechanisms}
+
+The thesis considers direct RPC-style transfer, bounded batching, and brokered event streams. These mechanisms are not interchangeable: they differ in coupling, replay, ordering, flow control, operational cost, and fit with generated policy-approved jobs.
+
+\subsection{gRPC streaming}
+
+The official gRPC documentation~\cite{grpc2024coreconcepts} describes four RPC styles: unary, server-streaming, client-streaming, and bidirectional streaming. For streaming calls, message ordering is preserved within each individual RPC, while deadlines, cancellation, metadata, and synchronous or asynchronous APIs are supported by the runtime.
+
+For microservice chains with point-to-point data transfer, client-streaming is a natural candidate because it lets a sender incrementally push chunks or records to a downstream consumer. Bidirectional streaming becomes relevant when the receiver should provide progress feedback, pacing information, or explicit acknowledgements during transfer. The main advantages are low protocol overhead, reuse of protobuf contracts, and no broker layer. The disadvantages are temporal coupling between endpoints, no default durable replay, and application-level responsibility for backlog and crash recovery. Roohitavaf et al.~\cite{roohitavaf2019logplayer} show that carefully designed asynchronous gRPC streaming can support efficient ordered delivery, making it a strong baseline rather than merely the status-quo option.
+
+\subsection{Apache Kafka}
+
+Apache Kafka is an event-streaming platform built around append-only logs, topics, partitions, retention, and replay \cite{kafka2026official}. Dobbelaere and Sheykh Esmaili~\cite{dobbelaere2017kafkarabbitmq} describe Kafka's log abstraction as a strong fit when temporal decoupling, repeated reads, and high-throughput retention matter. Its disadvantages are operational footprint, partition-local rather than global ordering, and a non-trivial tuning burden around acknowledgements, partitioning, batching, and replication.
+
+\subsection{RabbitMQ and RabbitMQ Streams}
+
+Dobbelaere and Sheykh Esmaili~\cite{dobbelaere2017kafkarabbitmq} position RabbitMQ as a routing-oriented messaging system with flexible exchanges and acknowledgement support. RabbitMQ Streams add an append-only, non-destructive stream abstraction that supports offset-based reads and replay \cite{rabbitmq2026streams}. This makes RabbitMQ useful as both a classic queue-oriented broker and a stream-log candidate. The limitation is that stream mode introduces its own replication, retention, and partitioning tradeoffs, and classic RabbitMQ queue semantics are not optimised for replay-heavy logs.
+
+\subsection{NATS with JetStream persistence}
+
+The NATS documentation~\cite{nats2026overview,nats2026reqreply,nats2026jetstream} presents core NATS as a lightweight connective technology for distributed systems, while JetStream adds persistence, replay, replication, and consumer state. NATS is therefore interesting as a smaller operational alternative to Kafka and RabbitMQ. A key complication is that some comparative literature still discusses the older NATS Streaming layer rather than JetStream; Sharvari and Sowmya Nag~\cite{sharvari2019messaging} are useful historically, but their results do not map perfectly to current JetStream behaviour.
+
+\section{Concept Matrix}
+
+\begin{table}[!htbp]
+    \centering
+    \footnotesize
+    \caption{Concept matrix for the communication mechanisms considered in this thesis.}
+    \label{tab:concept-matrix}
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.06}
+    \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.18\textwidth}}
+        \toprule
+        Mechanism & Architectural fit & Main strengths & Main limitations & Thesis role \\
+        \midrule
+        Per-message unary gRPC & Tight request-response; no replay by default; ordering is per request & Simple, debuggable, and compatible with existing RPC APIs & High per-message overhead for bulk transfer; no partial progress for one large response & Lower-bound baseline for request-response transfer \\
+        Batched / chunked unary gRPC & Request-shaped but chunked; caller pacing and per-chunk sequence metadata & Amortises overhead while preserving request-style integration & Requires application-level chunk metadata and reassembly & Main DYNAMOS implementation candidate \\
+        gRPC client streaming & Tight long-lived stream with transport flow control; no durable replay by default & Low protocol overhead and natural incremental transfer & Couples endpoint lifetimes; recovery and replay remain application responsibilities & Direct-transfer benchmark winner and in-pod optimisation candidate \\
+        RabbitMQ classic queues & Broker-decoupled queue delivery with acknowledgements; durability possible & Existing DYNAMOS fit, temporal decoupling, and mature routing & Classic queues are not replay-oriented stream logs & Existing agent-boundary model \\
+        RabbitMQ Streams & Broker-decoupled append-only retained stream with offset-based reads & Replay, non-destructive reads, and offset-based recovery & Extra broker overhead and stream-specific retention and replication tuning & Distributed-boundary candidate \\
+        NATS JetStream & Broker-decoupled durable streams and consumers; pull or push consumption & Lightweight deployment, replay, and flexible consumer modes & Ack and fetch configuration strongly affect duplicate behaviour and latency & Broker comparison and tuning-sensitive alternative \\
+        Kafka & Broker-decoupled durable partitioned log with consumer offsets and batching & Mature event-stream ecosystem and retention model & Operational footprint; partitioning and replication tune performance heavily & Durable log comparison point \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+The matrix shows why the thesis does not treat the fastest clean transport as automatically best. Direct gRPC transfer is attractive inside generated jobs where endpoint lifetimes are naturally coupled. Chunked unary is attractive when the existing request-shaped architecture should be preserved. Brokered streams are attractive when decoupling, replay, and independent consumption matter more than local latency.

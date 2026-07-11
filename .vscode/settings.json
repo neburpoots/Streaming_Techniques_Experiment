@@ -18,6 +18,13 @@
       ]
     },
     {
+      "name": "biber",
+      "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/biber.exe",
+      "args": [
+        "%DOCFILE%"
+      ]
+    },
+    {
       "name": "pdflatex",
       "command": "/mnt/c/Users/nebur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe",
       "args": [
@@ -47,6 +54,15 @@
   ],
   "latex-workshop.latex.recipes": [
     {
+      "name": "lualatex -> biber -> lualatex -> lualatex",
+      "tools": [
+        "lualatex",
+        "biber",
+        "lualatex",
+        "lualatex"
+      ]
+    },
+    {
       "name": "pdflatex -> bibtex -> pdflatex -> pdflatex",
       "tools": [
         "pdflatex",
@@ -74,5 +90,6 @@
       ]
     }
   ],
-  "latex-workshop.latex.recipe.default": "first"
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.latex.build.forceRecipeUsage": true
 }

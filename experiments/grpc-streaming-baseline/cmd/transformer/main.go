@@ -9,9 +9,11 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
+	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/app"
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/config"
 	"github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/metrics"
 	pb "github.com/nebur/streaming-techniques-experiment/grpc-streaming-baseline/internal/pb"
@@ -25,8 +27,10 @@ type transformerConfig struct {
 	listenAddr    string
 	metricsAddr   string
 	sinkAddr      string
+	resultDir     string
 	runID         string
 	transportMode string
+	totalMessages uint64
 	workIters     int
 	concurrency   int
 	grpcMaxBytes  int
@@ -37,9 +41,21 @@ type transformerConfig struct {
 
 type transformerServer struct {
 	pb.UnimplementedTransformerServer
-	sinkClient pb.SinkClient
-	metrics    transformerMetrics
-	workIters  int
+	sinkClient                pb.SinkClient
+	metrics                   transformerMetrics
+	workIters                 int
+	mu                        sync.Mutex
+	runID                     string
+	transportMode             string
+	resultDir                 string
+	expectedTotalMessages     uint64
+	natsSeenSequences         map[uint64]struct{}
+	natsDeliveriesObserved    uint64
+	natsRedeliveredDeliveries uint64
+	natsRedeliveryAttempts    uint64
+	natsMaxNumDelivered       uint64
+	natsMetadataErrors        uint64
+	natsLogicalDuplicates     uint64
 }
 
 type transformerMetrics struct {
@@ -48,6 +64,19 @@ type transformerMetrics struct {
 	streams   prometheus.Counter
 	unary     prometheus.Counter
 	workNanos prometheus.Histogram
+}
+
+type transformerNATSDeliveryDiagnosticsFile struct {
+	RunID                 string `json:"run_id"`
+	TransportMode         string `json:"transport_mode"`
+	Stage                 string `json:"stage"`
+	DeliveriesObserved    uint64 `json:"deliveries_observed"`
+	UniqueMessages        uint64 `json:"unique_messages"`
+	RedeliveredDeliveries uint64 `json:"redelivered_deliveries"`
+	RedeliveryAttempts    uint64 `json:"redelivery_attempts"`
+	MaxNumDelivered       uint64 `json:"max_num_delivered"`
+	MetadataErrors        uint64 `json:"metadata_errors"`
+	LogicalDuplicates     uint64 `json:"logical_duplicates"`
 }
 
 func main() {
@@ -114,9 +143,14 @@ func main() {
 		grpc.MaxSendMsgSize(cfg.grpcMaxBytes),
 	)
 	server := &transformerServer{
-		sinkClient: pb.NewSinkClient(conn),
-		metrics:    serverMetrics,
-		workIters:  cfg.workIters,
+		sinkClient:            pb.NewSinkClient(conn),
+		metrics:               serverMetrics,
+		workIters:             cfg.workIters,
+		runID:                 cfg.runID,
+		transportMode:         cfg.transportMode,
+		resultDir:             cfg.resultDir,
+		expectedTotalMessages: cfg.totalMessages,
+		natsSeenSequences:     make(map[uint64]struct{}),
 	}
 	pb.RegisterTransformerServer(grpcServer, server)
 
@@ -153,6 +187,10 @@ func loadConfig() (*transformerConfig, error) {
 	if concurrency <= 0 {
 		return nil, fmt.Errorf("CONCURRENCY must be positive")
 	}
+	totalMessages, err := config.Uint64("TOTAL_MESSAGES", 0)
+	if err != nil {
+		return nil, fmt.Errorf("invalid TOTAL_MESSAGES: %w", err)
+	}
 	grpcMaxBytes, err := config.Int("GRPC_MAX_MESSAGE_BYTES", 128*1024*1024)
 	if err != nil {
 		return nil, fmt.Errorf("invalid GRPC_MAX_MESSAGE_BYTES: %w", err)
@@ -175,8 +213,10 @@ func loadConfig() (*transformerConfig, error) {
 		listenAddr:    config.String("LISTEN_ADDR", ":50051"),
 		metricsAddr:   config.String("METRICS_ADDR", ":9101"),
 		sinkAddr:      config.String("SINK_ADDR", "sink:50052"),
+		resultDir:     config.String("RESULT_DIR", "/results"),
 		runID:         config.String("RUN_ID", "grpc-stream-local"),
 		transportMode: transportMode,
+		totalMessages: totalMessages,
 		workIters:     workIters,
 		concurrency:   concurrency,
 		grpcMaxBytes:  grpcMaxBytes,
@@ -292,4 +332,65 @@ func (s *transformerServer) applyWork(payload []byte) {
 		buffer = digest[:]
 	}
 	s.metrics.workNanos.Observe(float64(time.Since(start).Nanoseconds()))
+}
+
+func (s *transformerServer) recordNATSInputDelivery(chunk *pb.DataChunk, delivery *transport.NATSJetStreamDelivery) {
+	if s == nil || chunk == nil {
+		return
+	}
+
+	s.mu.Lock()
+	s.natsDeliveriesObserved++
+	if s.natsSeenSequences == nil {
+		s.natsSeenSequences = make(map[uint64]struct{})
+	}
+	if _, duplicate := s.natsSeenSequences[chunk.GetSequence()]; duplicate {
+		s.natsLogicalDuplicates++
+	} else {
+		s.natsSeenSequences[chunk.GetSequence()] = struct{}{}
+	}
+
+	if delivery != nil {
+		metadata, err := delivery.Metadata()
+		if err != nil {
+			s.natsMetadataErrors++
+		} else {
+			if metadata.NumDelivered > s.natsMaxNumDelivered {
+				s.natsMaxNumDelivered = metadata.NumDelivered
+			}
+			if metadata.NumDelivered > 1 {
+				s.natsRedeliveredDeliveries++
+				s.natsRedeliveryAttempts += metadata.NumDelivered - 1
+			}
+		}
+	}
+
+	uniqueMessages := uint64(len(s.natsSeenSequences))
+	shouldWrite := s.resultDir != "" && (s.natsDeliveriesObserved%1000 == 0 ||
+		s.natsLogicalDuplicates > 0 ||
+		s.natsRedeliveredDeliveries > 0 ||
+		(s.expectedTotalMessages > 0 && uniqueMessages >= s.expectedTotalMessages))
+	var snapshot *transformerNATSDeliveryDiagnosticsFile
+	if shouldWrite {
+		snapshot = &transformerNATSDeliveryDiagnosticsFile{
+			RunID:                 s.runID,
+			TransportMode:         s.transportMode,
+			Stage:                 "transformer-input",
+			DeliveriesObserved:    s.natsDeliveriesObserved,
+			UniqueMessages:        uniqueMessages,
+			RedeliveredDeliveries: s.natsRedeliveredDeliveries,
+			RedeliveryAttempts:    s.natsRedeliveryAttempts,
+			MaxNumDelivered:       s.natsMaxNumDelivered,
+			MetadataErrors:        s.natsMetadataErrors,
+			LogicalDuplicates:     s.natsLogicalDuplicates,
+		}
+	}
+	s.mu.Unlock()
+
+	if snapshot == nil {
+		return
+	}
+	if err := app.WriteJSON(s.resultDir, fmt.Sprintf("%s-transformer-nats-delivery-diagnostics.json", s.runID), snapshot); err != nil {
+		log.Printf("write transformer nats delivery diagnostics: %v", err)
+	}
 }

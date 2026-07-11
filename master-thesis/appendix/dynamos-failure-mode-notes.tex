@@ -1,0 +1,22 @@
+\section{DYNAMOS Failure-Mode Notes}
+\label{app:dynamos-failure-modes}
+
+\begin{table}[H]
+    \centering
+    \scriptsize
+    \caption{Failure modes observed or accounted for during the DYNAMOS benchmark work.}
+    \label{tab:dynamos-rq3-failure-modes}
+    \setlength{\tabcolsep}{3pt}
+    \fitwidth{%
+    \begin{tabular}{p{3cm}p{3cm}p{3.2cm}p{4.3cm}p{3cm}}
+        \toprule
+        Failure mode & Affected path & Observation & Treatment & Robustness claim \\
+        \midrule
+        Default gRPC message ceiling & Original classic unary & Original DYNAMOS documentation reports a practical limit around 4 MB, or roughly 30k rows in that setup & Increased benchmark message limits for the baseline so the comparison measures buffering cost rather than an artificial ceiling & Chunking removes the dependency on one very large response message \\
+        Full-result buffering & Classic unary and early bulk prototypes & Large results were materialized repeatedly before the client saw progress & Preserved 5k-row chunks through SQL, aggregate, algorithm, agent, and gateway stages & Supported by lower memory peaks and earlier partial results \\
+        Stale generated jobs & Repeated classic unary runs & Later repetitions could return fast 502 or empty-provider responses when old generated jobs remained & Cleaned generated \texttt{surf}, \texttt{uva}, and \texttt{vu} jobs outside the measured request window & Not a streaming advantage; handled for benchmark fairness \\
+        Multi-provider merge error & Classic multi-provider baseline & The first provider could be appended twice during aggregation & Applied a minimal aggregation correction before reporting multi-provider baseline timings & Baseline correctness fix, not a streaming feature \\
+        Timeout and empty-provider reporting & Early large-result runs & Some failures appeared as missing final results or empty provider bodies & Made timeout/error outcomes visible in benchmark output and separated clean errors from valid completions & Improves diagnosability; not a full crash-recovery proof \\
+        \bottomrule
+    \end{tabular}}
+\end{table}

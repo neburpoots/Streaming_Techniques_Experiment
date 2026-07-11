@@ -1,0 +1,6 @@
+# Overleaf/latexmk defaults for this thesis.
+# The template uses fontspec/polyglossia and biblatex, so it needs LuaLaTeX
+# and Biber rather than pdfLaTeX/BibTeX.
+$pdf_mode = 4;
+$lualatex = 'lualatex -file-line-error -interaction=nonstopmode -synctex=1 %O %S';
+$bibtex_use = 2;

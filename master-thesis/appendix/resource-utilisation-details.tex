@@ -1,0 +1,69 @@
+\section{Resource Utilisation Details}
+\label{app:resource-details}
+
+This appendix summarizes supporting resource metrics for diagnostic Kubernetes scenario runs where CPU and memory data are most informative. For brokered modes, the broker is reported as a separate role because its buffering layer is a core part of the transport cost. These tables are not used for the primary RQ1 ranking, which is based on the completed five-repetition throughput, latency, and correctness corpus. The six-transport scenario resource exports remain in the benchmark result directory; the tables below are retained as role-level context where the sampling scope is comparable.
+
+\begin{table}[H]
+    \centering
+    \scriptsize
+    \caption{Continuous scenario CPU usage by role (avg./peak \%).}
+    \label{tab:appendix-continuous-cpu}
+    \setlength{\tabcolsep}{3pt}
+    \fitwidth{%
+    \begin{tabular}{lrrrrr}
+        \toprule
+        Mode & Concur. & Producer & Transformer & Sink & Broker \\
+        \midrule
+        Client-streaming & 4 & 23.40 / 23.40 & 8.99 / 24.20 & 5.61 / 14.90 & -- \\
+        Client-streaming & 8 & -- & 9.31 / 25.60 & 5.64 / 15.50 & -- \\
+        Unary & 4 & 35.70 / 35.70 & 17.88 / 39.10 & 11.12 / 24.10 & -- \\
+        Unary & 8 & -- & 15.54 / 33.70 & 9.72 / 20.90 & -- \\
+        RabbitMQ Streams & 4 & 7.92 / 8.30 & 9.87 / 15.60 & 6.91 / 10.90 & 29.88 / 43.30 \\
+        RabbitMQ Streams & 8 & 7.88 / 8.20 & 10.46 / 15.80 & 7.50 / 11.70 & 33.00 / 46.50 \\
+        NATS JetStream & 4 & -- & 12.62 / 24.90 & 5.60 / 15.40 & 18.37 / 40.90 \\
+        NATS JetStream & 8 & -- & 16.23 / 23.70 & 6.45 / 14.20 & 22.74 / 38.50 \\
+        Kafka & 4 & -- & 4.68 / 5.70 & 0.69 / 1.90 & 51.52 / 52.90 \\
+        Kafka & 8 & -- & 8.58 / 8.80 & 1.00 / 2.20 & 41.13 / 58.80 \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \scriptsize
+    \caption{Recovery scenario CPU usage by role (avg./peak \%).}
+    \label{tab:appendix-recovery-cpu}
+    \setlength{\tabcolsep}{3pt}
+    \fitwidth{%
+    \begin{tabular}{lrrrr}
+        \toprule
+        Mode & Producer & Transformer & Sink & Broker \\
+        \midrule
+        Client-streaming & 31.60 / 31.60 & 12.64 / 31.60 & 3.89 / 17.50 & -- \\
+        Unary & 4.60 / 6.00 & 2.45 / 9.10 & 2.56 / 6.10 & -- \\
+        RabbitMQ Streams & 8.84 / 10.20 & 13.38 / 17.10 & 7.51 / 13.90 & 31.76 / 49.90 \\
+        NATS JetStream & 0.30 / 0.30 & 17.29 / 25.20 & 7.28 / 16.20 & 20.99 / 43.50 \\
+        Kafka & 0.40 / 0.40 & 7.63 / 8.10 & 1.44 / 2.50 & 46.77 / 75.40 \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \scriptsize
+    \caption{Recovery scenario memory usage by role (avg./peak MiB).}
+    \label{tab:appendix-recovery-memory}
+    \setlength{\tabcolsep}{3pt}
+    \fitwidth{%
+    \begin{tabular}{lrrrr}
+        \toprule
+        Mode & Producer & Transformer & Sink & Broker \\
+        \midrule
+        Client-streaming & 7.00 / 7.00 & 3.40 / 7.00 & 2.33 / 7.00 & -- \\
+        Unary & 7.00 / 7.00 & 3.08 / 7.00 & 4.53 / 7.00 & -- \\
+        RabbitMQ Streams & 10.00 / 10.00 & 25.72 / 31.00 & 5.78 / 8.00 & 490.91 / 511.00 \\
+        NATS JetStream & 8.00 / 8.00 & 14.00 / 14.00 & 9.75 / 15.00 & 306.06 / 537.00 \\
+        Kafka & 10.00 / 10.00 & 8.00 / 8.00 & 6.53 / 9.00 & 449.71 / 478.00 \\
+        \bottomrule
+    \end{tabular}}
+\end{table}

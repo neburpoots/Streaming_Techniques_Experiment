@@ -243,4 +243,11 @@ I.~Baldin, A.~Nikolich, J.~Griffioen, I.~I.~S. Monga, K.-C. Wang, T.~Lehman,
   \url{https://portal.fabric-testbed.net/about/about-fabric}, 2026, accessed:
   2026-05-25.
 
+\bibitem{streamingTechniquesExperiment2026}
+R.~Stoop, ``Streaming techniques experiment: Synthetic transport benchmark and
+  thesis artifacts,''
+  \url{https://github.com/neburpoots/Streaming_Techniques_Experiment}, 2026,
+  public experiment artifact repository, main branch commit
+  9e3870c145802fbb7547ebb24e879dc06cc390ad; accessed: 2026-06-22.
+
 \end{thebibliography}

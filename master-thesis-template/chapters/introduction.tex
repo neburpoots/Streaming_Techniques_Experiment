@@ -1,0 +1,49 @@
+\chapter{Introduction}\label{ch:introduction}
+
+\section{Context}
+
+Many contemporary distributed systems operate in environments where data and computational resources are owned by different organisations. In such settings, data exchange must adhere to legal agreements, privacy regulations, organisational policies, and infrastructure boundaries. These constraints are common in domains such as healthcare, scientific research, public-sector infrastructure, and cross-organisation analytics, where unrestricted data exchange is not acceptable.
+
+Microservice-based middleware is a natural fit for these environments because individual data exchange steps can be deployed, isolated, and scaled independently. However, the communication layer becomes a central design concern. A policy-aware system must not only move data efficiently; it must also preserve the control path that decides which parties may exchange data, where computation may run, and which execution shape is allowed. Communication mechanisms that improve throughput but obscure policy boundaries or complicate orchestration are therefore not automatically suitable.
+
+Streaming communication is attractive in this setting because data can be transferred and processed incrementally. A producer does not need to materialise a complete result before the consumer can begin work, and a client can observe progress before the final result is available. This can reduce peak memory usage and improve completion time for large result sets. At the same time, streaming introduces long-lived flows, buffering choices, backpressure behaviour, replay semantics, and failure modes that are more complex than simple request-response calls.
+
+\section{Case-Study System}
+
+Studying these tradeoffs empirically requires a system in which they actually collide, so the case-study system was selected against explicit criteria rather than assumed upfront. A suitable system must (i) evaluate data-sharing policies before execution and enforce the outcome architecturally, (ii) compose its execution path dynamically rather than through a fixed pipeline, (iii) mediate communication across independent administrative domains, and (iv) be open source and modifiable so that alternative data paths can be implemented and measured. Several classes of systems satisfy some of these criteria. Dataspace connectors such as the IDS Dataspace Connector implement policy-based, usage-controlled data exchange, but their deployments typically use a fixed connector topology rather than execution paths composed per request~\cite{idsa2023usagecontrol,neumaier2021policyaware}. Sidecar-based runtimes such as Dapr unify heterogeneous communication mechanisms behind one interface, but policy-driven orchestration of the execution path is not part of their core model~\cite{figueira2024selfadaptive}. Stream-processing platforms handle continuous data natively but are not built around per-request policy approval. None of these classes is inherently unable to support the studied combination; they simply do not match it as directly.
+
+DYNAMOS combines all four criteria in one implementation and is therefore used as the case-study system. Stutterheim~\cite{stutterheim2023thesis} and Stutterheim et al.~\cite{stutterheim2023icsa} describe DYNAMOS as a dynamically adaptive microservice-based middleware for data exchange systems. DYNAMOS implements recurring data-sharing archetypes, such as Compute-to-Data and Data-through-a-Trusted-Third-Party, by generating short-lived service chains after policy evaluation. This makes it a useful case because it combines the concerns that make streaming difficult: policy approval, dynamic orchestration, sidecar-mediated agent communication, generated jobs, and large intermediate results.
+
+The original DYNAMOS data path is built primarily around unary request-response transfers. That model is simple and compatible with generated jobs, but it becomes limiting when large tables or continuous outputs must pass through several services. A full-result response can be buffered repeatedly inside the SQL service, generated job chain, agent path, and gateway before the client sees any progress. The case study therefore asks whether streaming-style transfer can improve scalability while keeping the policy and orchestration model intact.
+
+\section{Problem Statement}
+
+The problem addressed in this thesis is that policy-aware data exchange systems need a communication model that can move large or continuous result sets without repeatedly materialising complete responses, while still preserving policy-driven orchestration and diagnosable execution boundaries. In DYNAMOS specifically, this means changing the bulk data path after approval, not replacing the policy decision point or the generated job model.
+
+The design space is not a simple choice between ``streaming'' and ``not streaming''. Direct gRPC streaming, bounded batched unary transfer, and brokered event streams make different tradeoffs. Direct streaming can reduce overhead when producer and consumer lifetimes are coupled. Batching can retain request-response compatibility while amortising per-message cost. Brokered streams can add temporal decoupling, replay, and retained records, but they introduce broker overhead and configuration sensitivity. The thesis therefore evaluates streaming communication as a set of architectural tradeoffs rather than as a single technology switch.
+
+\section{Research Questions}
+
+The main research question addressed in this thesis is:
+
+\begin{quote}
+\textbf{Main RQ:} How can streaming communication be integrated into dynamically composed, policy-aware microservice-based data exchange systems while preserving compliance-oriented orchestration and improving scalability and performance?
+\end{quote}
+
+To answer this question, the following sub-research questions are defined:
+
+\begin{itemize}
+  \item \textbf{RQ1:} Which streaming communication technologies, frameworks, and interaction patterns are suitable for large-scale and continuous data exchange in microservice-based systems?
+  \item \textbf{RQ2:} How can streaming communication be integrated into a policy-aware microservice architecture in a way that preserves dynamic service composition, policy-driven orchestration, and isolation guarantees?
+  \item \textbf{RQ3:} What is the impact of the implemented streaming data paths on scalability, performance, and robustness compared to a traditional request-response approach in the DYNAMOS case study?
+\end{itemize}
+
+\section{Approach and Contributions}
+
+This thesis uses a mixed-methods approach that combines literature analysis, controlled benchmarking, prototype implementation, and in-system validation. First, existing communication mechanisms and evaluation practices are reviewed to identify candidate technologies and relevant comparison dimensions. Second, a controlled Kubernetes benchmark evaluates six transport mappings under clean transfer, continuous flow, backpressure, and recovery scenarios. Third, the findings are used to implement three chunk-aware DYNAMOS data paths: chunked unary transfer, intra-job gRPC streaming, and RabbitMQ Streams at the agent boundary. Finally, these implementations are evaluated inside DYNAMOS on realistic bulk retrieval workloads and checked against multiple archetype and provider shapes.
+
+The contributions are fourfold. First, the thesis provides a controlled comparison of direct and brokered streaming-compatible transport mappings for microservice data exchange. Second, it identifies chunk preservation as the key architectural requirement for improving large-result transfer in a policy-aware generated workflow. Third, it implements and evaluates three chunk-aware data paths in DYNAMOS. Fourth, it documents the benchmark scope, parameter rationale, environment, provenance, and failure-mode notes needed to reproduce and interpret the results.
+
+\section{Outline}
+
+\Cref{ch:background} introduces policy-aware data exchange systems, the DYNAMOS case study, and the communication mechanisms considered in the thesis. \Cref{ch:related} positions the work against literature on streaming communication, adaptive microservice middleware, policy enforcement, resilience, and performance evaluation. \Cref{ch:methods} describes the research design, benchmark setup, parameter rationale, validation strategy, and ethical considerations. \Cref{ch:transport-benchmark} presents the controlled transport benchmark. \Cref{ch:dynamos-integration} describes the DYNAMOS streaming integration. \Cref{ch:dynamos-evaluation} reports the DYNAMOS-specific performance results. \Cref{ch:discussion} maps the findings back to the research questions and discusses limitations. \Cref{ch:conclusion} summarises the conclusions and future work.

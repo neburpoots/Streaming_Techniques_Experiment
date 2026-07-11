@@ -1,0 +1,8 @@
+\section{Future Work}
+
+The local DYNAMOS benchmark is not the final distributed scalability answer. This thesis validates the local implementation first, because the basic streaming path must work before it is meaningful to test it across sites. The natural next step is Scattered Directive, which extends DYNAMOS with cross-node microservice chains for policy-aware VFL workflows and uses FABRIC to automate distributed deployment \cite{jongejans2025scattered,scatteredDirectiveRepo2026}.
+
+In that setting, bulk transfer can become part of a larger VFL-style workflow. Parties may hold different features for overlapping entities, and a TTP or shared execution component may coordinate aligned intermediate values, labels, embeddings, model updates, or other training artefacts. The current thesis does not claim to validate a complete VFL training workload. It validates the DYNAMOS communication path that such a workload would depend on when large intermediate results have to cross generated services and agent boundaries.
+
+FABRIC provides programmable compute and storage resources connected by high-speed dedicated links, which makes it a suitable environment for testing DYNAMOS when the TTP and data providers are separated across sites \cite{baldin2019fabric,fabricPortal2026}. A later FABRIC experiment should keep the RQ3 metrics from this section and add network throughput, broker lag or stream backlog, cross-site tail latency, failure recovery, concurrent-job scaling, and policy-change responsiveness. RabbitMQ Streams deserves special attention in that setting because its local overhead may be outweighed by retained-stream and replay semantics once agents are no longer co-located.
+

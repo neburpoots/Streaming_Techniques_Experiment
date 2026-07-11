@@ -24,10 +24,21 @@ type NATSJetStreamConsumer struct {
 	conn    *nats.Conn
 	sub     *nats.Subscription
 	pending []*nats.Msg
+	config  NATSConfig
 }
 
 type NATSJetStreamDelivery struct {
 	msg *nats.Msg
+}
+
+type NATSJetStreamDeliveryMetadata struct {
+	Stream       string    `json:"stream"`
+	Consumer     string    `json:"consumer"`
+	StreamSeq    uint64    `json:"stream_seq"`
+	ConsumerSeq  uint64    `json:"consumer_seq"`
+	NumDelivered uint64    `json:"num_delivered"`
+	NumPending   uint64    `json:"num_pending"`
+	Timestamp    time.Time `json:"timestamp"`
 }
 
 type natsAsyncPublishState struct {
@@ -42,13 +53,9 @@ const (
 	natsPublishAsyncMaxPending    = 2048
 	natsPublishAsyncDrainTarget   = 512
 	natsPublishAsyncPollInterval  = 5 * time.Millisecond
-	natsFetchBatchSize            = 64
-	natsFetchMaxWait              = 25 * time.Millisecond
-	natsPullMaxWaiting            = 8
-	natsMaxAckPending             = 4096
+	natsPullMaxWaiting            = 128
 	natsConsumerPendingMsgLimit   = 8192
 	natsConsumerPendingBytesLimit = 128 * 1024 * 1024
-	natsAckWait                   = 30 * time.Second
 	natsMaxDeliver                = 20
 )
 
@@ -92,11 +99,11 @@ func NewNATSJetStreamConsumer(cfg NATSConfig, streamName string, subject string,
 		nats.AckExplicit(),
 		nats.DeliverAll(),
 		nats.ConsumerMemoryStorage(),
-		nats.AckWait(natsAckWait),
-		nats.MaxAckPending(natsMaxAckPending),
+		nats.AckWait(cfg.effectiveAckWait()),
+		nats.MaxAckPending(cfg.effectiveMaxAckPending()),
 		nats.MaxDeliver(natsMaxDeliver),
-		nats.MaxRequestBatch(natsFetchBatchSize),
-		nats.MaxRequestExpires(natsFetchMaxWait),
+		nats.MaxRequestBatch(cfg.effectiveFetchBatchSize()),
+		nats.MaxRequestExpires(cfg.effectiveFetchMaxWait()),
 		nats.PullMaxWaiting(natsPullMaxWaiting),
 	)
 	if err != nil {
@@ -108,7 +115,7 @@ func NewNATSJetStreamConsumer(cfg NATSConfig, streamName string, subject string,
 		conn.Close()
 		return nil, fmt.Errorf("configure nats pull consumer %q pending limits: %w", consumerName, err)
 	}
-	return &NATSJetStreamConsumer{conn: conn, sub: sub}, nil
+	return &NATSJetStreamConsumer{conn: conn, sub: sub, config: cfg}, nil
 }
 
 func (p *NATSJetStreamPublisher) PublishChunk(ctx context.Context, chunk *pb.DataChunk) error {
@@ -199,7 +206,7 @@ func (c *NATSJetStreamConsumer) ReceiveChunk(ctx context.Context) (*pb.DataChunk
 			return nil, nil, err
 		}
 		if len(c.pending) == 0 {
-			msgs, err := c.sub.Fetch(natsFetchBatchSize, nats.MaxWait(natsFetchMaxWait))
+			msgs, err := c.sub.Fetch(c.config.effectiveFetchBatchSize(), nats.MaxWait(c.config.effectiveFetchMaxWait()))
 			if err != nil {
 				if errors.Is(err, nats.ErrTimeout) {
 					continue
@@ -243,6 +250,25 @@ func (d *NATSJetStreamDelivery) Commit() error {
 	return d.msg.Ack()
 }
 
+func (d *NATSJetStreamDelivery) Metadata() (NATSJetStreamDeliveryMetadata, error) {
+	if d == nil || d.msg == nil {
+		return NATSJetStreamDeliveryMetadata{}, errors.New("nats delivery message is not available")
+	}
+	metadata, err := d.msg.Metadata()
+	if err != nil {
+		return NATSJetStreamDeliveryMetadata{}, err
+	}
+	return NATSJetStreamDeliveryMetadata{
+		Stream:       metadata.Stream,
+		Consumer:     metadata.Consumer,
+		StreamSeq:    metadata.Sequence.Stream,
+		ConsumerSeq:  metadata.Sequence.Consumer,
+		NumDelivered: metadata.NumDelivered,
+		NumPending:   metadata.NumPending,
+		Timestamp:    metadata.Timestamp,
+	}, nil
+}
+
 func openNATSJetStream(cfg NATSConfig, opts ...nats.JSOpt) (*nats.Conn, nats.JetStreamContext, error) {
 	conn, err := nats.Connect(cfg.URL, nats.Timeout(natsConnectTimeout), nats.RetryOnFailedConnect(true), nats.MaxReconnects(5))
 	if err != nil {
@@ -254,6 +280,34 @@ func openNATSJetStream(cfg NATSConfig, opts ...nats.JSOpt) (*nats.Conn, nats.Jet
 		return nil, nil, fmt.Errorf("open nats jetstream context: %w", err)
 	}
 	return conn, js, nil
+}
+
+func (cfg NATSConfig) effectiveAckWait() time.Duration {
+	if cfg.AckWait <= 0 {
+		return DefaultNATSAckWait
+	}
+	return cfg.AckWait
+}
+
+func (cfg NATSConfig) effectiveMaxAckPending() int {
+	if cfg.MaxAckPending <= 0 {
+		return DefaultNATSMaxAckPending
+	}
+	return cfg.MaxAckPending
+}
+
+func (cfg NATSConfig) effectiveFetchBatchSize() int {
+	if cfg.FetchBatchSize <= 0 {
+		return DefaultNATSFetchBatchSize
+	}
+	return cfg.FetchBatchSize
+}
+
+func (cfg NATSConfig) effectiveFetchMaxWait() time.Duration {
+	if cfg.FetchMaxWait <= 0 {
+		return DefaultNATSFetchMaxWait
+	}
+	return cfg.FetchMaxWait
 }
 
 func (p *NATSJetStreamPublisher) asyncPublishError() error {
