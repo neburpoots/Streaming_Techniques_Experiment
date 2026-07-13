@@ -29,7 +29,7 @@ set -euo pipefail
 #   --help              Show usage
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RESULTS_DIR="${ROOT}/results"
+RESULTS_DIR="${RESULTS_DIR:-${ROOT}/results}"
 STATS_SCRIPT="${ROOT}/scripts/collect-k8s-stats.sh"
 EXPORT_SCRIPT="${ROOT}/scripts/export-results.ps1"
 AGGREGATE_SCRIPT="${ROOT}/scripts/aggregate-repeat-results.ps1"
@@ -67,6 +67,8 @@ BATCHED_UNARY_BATCH_SIZE="${BATCHED_UNARY_BATCH_SIZE:-100}"
 GRPC_MAX_MESSAGE_BYTES="${GRPC_MAX_MESSAGE_BYTES:-134217728}"
 SYNTHETIC_CLEAN_TOTAL_MESSAGES="${SYNTHETIC_CLEAN_TOTAL_MESSAGES:-20000}"
 NATS_STREAM_MIN_BYTES="${NATS_STREAM_MIN_BYTES:-536870912}"
+KAFKA_RESTART_BROKER_PER_CASE="${KAFKA_RESTART_BROKER_PER_CASE:-true}"
+SKIP_COMPLETED_CASES="${SKIP_COMPLETED_CASES:-false}"
 ACTIVE_STATS_PID=""
 ACTIVE_STATS_STOP_FILE=""
 FAILURE_PID=""
@@ -299,6 +301,17 @@ cleanup_broker_overlay_conflicts() {
     kubectl delete "${stale_resources[@]}" -n "${NAMESPACE}" --ignore-not-found=true >/dev/null 2>&1 || true
 }
 
+configure_kafka_broker() {
+    if [[ -z "${KAFKA_BROKER_MESSAGE_MAX_BYTES:-}" ]]; then
+        return 0
+    fi
+
+    kubectl set env deployment/grpc-stream-kafka -n "${NAMESPACE}" \
+        KAFKA_MESSAGE_MAX_BYTES="${KAFKA_BROKER_MESSAGE_MAX_BYTES}" \
+        KAFKA_REPLICA_FETCH_MAX_BYTES="${KAFKA_BROKER_MESSAGE_MAX_BYTES}" \
+        >/dev/null
+}
+
 scale_workload_if_present() {
     local name="$1"
     local replicas="$2"
@@ -336,6 +349,11 @@ scale_brokers_for_transport() {
     scale_workload_if_present grpc-stream-rabbitmq "${rabbitmq_replicas}"
     scale_workload_if_present grpc-stream-nats "${nats_replicas}"
     scale_workload_if_present grpc-stream-kafka "${kafka_replicas}"
+    if [[ "${transport_mode}" == "kafka" ]]; then
+        scale_workload_if_present grpc-stream-transformer "${KAFKA_TRANSFORMER_REPLICAS:-1}"
+    else
+        scale_workload_if_present grpc-stream-transformer 1
+    fi
 }
 
 # ── ConfigMap patching ──
@@ -432,6 +450,17 @@ patch_configmap() {
         --from-literal=KAFKA_TRANSFORMER_TO_SINK_TOPIC="${KAFKA_TRANSFORMER_TO_SINK_TOPIC:-transformer-to-sink}" \
         --from-literal=KAFKA_TOPIC_PARTITIONS="${KAFKA_TOPIC_PARTITIONS:-16}" \
         --from-literal=KAFKA_TOPIC_REPLICATION_FACTOR="${KAFKA_TOPIC_REPLICATION_FACTOR:-1}" \
+        --from-literal=KAFKA_BATCH_SIZE="${KAFKA_BATCH_SIZE:-256}" \
+        --from-literal=KAFKA_BATCH_BYTES="${KAFKA_BATCH_BYTES:-1048576}" \
+        --from-literal=KAFKA_BATCH_TIMEOUT_MS="${KAFKA_BATCH_TIMEOUT_MS:-5}" \
+        --from-literal=KAFKA_COMMIT_INTERVAL_MS="${KAFKA_COMMIT_INTERVAL_MS:-250}" \
+        --from-literal=KAFKA_QUEUE_CAPACITY="${KAFKA_QUEUE_CAPACITY:-512}" \
+        --from-literal=KAFKA_FETCH_MIN_BYTES="${KAFKA_FETCH_MIN_BYTES:-65536}" \
+        --from-literal=KAFKA_FETCH_MAX_BYTES="${KAFKA_FETCH_MAX_BYTES:-67108864}" \
+        --from-literal=KAFKA_FETCH_MAX_WAIT_MS="${KAFKA_FETCH_MAX_WAIT_MS:-250}" \
+        --from-literal=KAFKA_REQUIRED_ACKS="${KAFKA_REQUIRED_ACKS:-one}" \
+        --from-literal=KAFKA_COMPRESSION="${KAFKA_COMPRESSION:-none}" \
+        --from-literal=KAFKA_KEY_MODE="${KAFKA_KEY_MODE:-worker}" \
         --dry-run=client -o yaml | kubectl apply -f -
 }
 
@@ -593,7 +622,9 @@ restart_deployments() {
             wait_for_nats_ready
             ;;
         kafka)
-            rollout_restart grpc-stream-kafka
+            if [[ "${KAFKA_RESTART_BROKER_PER_CASE}" == "true" ]]; then
+                rollout_restart grpc-stream-kafka
+            fi
             wait_for_kafka_ready
             ;;
     esac
@@ -861,6 +892,13 @@ run_case() {
     local dataset_repeat="${18:-1}"
     local effective_run_id="${RUN_ID_PREFIX}${run_id}${REPEAT_SUFFIX}"
 
+    if [[ "${SKIP_COMPLETED_CASES}" == "true" ]] \
+        && [[ -f "${RESULTS_DIR}/${effective_run_id}-producer-result.json" ]] \
+        && [[ -f "${RESULTS_DIR}/${effective_run_id}-sink-summary.json" ]]; then
+        echo "  Skipping completed case: ${effective_run_id}"
+        return 0
+    fi
+
     # Time-boxed campaigns: once the deadline passes, skip remaining cases
     # instead of starting new multi-minute runs.
     if [[ -n "${CASE_DEADLINE_EPOCH:-}" ]] && (( $(date +%s) > CASE_DEADLINE_EPOCH )); then
@@ -1082,6 +1120,7 @@ fi
 # Apply the overlay to create/update deployments and services
 cleanup_broker_overlay_conflicts
 kubectl apply -k "${OVERLAY_DIR}"
+configure_kafka_broker
 
 # Delete producer job so it does not block the first run
 delete_producer_job

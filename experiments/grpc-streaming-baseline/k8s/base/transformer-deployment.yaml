@@ -161,6 +161,72 @@ spec:
                 configMapKeyRef:
                   name: grpc-streaming-baseline-config
                   key: KAFKA_TRANSFORMER_TO_SINK_TOPIC
+            - name: KAFKA_TOPIC_PARTITIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_TOPIC_PARTITIONS
+            - name: KAFKA_TOPIC_REPLICATION_FACTOR
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_TOPIC_REPLICATION_FACTOR
+            - name: KAFKA_BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_BATCH_SIZE
+            - name: KAFKA_BATCH_BYTES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_BATCH_BYTES
+            - name: KAFKA_BATCH_TIMEOUT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_BATCH_TIMEOUT_MS
+            - name: KAFKA_COMMIT_INTERVAL_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_COMMIT_INTERVAL_MS
+            - name: KAFKA_QUEUE_CAPACITY
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_QUEUE_CAPACITY
+            - name: KAFKA_FETCH_MIN_BYTES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_FETCH_MIN_BYTES
+            - name: KAFKA_FETCH_MAX_BYTES
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_FETCH_MAX_BYTES
+            - name: KAFKA_FETCH_MAX_WAIT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_FETCH_MAX_WAIT_MS
+            - name: KAFKA_REQUIRED_ACKS
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_REQUIRED_ACKS
+            - name: KAFKA_COMPRESSION
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_COMPRESSION
+            - name: KAFKA_KEY_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: grpc-streaming-baseline-config
+                  key: KAFKA_KEY_MODE
+
           ports:
             - containerPort: 50051
               name: grpc

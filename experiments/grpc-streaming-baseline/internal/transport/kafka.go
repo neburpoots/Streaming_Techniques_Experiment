@@ -19,7 +19,9 @@ type KafkaPublisher struct {
 	writer        *kafka.Writer
 	topic         string
 	flushInterval time.Duration
+	maxBatchSize  int
 	maxBatchBytes int
+	keyMode       string
 	closeCh       chan struct{}
 	flushDone     chan struct{}
 	mu            sync.Mutex
@@ -38,17 +40,10 @@ type KafkaDelivery struct {
 }
 
 const (
-	kafkaBatchSize         = 256
-	kafkaBatchBytes        = 1 * 1024 * 1024
-	kafkaBatchTimeout      = 5 * time.Millisecond
-	kafkaCommitInterval    = 250 * time.Millisecond
-	kafkaFlushTimeout      = 5 * time.Second
-	kafkaCommitTimeout     = 5 * time.Second
-	kafkaReadMaxWait       = 250 * time.Millisecond
-	kafkaReadMinBytes      = 64 * 1024
-	kafkaReadMaxBytes      = 64 * 1024 * 1024
-	kafkaWriterAttempts    = 10
-	kafkaWriterQueueLength = 2 * kafkaBatchSize
+	kafkaFlushTimeout   = 5 * time.Second
+	kafkaCommitTimeout  = 5 * time.Second
+	kafkaWriterAttempts = 10
+	kafkaTopicReadyWait = 30 * time.Second
 )
 
 func NewKafkaPublisher(cfg KafkaConfig, topic string) (*KafkaPublisher, error) {
@@ -58,22 +53,25 @@ func NewKafkaPublisher(cfg KafkaConfig, topic string) (*KafkaPublisher, error) {
 	writer := &kafka.Writer{
 		Addr:                   kafka.TCP(cfg.Brokers...),
 		Topic:                  topic,
-		Balancer:               &kafka.Hash{},
-		RequiredAcks:           kafka.RequireOne,
-		BatchSize:              kafkaBatchSize,
-		BatchBytes:             kafkaBatchBytes,
-		BatchTimeout:           kafkaBatchTimeout,
+		Balancer:               kafkaBalancer(cfg.KeyMode),
+		RequiredAcks:           kafkaRequiredAcks(cfg.RequiredAcks),
+		BatchSize:              cfg.BatchSize,
+		BatchBytes:             int64(cfg.BatchBytes),
+		BatchTimeout:           cfg.BatchTimeout,
+		Compression:            kafkaCompression(cfg.Compression),
 		MaxAttempts:            kafkaWriterAttempts,
 		AllowAutoTopicCreation: true,
 	}
 	publisher := &KafkaPublisher{
 		writer:        writer,
 		topic:         topic,
-		flushInterval: kafkaBatchTimeout,
-		maxBatchBytes: kafkaBatchBytes,
+		flushInterval: cfg.BatchTimeout,
+		maxBatchSize:  cfg.BatchSize,
+		maxBatchBytes: cfg.BatchBytes,
+		keyMode:       cfg.KeyMode,
 		closeCh:       make(chan struct{}),
 		flushDone:     make(chan struct{}),
-		pending:       make([]kafka.Message, 0, kafkaWriterQueueLength),
+		pending:       make([]kafka.Message, 0, cfg.QueueCapacity),
 	}
 	publisher.startPeriodicFlush()
 	return publisher, nil
@@ -111,11 +109,11 @@ func NewKafkaConsumer(cfg KafkaConfig, topic string, consumerGroup string) (*Kaf
 		Brokers:        cfg.Brokers,
 		Topic:          topic,
 		GroupID:        consumerGroup,
-		CommitInterval: kafkaCommitInterval,
-		QueueCapacity:  kafkaWriterQueueLength,
-		MinBytes:       kafkaReadMinBytes,
-		MaxBytes:       kafkaReadMaxBytes,
-		MaxWait:        kafkaReadMaxWait,
+		CommitInterval: cfg.CommitInterval,
+		QueueCapacity:  cfg.QueueCapacity,
+		MinBytes:       cfg.ReadMinBytes,
+		MaxBytes:       cfg.ReadMaxBytes,
+		MaxWait:        cfg.ReadMaxWait,
 		StartOffset:    kafka.FirstOffset,
 	})
 	return &KafkaConsumer{reader: reader}, nil
@@ -173,7 +171,7 @@ func (p *KafkaPublisher) PublishChunk(ctx context.Context, chunk *pb.DataChunk) 
 		return fmt.Errorf("marshal data chunk: %w", err)
 	}
 	message := kafka.Message{
-		Key:   []byte(strconv.FormatUint(chunk.GetProducerWorker(), 10)),
+		Key:   kafkaMessageKey(p.keyMode, chunk),
 		Value: body,
 		Headers: []kafka.Header{
 			{Key: "run_id", Value: []byte(chunk.GetRunId())},
@@ -197,11 +195,55 @@ func (p *KafkaPublisher) PublishChunk(ctx context.Context, chunk *pb.DataChunk) 
 		p.lastFlushAt = time.Now()
 	}
 
-	if len(p.pending) < kafkaBatchSize && p.pendingBytes < p.maxBatchBytes {
+	if len(p.pending) < p.maxBatchSize && p.pendingBytes < p.maxBatchBytes {
 		return nil
 	}
 
 	return p.flushLocked(ctx)
+}
+
+func kafkaMessageKey(mode string, chunk *pb.DataChunk) []byte {
+	switch mode {
+	case "run":
+		return []byte(chunk.GetRunId())
+	case "none":
+		return nil
+	default:
+		return []byte(strconv.FormatUint(chunk.GetProducerWorker(), 10))
+	}
+}
+
+func kafkaBalancer(keyMode string) kafka.Balancer {
+	if keyMode == "none" {
+		return &kafka.LeastBytes{}
+	}
+	return &kafka.Hash{}
+}
+
+func kafkaRequiredAcks(value string) kafka.RequiredAcks {
+	switch value {
+	case "none":
+		return kafka.RequireNone
+	case "all":
+		return kafka.RequireAll
+	default:
+		return kafka.RequireOne
+	}
+}
+
+func kafkaCompression(value string) kafka.Compression {
+	switch value {
+	case "gzip":
+		return kafka.Gzip
+	case "snappy":
+		return kafka.Snappy
+	case "lz4":
+		return kafka.Lz4
+	case "zstd":
+		return kafka.Zstd
+	default:
+		return 0
+	}
 }
 
 func (p *KafkaPublisher) flush(ctx context.Context) error {
@@ -249,8 +291,37 @@ func ensureKafkaTopic(cfg KafkaConfig, topic string) error {
 		NumPartitions:     cfg.TopicPartitions,
 		ReplicationFactor: cfg.TopicReplicationFactor,
 	})
-	if err == nil || strings.Contains(strings.ToLower(err.Error()), "already exists") {
-		return nil
+	if err != nil && !strings.Contains(strings.ToLower(err.Error()), "already exists") {
+		return fmt.Errorf("create kafka topic %q: %w", topic, err)
 	}
-	return fmt.Errorf("create kafka topic %q: %w", topic, err)
+
+	deadline := time.Now().Add(kafkaTopicReadyWait)
+	for {
+		partitions, metadataErr := conn.ReadPartitions(topic)
+		if metadataErr == nil && kafkaTopicHasPartitions(partitions, topic, cfg.TopicPartitions) {
+			return nil
+		}
+		if time.Now().After(deadline) {
+			if metadataErr != nil {
+				return fmt.Errorf("wait for Kafka topic %q metadata: %w", topic, metadataErr)
+			}
+			return fmt.Errorf(
+				"wait for Kafka topic %q metadata: expected %d partitions, observed %d",
+				topic,
+				cfg.TopicPartitions,
+				len(partitions),
+			)
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
+func kafkaTopicHasPartitions(partitions []kafka.Partition, topic string, expected int) bool {
+	seen := make(map[int]struct{}, expected)
+	for _, partition := range partitions {
+		if partition.Topic == topic {
+			seen[partition.ID] = struct{}{}
+		}
+	}
+	return len(seen) >= expected
 }

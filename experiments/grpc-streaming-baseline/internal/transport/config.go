@@ -55,6 +55,17 @@ type KafkaConfig struct {
 	TransformerToSinkTopic     string
 	TopicPartitions            int
 	TopicReplicationFactor     int
+	BatchSize                  int
+	BatchBytes                 int
+	BatchTimeout               time.Duration
+	CommitInterval             time.Duration
+	QueueCapacity              int
+	ReadMinBytes               int
+	ReadMaxBytes               int
+	ReadMaxWait                time.Duration
+	RequiredAcks               string
+	Compression                string
+	KeyMode                    string
 }
 
 func SupportedModes() []string {
@@ -167,12 +178,73 @@ func LoadKafkaConfig() KafkaConfig {
 	if err != nil || topicReplicationFactor <= 0 {
 		topicReplicationFactor = 1
 	}
+	batchSize, err := config.Int("KAFKA_BATCH_SIZE", 256)
+	if err != nil || batchSize <= 0 {
+		batchSize = 256
+	}
+	batchBytes, err := config.Int("KAFKA_BATCH_BYTES", 1024*1024)
+	if err != nil || batchBytes <= 0 {
+		batchBytes = 1024 * 1024
+	}
+	batchTimeout, err := config.DurationMillis("KAFKA_BATCH_TIMEOUT_MS", 5*time.Millisecond)
+	if err != nil || batchTimeout <= 0 {
+		batchTimeout = 5 * time.Millisecond
+	}
+	commitInterval, err := config.DurationMillis("KAFKA_COMMIT_INTERVAL_MS", 250*time.Millisecond)
+	if err != nil || commitInterval < 0 {
+		commitInterval = 250 * time.Millisecond
+	}
+	queueCapacity, err := config.Int("KAFKA_QUEUE_CAPACITY", 512)
+	if err != nil || queueCapacity <= 0 {
+		queueCapacity = 512
+	}
+	readMinBytes, err := config.Int("KAFKA_FETCH_MIN_BYTES", 64*1024)
+	if err != nil || readMinBytes <= 0 {
+		readMinBytes = 64 * 1024
+	}
+	readMaxBytes, err := config.Int("KAFKA_FETCH_MAX_BYTES", 64*1024*1024)
+	if err != nil || readMaxBytes < readMinBytes {
+		readMaxBytes = 64 * 1024 * 1024
+	}
+	readMaxWait, err := config.DurationMillis("KAFKA_FETCH_MAX_WAIT_MS", 250*time.Millisecond)
+	if err != nil || readMaxWait <= 0 {
+		readMaxWait = 250 * time.Millisecond
+	}
+	requiredAcks := strings.ToLower(config.String("KAFKA_REQUIRED_ACKS", "one"))
+	switch requiredAcks {
+	case "none", "one", "all":
+	default:
+		requiredAcks = "one"
+	}
+	compression := strings.ToLower(config.String("KAFKA_COMPRESSION", "none"))
+	switch compression {
+	case "none", "gzip", "snappy", "lz4", "zstd":
+	default:
+		compression = "none"
+	}
+	keyMode := strings.ToLower(config.String("KAFKA_KEY_MODE", "worker"))
+	switch keyMode {
+	case "worker", "run", "none":
+	default:
+		keyMode = "worker"
+	}
 	return KafkaConfig{
 		Brokers:                    brokers,
 		ProducerToTransformerTopic: config.String("KAFKA_PRODUCER_TO_TRANSFORMER_TOPIC", "producer-to-transformer"),
 		TransformerToSinkTopic:     config.String("KAFKA_TRANSFORMER_TO_SINK_TOPIC", "transformer-to-sink"),
 		TopicPartitions:            topicPartitions,
 		TopicReplicationFactor:     topicReplicationFactor,
+		BatchSize:                  batchSize,
+		BatchBytes:                 batchBytes,
+		BatchTimeout:               batchTimeout,
+		CommitInterval:             commitInterval,
+		QueueCapacity:              queueCapacity,
+		ReadMinBytes:               readMinBytes,
+		ReadMaxBytes:               readMaxBytes,
+		ReadMaxWait:                readMaxWait,
+		RequiredAcks:               requiredAcks,
+		Compression:                compression,
+		KeyMode:                    keyMode,
 	}
 }
 
