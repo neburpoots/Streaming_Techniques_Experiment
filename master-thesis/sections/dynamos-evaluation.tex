@@ -9,7 +9,7 @@ The primary benchmark uses the \texttt{dataThroughTtp} archetype with a single d
 
 Each request executes a bulk projection query over the large \texttt{PersonenLarge} and \texttt{AanstellingenLarge} tables and joins them on \texttt{Unieknr}. The result is limited to 50{,}000, 100{,}000, or 250{,}000 rows. The chunked variants use 5{,}000 rows per SQL chunk, which gives 10, 20, and 50 total chunks respectively. This value is an experimental configuration rather than a claimed optimum: it is large enough to avoid turning the benchmark into a per-row messaging test and small enough to expose partial progress. In the saved 50k-row bulk output, one 5{,}000-row chunk serialized as a DYNAMOS protobuf \texttt{MicroserviceCommunication} is approximately 280{,}255 bytes, or 273.7~KiB.
 
-Four implementations are compared. Classic unary is taken from the original DYNAMOS \texttt{main} branch at commit \texttt{a2d9531}. The chunked unary, intra-job gRPC streaming, and RabbitMQ Streams variants are taken from the streaming implementation branch at commit \texttt{923b018}. Every primary \texttt{dataThroughTtp} cell uses 10 warm repetitions. Runs are accepted only when row counts match the expected limit and canonical content hashes validate the returned content. For chunked variants, the benchmark also requires partial result events before completion.
+Four implementations are compared. Classic unary is taken from the original DYNAMOS \texttt{main} branch at commit \texttt{a2d9531}. The chunked unary, intra-job gRPC streaming, and RabbitMQ Streams variants are taken from the streaming implementation branch at commit \texttt{923b018}. Every primary \texttt{dataThroughTtp} cell uses 20 warm repetitions. Runs are accepted only when row counts match the expected limit and canonical content hashes validate the returned content. For chunked variants, the benchmark also requires partial result events before completion.
 
 Two focused scenario checks are added after the primary benchmark. The first changes the archetype to \texttt{computeToData}. The second keeps \texttt{dataThroughTtp} but uses two data providers, \texttt{UVA,VU}. These checks test whether chunk preservation remains compatible when the generated job topology and aggregation path differ from the primary single-provider TTP case.
 
@@ -20,7 +20,7 @@ Resource usage is sampled from Kubernetes once per second across the relevant DY
 \begin{table}[!t]
     \centering
     \scriptsize
-    \caption{Average completion latency for DYNAMOS bulk retrieval. All cells completed 10/10 valid repetitions.}
+    \caption{Average completion latency for DYNAMOS bulk retrieval. All cells completed 20/20 valid repetitions.}
     \label{tab:dynamos-rq3-latency}
     \setlength{\tabcolsep}{3pt}
     \resizebox{\columnwidth}{!}{%
@@ -28,10 +28,10 @@ Resource usage is sampled from Kubernetes once per second across the relevant DY
         \toprule
         Implementation & 50k rows & 100k rows & 250k rows \\
         \midrule
-        Classic unary & 14.529s & 22.791s & 34.865s \\
-        Chunked unary & 8.568s & 7.869s & 14.357s \\
-        Intra-job gRPC streaming & 8.431s & 11.074s & 15.257s \\
-        RabbitMQ Streams boundary & 7.647s & 9.464s & 17.302s \\
+        Classic unary & 13.988s & 19.343s & 29.078s \\
+        Chunked unary & 6.536s & 6.754s & 11.684s \\
+        Intra-job gRPC streaming & 6.346s & 8.255s & 12.319s \\
+        RabbitMQ Streams boundary & 5.948s & 7.727s & 14.066s \\
         \bottomrule
     \end{tabular}}
 \end{table}
@@ -55,13 +55,13 @@ Resource usage is sampled from Kubernetes once per second across the relevant DY
             label style={font=\scriptsize},
             legend style={font=\scriptsize}
         ]
-            \addplot+[mark=*] coordinates {(50000,14.529) (100000,22.791) (250000,34.865)};
+            \addplot+[mark=*] coordinates {(50000,13.988) (100000,19.343) (250000,29.078)};
             \addlegendentry{Classic unary}
-            \addplot+[mark=square*] coordinates {(50000,8.568) (100000,7.869) (250000,14.357)};
+            \addplot+[mark=square*] coordinates {(50000,6.536) (100000,6.754) (250000,11.684)};
             \addlegendentry{Chunked unary}
-            \addplot+[mark=triangle*] coordinates {(50000,8.431) (100000,11.074) (250000,15.257)};
+            \addplot+[mark=triangle*] coordinates {(50000,6.346) (100000,8.255) (250000,12.319)};
             \addlegendentry{Intra-job gRPC streaming}
-            \addplot+[mark=diamond*] coordinates {(50000,7.647) (100000,9.464) (250000,17.302)};
+            \addplot+[mark=diamond*] coordinates {(50000,5.948) (100000,7.727) (250000,14.066)};
             \addlegendentry{RabbitMQ Streams boundary}
         \end{axis}
     \end{tikzpicture}
@@ -69,9 +69,9 @@ Resource usage is sampled from Kubernetes once per second across the relevant DY
     \label{fig:dynamos-rq3-latency}
 \end{figure*}
 
-Table~\ref{tab:dynamos-rq3-latency} and Figure~\ref{fig:dynamos-rq3-latency} show that all three chunk-aware variants reduce average completion latency compared with classic unary. At 250k rows, chunked unary is 2.43x faster than classic unary, intra-job gRPC streaming is 2.29x faster, and the RabbitMQ Streams boundary variant is 2.01x faster. The 100k row case is especially favourable to chunked unary, which finishes in 7.869s compared with 22.791s for classic unary. The relatively small increase of the chunked variants between 50k and 100k rows is explained by the fixed control-path cost analysed with Table~\ref{tab:dynamos-rq3-first}: at these sizes much of the measured time is policy handling, orchestration, and job startup rather than transfer.
+Table~\ref{tab:dynamos-rq3-latency} and Figure~\ref{fig:dynamos-rq3-latency} show that all three chunk-aware variants reduce average completion latency compared with classic unary. At 250k rows, chunked unary is 2.49x faster than classic unary, intra-job gRPC streaming is 2.36x faster, and the RabbitMQ Streams boundary variant is 2.07x faster. The 100k row case is especially favourable to chunked unary, which finishes in 6.754s compared with 19.343s for classic unary. The relatively small increase of the chunked variants between 50k and 100k rows is explained by the fixed control-path cost analysed with Table~\ref{tab:dynamos-rq3-first}: at these sizes much of the measured time is policy handling, orchestration, and job startup rather than transfer.
 
-The average values include the long-tail runs that occur in the local Kubernetes deployment, so they are more conservative than the medians. At 250k rows, classic unary ranged from 29.615s to 50.854s. Chunked unary ranged from 10.985s to 23.233s, intra-job gRPC streaming from 10.566s to 23.311s, and RabbitMQ Streams from 12.724s to 26.520s. This spread shows why repeated runs are necessary. The source of this large variance is due to Kubernetes and DYNAMOS irregularities, not the actual transport layer.
+The average values include the long-tail runs that occur in the local Kubernetes deployment, so they are more conservative than the medians. At 250k rows, classic unary ranged from 21.901s to 50.854s. Chunked unary ranged from 7.544s to 23.233s, intra-job gRPC streaming from 7.490s to 23.311s, and RabbitMQ Streams from 9.968s to 26.520s. This spread shows why repeated runs are necessary. The source of this large variance is due to Kubernetes and DYNAMOS irregularities, not the actual transport layer.
 
 \subsection{Additional scenario checks}
 
@@ -86,15 +86,15 @@ The average values include the long-tail runs that occur in the local Kubernetes
         \toprule
         Scenario & Providers & Rows per provider & Total rows & Classic unary & Chunked unary & Intra-job gRPC streaming & RabbitMQ Streams boundary \\
         \midrule
-        \texttt{computeToData} & \texttt{UVA,VU} & 50k & 100k & 9.660s & 5.584s & 4.895s & 5.371s \\
-        \texttt{computeToData} & \texttt{UVA,VU} & 250k & 500k & 16.290s & 10.913s & 10.876s & 13.140s \\
-        \texttt{dataThroughTtp} & \texttt{UVA,VU} & 50k & 100k & 13.163s & 5.820s & 5.322s & 7.226s \\
-        \texttt{dataThroughTtp} & \texttt{UVA,VU} & 250k & 500k & 33.920s & 13.444s & 12.928s & 14.883s \\
+        \texttt{computeToData} & \texttt{UVA,VU} & 50k & 100k & 9.622s & 5.178s & 4.528s & 4.586s \\
+        \texttt{computeToData} & \texttt{UVA,VU} & 250k & 500k & 16.620s & 9.182s & 7.989s & 10.289s \\
+        \texttt{dataThroughTtp} & \texttt{UVA,VU} & 50k & 100k & 13.750s & 5.196s & 4.474s & 6.492s \\
+        \texttt{dataThroughTtp} & \texttt{UVA,VU} & 250k & 500k & 35.396s & 12.032s & 11.165s & 15.618s \\
         \bottomrule
     \end{tabular}}
 \end{table*}
 
-Table~\ref{tab:dynamos-rq3-scenarios} shows that the chunk-aware paths are not limited to the primary single-provider TTP case. For \texttt{computeToData}, the improvement is smaller because the request avoids part of the TTP aggregation path, but the chunked variants still complete faster than classic unary at both tested sizes. For multi-provider \texttt{dataThroughTtp}, the improvement remains large: at 250k rows per provider, the classic baseline returns 500k total rows in 33.920s, while the chunked variants complete in 12.928s to 14.883s.
+Table~\ref{tab:dynamos-rq3-scenarios} shows that the chunk-aware paths are not limited to the primary single-provider TTP case. For \texttt{computeToData}, the improvement is smaller because the request avoids part of the TTP aggregation path, but the chunked variants still complete faster than classic unary at both tested sizes. For multi-provider \texttt{dataThroughTtp}, the improvement remains large: at 250k rows per provider, the classic baseline returns 500k total rows in 35.396s, while the chunked variants complete in 11.165s to 15.618s.
 
 These scenario checks are compatibility-oriented rather than an exhaustive benchmark matrix. Their value is that they show the implementation still works when the archetype and provider count change, and that the speedup is strongest when DYNAMOS must move large row sets through the TTP path.
 
@@ -111,23 +111,23 @@ These scenario checks are compatibility-oriented rather than an exhaustive bench
         \toprule
         Implementation & Rows & First result & Done & Post-first & Partial chunks \\
         \midrule
-        Classic unary & 50k & 14.529s & 14.529s & 0.000s & 0 \\
-        Classic unary & 100k & 22.791s & 22.791s & 0.000s & 0 \\
-        Classic unary & 250k & 34.865s & 34.865s & 0.000s & 0 \\
-        Chunked unary & 50k & 7.712s & 8.568s & 0.856s & 9 \\
-        Chunked unary & 100k & 6.056s & 7.869s & 1.812s & 19 \\
-        Chunked unary & 250k & 6.492s & 14.357s & 7.866s & 49 \\
-        Intra-job gRPC streaming & 50k & 7.414s & 8.431s & 1.017s & 9 \\
-        Intra-job gRPC streaming & 100k & 8.816s & 11.074s & 2.259s & 19 \\
-        Intra-job gRPC streaming & 250k & 8.032s & 15.257s & 7.226s & 49 \\
-        RabbitMQ Streams boundary & 50k & 6.812s & 7.647s & 0.835s & 9 \\
-        RabbitMQ Streams boundary & 100k & 6.997s & 9.464s & 2.467s & 19 \\
-        RabbitMQ Streams boundary & 250k & 7.630s & 17.302s & 9.672s & 49 \\
+        Classic unary & 50k & 13.988s & 13.988s & 0.000s & 0 \\
+        Classic unary & 100k & 19.343s & 19.343s & 0.000s & 0 \\
+        Classic unary & 250k & 29.078s & 29.078s & 0.000s & 0 \\
+        Chunked unary & 50k & 5.778s & 6.536s & 0.758s & 9 \\
+        Chunked unary & 100k & 4.977s & 6.754s & 1.777s & 19 \\
+        Chunked unary & 250k & 5.145s & 11.684s & 6.539s & 49 \\
+        Intra-job gRPC streaming & 50k & 5.574s & 6.346s & 0.772s & 9 \\
+        Intra-job gRPC streaming & 100k & 6.250s & 8.255s & 2.005s & 19 \\
+        Intra-job gRPC streaming & 250k & 6.017s & 12.319s & 6.302s & 49 \\
+        RabbitMQ Streams boundary & 50k & 5.184s & 5.948s & 0.763s & 9 \\
+        RabbitMQ Streams boundary & 100k & 5.416s & 7.727s & 2.311s & 19 \\
+        RabbitMQ Streams boundary & 250k & 5.613s & 14.066s & 8.453s & 49 \\
         \bottomrule
     \end{tabular}}
 \end{table}
 
-Table~\ref{tab:dynamos-rq3-first} shows the qualitative benefit of chunking. Classic unary cannot expose progress: the first result is the final result. The chunked variants emit partial results substantially earlier. At 250k rows, the first partial result appears after about 6.5s to 8.0s on average, while completion follows after 14.4s to 17.3s. The post-first column estimates how much of the measured time remains after the first visible chunk. It is not a pure network-transfer measurement, because the first chunk still includes policy handling, job creation, and initial SQL execution. It is nevertheless useful because it separates request startup from the observable chunk-drain phase. Read together with Table~\ref{tab:dynamos-rq3-latency}, this decomposition shows that the end-to-end ratios understate the data-path difference: every chunked variant spends roughly 6--8~s before the first chunk, which is the shared policy, orchestration, and job-startup cost. End-to-end remains the headline metric since it is what a DYNAMOS client experiences, but the time-to-first-result values show that chunking also changes the interaction pattern: a client can observe progress and begin processing data before the full result has been materialized. This decomposition also matters for diagnosing whether a large request is still making progress.
+Table~\ref{tab:dynamos-rq3-first} shows the qualitative benefit of chunking. Classic unary cannot expose progress: the first result is the final result. The chunked variants emit partial results substantially earlier. At 250k rows, the first partial result appears after about 5.1s to 6.0s on average, while completion follows after 11.7s to 14.1s. The post-first column estimates how much of the measured time remains after the first visible chunk. It is not a pure network-transfer measurement, because the first chunk still includes policy handling, job creation, and initial SQL execution. It is nevertheless useful because it separates request startup from the observable chunk-drain phase. Read together with Table~\ref{tab:dynamos-rq3-latency}, this decomposition shows that the end-to-end ratios understate the data-path difference: every chunked variant spends roughly 5--6~s before the first chunk, which is the shared policy, orchestration, and job-startup cost. End-to-end remains the headline metric since it is what a DYNAMOS client experiences, but the time-to-first-result values show that chunking also changes the interaction pattern: a client can observe progress and begin processing data before the full result has been materialized. This decomposition also matters for diagnosing whether a large request is still making progress.
 
 \subsection{Resource usage}
 
@@ -142,16 +142,16 @@ Table~\ref{tab:dynamos-rq3-first} shows the qualitative benefit of chunking. Cla
         \toprule
         Implementation & Rows & Peak CPU & Peak memory \\
         \midrule
-        Classic unary & 50k & 782m & 1{,}571 MiB \\
+        Classic unary & 50k & 958m & 1{,}571 MiB \\
         Classic unary & 100k & 813m & 2{,}046 MiB \\
         Classic unary & 250k & 1{,}198m & 3{,}695 MiB \\
-        Chunked unary & 50k & 403m & 1{,}151 MiB \\
-        Chunked unary & 100k & 469m & 1{,}723 MiB \\
+        Chunked unary & 50k & 1{,}059m & 1{,}151 MiB \\
+        Chunked unary & 100k & 961m & 1{,}723 MiB \\
         Chunked unary & 250k & 1{,}097m & 1{,}378 MiB \\
-        Intra-job gRPC streaming & 50k & 351m & 1{,}198 MiB \\
-        Intra-job gRPC streaming & 100k & 479m & 1{,}230 MiB \\
+        Intra-job gRPC streaming & 50k & 1{,}180m & 1{,}198 MiB \\
+        Intra-job gRPC streaming & 100k & 1{,}154m & 1{,}230 MiB \\
         Intra-job gRPC streaming & 250k & 1{,}418m & 1{,}495 MiB \\
-        RabbitMQ Streams boundary & 50k & 457m & 1{,}161 MiB \\
+        RabbitMQ Streams boundary & 50k & 684m & 1{,}161 MiB \\
         RabbitMQ Streams boundary & 100k & 982m & 1{,}436 MiB \\
         RabbitMQ Streams boundary & 250k & 1{,}687m & 1{,}715 MiB \\
         \bottomrule
@@ -183,4 +183,3 @@ The answer to RQ3 is that the implemented chunk-aware DYNAMOS data paths improve
 \subsection{Threats to validity}
 
 The RQ3 evidence has five main limits. First, the benchmark runs on a local Kubernetes deployment, so it does not capture cross-site latency, bandwidth variation, or independent administrative domains. Second, the additional scenario checks cover two alternative request shapes, not the full space of DYNAMOS archetypes, query forms, and provider combinations. They support compatibility, but they do not replace a broader workload campaign. Third, resource usage is sampled once per second, so peak CPU and memory values can miss short spikes. Fourth, the fixed 5{,}000-row chunk size is justified experimentally but not optimized across all workloads. Fifth, the measured request window includes policy handling, orchestration, generated job startup, and response serialization. That is fair for comparing user-visible DYNAMOS behaviour, but it compresses the apparent transfer-only speedup because fixed control-path costs remain present in every implementation.
-

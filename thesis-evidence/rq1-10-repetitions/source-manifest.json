@@ -1,0 +1,62 @@
+[
+  {
+    "copied_file": "source-results/01-rq1-concept5-clean-no256k-20260615-synthetic-clean-summary.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-concept5-clean-no256k-20260615-synthetic-clean-summary.csv",
+    "sha256": "a7da12a10719021df13b688dcf0610982a96c9aed15608a00265f8335bad827e"
+  },
+  {
+    "copied_file": "source-results/02-rq1-concept5-scenarios-no256k-20260616-synthetic-continuous-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-concept5-scenarios-no256k-20260616-synthetic-continuous-summary-aggregated.csv",
+    "sha256": "222add69792ef2afb467806d229fc10bc3ff7fed09dc66d9c896a5cf89fd9911"
+  },
+  {
+    "copied_file": "source-results/03-rq1-concept5-scenarios-no256k-20260616-synthetic-backpressure-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-concept5-scenarios-no256k-20260616-synthetic-backpressure-summary-aggregated.csv",
+    "sha256": "a54c99f49b52ab78a716ba87d20fd9e341f004a45d4a9c3a7397088430fd7751"
+  },
+  {
+    "copied_file": "source-results/04-rq1-concept5-scenarios-no256k-20260616-synthetic-recovery-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-concept5-scenarios-no256k-20260616-synthetic-recovery-summary-aggregated.csv",
+    "sha256": "1e11028a5533a9fcff8cbfef90b3b40306587c1429924395d2a0a8b9a7496830"
+  },
+  {
+    "copied_file": "source-results/05-rq1-nats-fetchwait-20260621-synthetic-clean-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-nats-fetchwait-20260621-synthetic-clean-summary-aggregated.csv",
+    "sha256": "876f431fc33ade4ac95eeb8b95bb63497a31bb05bfd882ed743553e412bd7ba7"
+  },
+  {
+    "copied_file": "source-results/06-rq1-nats-fetchwait-20260621-synthetic-continuous-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-nats-fetchwait-20260621-synthetic-continuous-summary-aggregated.csv",
+    "sha256": "e7114c7c22d5360baa270c2ddf5fb1c64ffe209b1a143ca9398374671379e224"
+  },
+  {
+    "copied_file": "source-results/07-rq1-nats-fetchwait-20260621-synthetic-backpressure-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-nats-fetchwait-20260621-synthetic-backpressure-summary-aggregated.csv",
+    "sha256": "2827b39802a58cc62c4d12c1e8e91038ee4e9f23960d59e269514c9291ce44d9"
+  },
+  {
+    "copied_file": "source-results/08-rq1-nats-fetchwait-20260621-synthetic-recovery-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-nats-fetchwait-20260621-synthetic-recovery-summary-aggregated.csv",
+    "sha256": "daacf20c4a48cbe58c3c45e88201b8fafc5b949cb9aa527aaa54f100072fae14"
+  },
+  {
+    "copied_file": "source-results/09-rq1-extra5-no256k-20260709-synthetic-clean-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-extra5-no256k-20260709-synthetic-clean-summary-aggregated.csv",
+    "sha256": "fb8b14293584c7327e2ec8563cbe6a82edf0e9320fe2b97ad90096a734fb7703"
+  },
+  {
+    "copied_file": "source-results/10-rq1-extra5-no256k-20260709-synthetic-continuous-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-extra5-no256k-20260709-synthetic-continuous-summary-aggregated.csv",
+    "sha256": "274c29a39573a39de79ed8d93f7f67b51eb24467be2117363ba998c031f84f69"
+  },
+  {
+    "copied_file": "source-results/11-rq1-extra5-no256k-20260709-synthetic-backpressure-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-extra5-no256k-20260709-synthetic-backpressure-summary-aggregated.csv",
+    "sha256": "bad4be905f9502fd7c46947ccec79f1d8ee4b07389a34178bcb1cf5bff57b7d6"
+  },
+  {
+    "copied_file": "source-results/12-rq1-extra5-no256k-20260709-synthetic-recovery-summary-aggregated.csv",
+    "original_path": "/home/nebur/Streaming_Techniques_Experiment/experiments/grpc-streaming-baseline/results/rq1-extra5-no256k-20260709-synthetic-recovery-summary-aggregated.csv",
+    "sha256": "313f070e0707fd01084213b8cd470574e0cc2dbbc0ecd91f503af9c16fcdd4a6"
+  }
+]

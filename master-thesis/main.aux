@@ -73,18 +73,18 @@
 \newlabel{tab:phase1-scenario-map}{{I}{7}{}{table.1}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}2}Comparison scope}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}3}Clean bulk-transfer matrix}{7}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Single-node synthetic-clean summary across six transports, averaged over five repetitions, four payload sizes, and four concurrency levels.}}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Single-node synthetic-clean summary across six transports, averaged over ten repetitions, four payload sizes, and four concurrency levels.}}{8}{}\protected@file@percent }
 \newlabel{tab:grpc-preliminary-results}{{II}{8}{}{table.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Continuous steady-rate scenario: single-node results averaged over five repetitions (1\,KiB payload, 1{,}000 msg/s target). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Continuous steady-rate scenario: single-node results averaged over ten repetitions (1\,KiB payload, 1{,}000 msg/s target). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}}{8}{}\protected@file@percent }
 \newlabel{tab:grpc-continuous-results}{{III}{8}{}{table.3}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}4}Continuous steady-rate scenario}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Backpressure scenario: single-node results averaged over five repetitions (1\,KiB, concurrency 8, 4{,}000 msg/s target, 2\,ms sink delay). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Backpressure scenario: single-node results averaged over ten repetitions (1\,KiB, concurrency 8, 4{,}000 msg/s target, 2\,ms sink delay). Throughput in msg/s; latency, inter-arrival, and jitter values in milliseconds.}}{8}{}\protected@file@percent }
 \newlabel{tab:grpc-backpressure-results}{{IV}{8}{}{table.4}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}5}Backpressure scenario}{8}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}6}Recovery scenario}{8}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-F}7}Discussion}{9}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Threats to Validity}{9}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Recovery scenario: single-node results averaged over five repetitions (4\,KiB, concurrency 8, 2{,}000 msg/s, transformer restart at 3\,s). Throughput values are in msg/s; time, latency, and drain values are in milliseconds. Sustained recovery is the first five complete one-second buckets at or above 80\% of target. Dashes indicate that the value was not observed.}}{9}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Recovery scenario: single-node results averaged over ten repetitions (4\,KiB, concurrency 8, 2{,}000 msg/s, transformer restart at 3\,s). Throughput values are in msg/s; time, latency, and drain values are in milliseconds. Sustained recovery is the first five complete one-second buckets at or above 80\% of target. Dashes indicate that the value was not observed.}}{9}{}\protected@file@percent }
 \newlabel{tab:grpc-recovery-results}{{V}{9}{}{table.5}{}}
 \citation{stutterheim2023thesis}
 \citation{dynamosMainCommit2026}
@@ -106,7 +106,7 @@
 \newlabel{sec:dynamos-rq3}{{V}{12}{}{section.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Benchmark method}{12}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Completion latency}{13}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Average completion latency for DYNAMOS bulk retrieval. All cells completed 10/10 valid repetitions.}}{13}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Average completion latency for DYNAMOS bulk retrieval. All cells completed 20/20 valid repetitions.}}{13}{}\protected@file@percent }
 \newlabel{tab:dynamos-rq3-latency}{{VII}{13}{}{table.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Additional scenario checks}{13}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Time to first result}{13}{}\protected@file@percent }
@@ -186,13 +186,13 @@
 \newlabel{tab:dynamos-rq3-failure-modes}{{XIV}{20}{}{table.14}{}}
 \@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  D: Detailed Clean-Matrix Results}{21}{}\protected@file@percent }
 \newlabel{app:clean-matrix-details}{{D}{21}{}{section.Appendix.D}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XV}{\ignorespaces Synthetic bulk-transfer throughput by message size, averaged over five repetitions and concurrency levels 1, 4, 8, and 16.}}{21}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {XV}{\ignorespaces Synthetic bulk-transfer throughput by message size, averaged over ten repetitions and concurrency levels 1, 4, 8, and 16.}}{21}{}\protected@file@percent }
 \newlabel{tab:grpc-per-size}{{XV}{21}{}{table.15}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XVI}{\ignorespaces Detailed synthetic-clean message throughput (msg/s) by payload size and concurrency, averaged over five repetitions.}}{21}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {XVI}{\ignorespaces Detailed synthetic-clean message throughput (msg/s) by payload size and concurrency, averaged over ten repetitions.}}{21}{}\protected@file@percent }
 \newlabel{tab:appendix-clean-throughput}{{XVI}{21}{}{table.16}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XVII}{\ignorespaces Detailed synthetic-clean data throughput (MiB/s) by payload size and concurrency, averaged over five repetitions.}}{21}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {XVII}{\ignorespaces Detailed synthetic-clean data throughput (MiB/s) by payload size and concurrency, averaged over ten repetitions.}}{21}{}\protected@file@percent }
 \newlabel{tab:appendix-clean-mib}{{XVII}{21}{}{table.17}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XVIII}{\ignorespaces Detailed synthetic-clean $p_{95}$ latency (ms) by payload size and concurrency, averaged over five repetitions.}}{22}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {XVIII}{\ignorespaces Detailed synthetic-clean $p_{95}$ latency (ms) by payload size and concurrency, averaged over ten repetitions.}}{22}{}\protected@file@percent }
 \newlabel{tab:appendix-clean-p95}{{XVIII}{22}{}{table.18}{}}
 \@writefile{toc}{\contentsline {section}{Appendix\nobreakspace  E: Resource Utilisation Details}{23}{}\protected@file@percent }
 \newlabel{app:resource-details}{{E}{23}{}{section.Appendix.E}{}}

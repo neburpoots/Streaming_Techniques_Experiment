@@ -10,7 +10,7 @@ Many such systems can be described through data-sharing archetypes. These archet
 
 \section{DYNAMOS as Case Study}
 
-Stutterheim~\cite{stutterheim2023thesis} and Stutterheim et al.~\cite{stutterheim2023icsa} describe DYNAMOS as a dynamically adaptive microservice-based middleware for data exchange systems. DYNAMOS translates a policy-approved request into a generated microservice chain. Agents and sidecars mediate communication between administrative domains, while short-lived generated jobs execute the selected data-sharing archetype.
+DYNAMOS~\cite{stutterheim2023thesis,stutterheim2023icsa} translates a policy-approved request into a generated microservice chain. Agents and sidecars mediate communication between administrative domains, while short-lived generated jobs execute the selected data-sharing archetype.
 
 DYNAMOS is a useful case study because it combines three concerns that are usually studied separately. First, it has a policy-controlled orchestration path that decides which exchange is allowed. Second, it creates ephemeral execution units rather than relying on one static pipeline. Third, it can move large intermediate results through several services and agent boundaries. These properties make streaming integration more demanding than adding a stream API to a fixed producer-consumer pair.
 

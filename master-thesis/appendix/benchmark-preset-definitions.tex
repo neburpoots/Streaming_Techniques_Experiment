@@ -14,10 +14,10 @@ This appendix documents the complete preset definitions used in the benchmark ev
         \toprule
         Preset & Key parameters & Purpose \\
         \midrule
-        \texttt{synthetic-clean} & Synthetic payloads from 256 B to 16 KiB; concurrency 1--16; five repetitions; no injected failure & Baseline bulk-transfer throughput, latency, and correctness matrix \\
-        \texttt{synthetic-continuous} & 1 KiB payloads, 1{,}000 msg/s target, concurrency 4 and 8, five repetitions & Steady-rate pacing and jitter comparison \\
-        \texttt{synthetic-backpressure} & 1 KiB payloads, 4{,}000 msg/s target, concurrency 8, 2 ms sink delay, five repetitions & Slow-consumer overload and queueing behaviour \\
-        \texttt{synthetic-recovery} & 4 KiB payloads, 2{,}000 msg/s target, concurrency 8, transformer restart after 3 s, 120 retries at 250 ms backoff, five repetitions & Restart recovery, replay, and continuity analysis \\
+        \texttt{synthetic-clean} & Synthetic payloads from 256 B to 16 KiB; concurrency 1--16; ten repetitions; no injected failure & Baseline bulk-transfer throughput, latency, and correctness matrix \\
+        \texttt{synthetic-continuous} & 1 KiB payloads, 1{,}000 msg/s target, concurrency 4 and 8, ten repetitions & Steady-rate pacing and jitter comparison \\
+        \texttt{synthetic-backpressure} & 1 KiB payloads, 4{,}000 msg/s target, concurrency 8, 2 ms sink delay, ten repetitions & Slow-consumer overload and queueing behaviour \\
+        \texttt{synthetic-recovery} & 4 KiB payloads, 2{,}000 msg/s target, concurrency 8, transformer restart after 3 s, 120 retries at 250 ms backoff, ten repetitions & Restart recovery, replay, and continuity analysis \\
         \bottomrule
     \end{tabularx}
 \end{table}

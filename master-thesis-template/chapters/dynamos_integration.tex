@@ -57,23 +57,27 @@ DYNAMOS separates the control path from the data path. A client request first pa
 
 Figure~\ref{fig:dynamos-rq2-path} shows the boundary that matters for the implementation. In the original path, a large result can be rebuilt several times before the client sees anything: inside the SQL response, inside the generated service chain, inside the agent response, and again at the gateway. The streaming implementation therefore treats chunk preservation as the central requirement. A transport is only useful for this workload if the first rows can leave the provider path before the final rows have been read and serialised.
 
-The implementation should not be a special case for one benchmark request. DYNAMOS supports multiple archetypes and multiple data providers, so a chunk-aware path must keep existing request shapes valid. The primary evaluation uses \texttt{dataThroughTtp} with one provider to isolate the large-result bottleneck. RQ3 then adds focused checks for \texttt{computeToData} and for \texttt{dataThroughTtp} with two providers, because those scenarios exercise different parts of the generated job and aggregation path.
+The implementation should not be a special case for one benchmark request. DYNAMOS supports multiple archetypes and multiple data providers, so a chunk-aware path must keep existing request shapes valid. The primary evaluation uses \texttt{dataThroughTtp} with one provider to isolate the large-result bottleneck. RQ3 then checks the \texttt{computeToData} archetype and a two-provider \texttt{dataThroughTtp} request, because those scenarios exercise different parts of the generated job and aggregation path.
 
 \section{Common Chunk Model}
 
 All chunked variants use the same logical stream model. The SQL query service reads the bulk result in fixed row batches. Each batch carries stream metadata: provider identity, correlation identifier, sequence number, row count, partial or final status, and ordered column names. Listing~\ref{lst:chunk-metadata} shows the logical chunk envelope carried by every chunked message, independent of the transport that moves it. The ordered-column metadata is important because Go protobuf structs can otherwise expose map fields in nondeterministic order, which would make equal results appear different across transports.
 
-% TODO(Ruben): verify field names against proto-files/ on streaming branch commit 923b018 before submission.
 \begin{figure}[!htbp]
+\footnotesize
 \begin{verbatim}
-// Chunk envelope carried with every partial result
-// (streaming branch, commit 923b018)
-provider          string   // data steward that produced the chunk
-correlation_id    string   // ties all chunks of one approved request
-sequence_number   int32    // per-provider chunk order, starting at 1
-row_count         int32    // rows in this chunk
-is_final          bool     // last chunk of this provider's stream
-column_order      []string // deterministic column ordering
+// Request metadata retained on every MicroserviceCommunication
+request_metadata.correlation_id  string
+
+// String metadata added to each chunk (streaming branch, 923b018)
+stream_provider        string // data steward that produced the chunk
+stream_sequence        string // per-provider sequence, starting at 1
+stream_rows_processed  string // cumulative rows emitted
+stream_rows_total      string // expected or final row total
+stream_partial         string // "true" until the final chunk
+stream_final           string // "true" on the final chunk
+stream_batch_id        string // provider and sequence identifier
+stream_columns         string // JSON array preserving column order
 \end{verbatim}
 \caption{Logical chunk metadata shared by all chunk-aware variants. The same envelope travels as repeated unary calls, gRPC stream messages, or RabbitMQ stream records depending on the variant.}
 \label{lst:chunk-metadata}
@@ -126,14 +130,13 @@ The three chunked paths use the streaming implementation branch at commit \textt
 
 These variants are not three independent full-stack streaming systems. They are interventions at different parts of the same DYNAMOS path. The local performance improvement of the RabbitMQ Streams variant is therefore not caused by RabbitMQ Streams alone. It is caused by the common chunk-aware data path, with RabbitMQ Streams adding a different broker representation at the agent boundary.
 
-% TODO(Ruben): verify the per-service checkmarks against the diff of 923b018 vs a2d9531 before submission.
 \begin{table}[!htbp]
     \centering
     \footnotesize
-    \caption{DYNAMOS services modified on the streaming implementation branch (commit \texttt{923b018}) relative to \texttt{main} (commit \texttt{a2d9531}). The policy enforcer and orchestrator are untouched: the control path is preserved by construction.}
+    \caption{DYNAMOS services modified on the streaming implementation branch (commit \texttt{923b018}) relative to \texttt{main} (commit \texttt{a2d9531}). The orchestrator and policy enforcer carry the selected transport, but their policy decision and job-composition responsibilities remain unchanged.}
     \label{tab:services-modified}
     \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{lllc}
+    \begin{tabularx}{\textwidth}{llXc}
         \toprule
         Service & Language & Role in the chunked path & Modified \\
         \midrule
@@ -143,8 +146,8 @@ These variants are not three independent full-stack streaming systems. They are 
         \texttt{sidecar} & Go & Carries chunk messages; gRPC stream endpoint (intra-job variant) & Yes \\
         \texttt{agent} & Go & Chunk transfer at the agent boundary; RabbitMQ Streams variant & Yes \\
         \texttt{api-gateway} & Go & Emits partial \texttt{providerResult} NDJSON events & Yes \\
-        \texttt{orchestrator} & Go & Generated job composition & No \\
-        \texttt{policy-enforcer} & Go & Policy evaluation and approval & No \\
+        \texttt{orchestrator} & Go & Selects and forwards the requested transport during job composition & Yes \\
+        \texttt{policy-enforcer} & Go & Propagates the transport through the existing approval response & Yes \\
         \bottomrule
-    \end{tabular}
+    \end{tabularx}
 \end{table}
